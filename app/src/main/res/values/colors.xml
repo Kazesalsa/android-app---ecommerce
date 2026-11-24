@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- TikTok Shop / Shopee Mall Inspired Modern Commerce Palette (WCAG >= 4.5:1) -->
+    <color name="primary">#DC2645</color>
+    <color name="primary_pressed">#BE1E3A</color>
+    <color name="primary_soft">#FFF0F3</color>
+    <color name="primary_container">#FFF0F3</color>
+
+    <!-- Secondary Deep Ink & Trust Teal (Freeship / Chính hãng) -->
+    <color name="ink_dark">#161823</color>
+    <color name="ink_dark_end">#25283B</color>
+
+    <color name="teal_trust">#007A67</color>
+    <color name="teal_trust_bg">#E6F7F4</color>
+    <color name="teal_trust_border">#A7E6DB</color>
+
+    <color name="accent">#DC2645</color>
+    <color name="accent_soft">#FFF0F3</color>
+
+    <!-- Crisp Commerce Surfaces: Soft Gray Feed Canvas + Pure White Blocks -->
+    <color name="bg_screen">#F4F4F6</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_subtle">#F4F4F6</color>
+    <color name="bg_section_band">#F4F4F6</color>
+    <color name="border_light">#E5E7EB</color>
+    <color name="divider_hairline">#EFEFF2</color>
+
+    <!-- High-Contrast Ink Hierarchy -->
+    <color name="text_primary">#161823</color>
+    <color name="text_secondary">#525460</color>
+    <color name="text_muted">#6E7180</color>
+
+    <!-- Semantic Accents -->
+    <color name="star_amber">#F59E0B</color>
+    <color name="star_empty">#D4D5DC</color>
+
+    <color name="success_green">#007A67</color>
+    <color name="success_bg">#E6F7F4</color>
+
+    <color name="warning_amber">#B45309</color>
+    <color name="warning_bg">#FFFBEB</color>
+
+    <color name="danger_red">#C81E1E</color>
+    <color name="danger_bg">#FEF2F2</color>
+
+    <color name="badge_bg">#DC2645</color>
+</resources>

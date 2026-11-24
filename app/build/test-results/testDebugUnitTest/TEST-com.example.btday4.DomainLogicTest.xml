@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.btday4.DomainLogicTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-24T05:19:23.309Z" hostname="archlinux" time="0.016">
+  <properties/>
+  <testcase name="ratingSummaryComputesAverageAndDistributionAccurately" classname="com.example.btday4.DomainLogicTest" time="0.003"/>
+  <testcase name="profileCompletionTracksMissingFieldsAndReaches100Percent" classname="com.example.btday4.DomainLogicTest" time="0.003"/>
+  <testcase name="formatUtilsComputesShippingDiscountAndInitials" classname="com.example.btday4.DomainLogicTest" time="0.0"/>
+  <testcase name="validationUtilsChecksPhoneEmailAndPassword" classname="com.example.btday4.DomainLogicTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

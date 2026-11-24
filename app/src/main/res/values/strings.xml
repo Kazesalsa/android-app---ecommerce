@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">BtDay4 Store</string>
+
+    <!-- Auth -->
+    <string name="hint_username">Tên đăng nhập hoặc email</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="remember_me">Ghi nhớ đăng nhập</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="error_username_empty">Vui lòng nhập tên đăng nhập hoặc email</string>
+    <string name="error_password_empty">Vui lòng nhập mật khẩu</string>
+    <string name="error_password_short">Mật khẩu phải có ít nhất 4 ký tự</string>
+
+    <!-- Navigation -->
+    <string name="nav_products">Cửa hàng</string>
+    <string name="nav_cart">Giỏ hàng</string>
+    <string name="nav_profile">Tài khoản</string>
+
+    <!-- Products -->
+    <string name="products_title">Cửa hàng</string>
+    <string name="search_hint">Tìm điện thoại, laptop, phụ kiện...</string>
+    <string name="empty_products">Không có sản phẩm phù hợp</string>
+    <string name="category_all">Tất cả</string>
+    <string name="clear_filter">Đặt lại bộ lọc</string>
+
+    <!-- Product Detail & Reviews -->
+    <string name="product_detail_title">Chi tiết sản phẩm</string>
+    <string name="section_description">Tổng quan</string>
+    <string name="section_specs">Thông số kỹ thuật</string>
+    <string name="section_reviews">Đánh giá từ khách hàng</string>
+    <string name="btn_write_review">Viết đánh giá</string>
+    <string name="btn_edit_review">Sửa đánh giá</string>
+    <string name="btn_add_to_cart">Thêm vào giỏ</string>
+    <string name="btn_buy_now">Mua ngay</string>
+    <string name="empty_reviews">Chưa có đánh giá nào cho bộ lọc này.</string>
+
+    <!-- Cart & Checkout -->
+    <string name="cart_title">Giỏ hàng</string>
+    <string name="checkout_title">Thanh toán</string>
+    <string name="qr_payment_title">Thanh toán bằng mã QR</string>
+    <string name="btn_checkout">Tiến hành thanh toán</string>
+    <string name="btn_place_order">Đặt hàng</string>
+    <string name="btn_place_order_qr">Tạo mã QR</string>
+    <string name="btn_pay_qr_now">Thanh toán mã QR ngay</string>
+    <string name="free_shipping">Miễn phí</string>
+
+    <!-- Orders -->
+    <string name="orders_title">Đơn hàng của tôi</string>
+    <string name="order_detail_title">Chi tiết đơn hàng</string>
+    <string name="empty_orders">Bạn chưa có đơn hàng nào</string>
+
+    <!-- Profile -->
+    <string name="profile_title">Tài khoản</string>
+    <string name="edit_profile_title">Thông tin cá nhân</string>
+    <string name="change_password_title">Đổi mật khẩu</string>
+    <string name="my_reviews_title">Đánh giá của tôi</string>
+    <string name="profile_personal_info_title">Hồ sơ cá nhân</string>
+    <string name="profile_login_info_title">Phiên đăng nhập</string>
+    <string name="not_updated">Chưa cập nhật</string>
+    <string name="btn_logout">Đăng xuất</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="btn_confirm">Xác nhận</string>
+    <string name="btn_save">Lưu thay đổi</string>
+</resources>

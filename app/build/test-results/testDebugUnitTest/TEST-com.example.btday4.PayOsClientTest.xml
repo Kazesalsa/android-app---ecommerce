@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.btday4.PayOsClientTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-24T05:19:23.327Z" hostname="archlinux" time="0.031">
+  <properties/>
+  <testcase name="parsePaymentResponseHandlesSuccessAndErrorEnvelopes" classname="com.example.btday4.PayOsClientTest" time="0.006"/>
+  <testcase name="signatureMatchesHmacSha256CanonicalSpec" classname="com.example.btday4.PayOsClientTest" time="0.022"/>
+  <testcase name="transferDescriptionIsAsciiSafeAndWithinPayOsLimit" classname="com.example.btday4.PayOsClientTest" time="0.001"/>
+  <testcase name="paymentMethodAndOrderStatusAndBankBinMappingWork" classname="com.example.btday4.PayOsClientTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.btday4.app-mergeDebugResources-43:/values-v18/values-v18.xml",
+            "map": [
+                {
+                    "source": "/home/tan_tai/.gradle/caches/9.6.0/transforms/716d3b4020371626f0700fb2aa299ff8/transformed/appcompat-1.6.1/res/values-v18/values-v18.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "48",
+                        "endOffsets": "99"
+                    }
+                }
+            ]
+        }
+    ]
+}

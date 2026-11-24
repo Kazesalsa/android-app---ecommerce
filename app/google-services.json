@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "183128094259",
+    "project_id": "tantai-dea4b",
+    "storage_bucket": "tantai-dea4b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:183128094259:android:66f7a8913bca15b1449546",
+        "android_client_info": {
+          "package_name": "com.example.btday4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwSB6UH5HS9RQvpyTJHv9UHv-CcU8eY3c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
