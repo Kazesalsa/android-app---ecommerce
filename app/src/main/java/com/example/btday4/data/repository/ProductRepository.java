@@ -5,9 +5,12 @@ import com.example.btday4.data.local.AppDatabase;
 import com.example.btday4.data.local.Product;
 import com.example.btday4.data.local.ProductDao;
 import com.example.btday4.model.ProductWithRating;
+import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.ValidationUtils;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 /**
@@ -15,6 +18,8 @@ import java.util.function.Consumer;
  * and safe remote synchronization without cascading deletes.
  */
 public final class ProductRepository {
+
+    public static final long LEGACY_UNSCALED_PRICE_THRESHOLD = 1_000_000L;
 
     private ProductRepository() {
     }
@@ -39,7 +44,7 @@ public final class ProductRepository {
 
     /**
      * Merges remote Firestore products into Room without replacing rows (avoiding ON DELETE CASCADE)
-     * and preserving rich local fields if remote documents only have legacy fields.
+     * and prevents legacy unscaled remote seed documents from reverting the 100x reduced prices.
      */
     public static void syncFromRemote(
             Context context,
@@ -48,6 +53,10 @@ public final class ProductRepository {
     ) {
         if (remoteProducts == null || remoteProducts.isEmpty()) {
             return;
+        }
+        Set<String> defaultIds = new HashSet<>();
+        for (Product p : createDefaultProducts()) {
+            defaultIds.add(p.getId());
         }
         AppDatabase.runAsync(context, db -> {
             ProductDao dao = db.productDao();
@@ -62,11 +71,20 @@ public final class ProductRepository {
                     }
                     dao.insertSingle(remote);
                 } else {
+                    boolean ignoreLegacyRemotePrice = defaultIds.contains(existing.getId())
+                            && FormatUtils.parseVnd(remote.getPrice()) >= LEGACY_UNSCALED_PRICE_THRESHOLD;
+                    String resolvedPrice = ignoreLegacyRemotePrice
+                            ? existing.getPrice()
+                            : pickNonBlank(remote.getPrice(), existing.getPrice());
+                    String resolvedOriginalPrice = ignoreLegacyRemotePrice
+                            ? existing.getOriginalPrice()
+                            : pickNonBlank(remote.getOriginalPrice(), existing.getOriginalPrice());
+
                     Product merged = new Product(
                             existing.getId(),
                             pickNonBlank(remote.getName(), existing.getName()),
-                            pickNonBlank(remote.getPrice(), existing.getPrice()),
-                            pickNonBlank(remote.getOriginalPrice(), existing.getOriginalPrice()),
+                            resolvedPrice,
+                            resolvedOriginalPrice,
                             pickNonBlank(remote.getShortInfo(), existing.getShortInfo()),
                             pickNonBlank(remote.getCategory(), existing.getCategory()),
                             pickNonBlank(remote.getImageUrl(), existing.getImageUrl()),
@@ -96,8 +114,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "iphone_15",
                 "iPhone 15 128GB",
-                "19.990.000 ₫",
-                "22.990.000 ₫",
+                "199.900 ₫",
+                "229.900 ₫",
                 "Chip A16 Bionic, 6.1\" Super Retina XDR, Camera 48MP, USB-C",
                 "Điện thoại",
                 "https://cdn.tgdd.vn/Products/Images/42/281570/iphone-15-xanh-thumb-600x600.jpg",
@@ -111,8 +129,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "iphone_16_pro_max",
                 "iPhone 16 Pro Max 256GB",
-                "34.490.000 ₫",
-                "34.990.000 ₫",
+                "344.900 ₫",
+                "349.900 ₫",
                 "Chip A18 Pro, 6.9\" ProMotion 120Hz, Khung Titan, Camera 48MP Fusion",
                 "Điện thoại",
                 "https://cdn.tgdd.vn/Products/Images/42/329151/iphone-16-pro-max-sa-mac-thumb-600x600.jpg",
@@ -126,8 +144,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "macbook_air_m3",
                 "MacBook Air 13 inch M3",
-                "27.990.000 ₫",
-                "29.990.000 ₫",
+                "279.900 ₫",
+                "299.900 ₫",
                 "Apple M3 8-core, RAM 16GB, SSD 256GB, Liquid Retina 13.6\"",
                 "Laptop",
                 "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/44/331644/macbook-air-13-inch-m3-tgdd-bac-1-638660181778087730.jpg",
@@ -141,8 +159,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "ipad_air_6",
                 "iPad Air 6 M2 11 inch",
-                "16.990.000 ₫",
-                "18.490.000 ₫",
+                "169.900 ₫",
+                "184.900 ₫",
                 "Chip Apple M2, Liquid Retina 11\", hỗ trợ Apple Pencil Pro",
                 "Tablet",
                 "https://cdn.tgdd.vn/Products/Images/522/325523/ipad-air-11-inch-m2-lte-grey-thumb.jpg",
@@ -156,8 +174,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "airpods_pro_2",
                 "AirPods Pro 2 (USB-C)",
-                "5.490.000 ₫",
-                "6.190.000 ₫",
+                "54.900 ₫",
+                "61.900 ₫",
                 "Chống ồn chủ động ANC 2X, Chip H2, MagSafe USB-C IP54",
                 "Phụ kiện",
                 "https://cdn.tgdd.vn/Products/Images/54/315014/tai-nghe-bluetooth-airpods-pro-2nd-gen-usb-c-charge-apple-1.jpg",
@@ -171,8 +189,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "apple_watch_s10",
                 "Apple Watch Series 10",
-                "10.990.000 ₫",
-                "11.990.000 ₫",
+                "109.900 ₫",
+                "119.900 ₫",
                 "Màn hình OLED góc rộng, theo dõi sức khỏe, sạc nhanh 30 phút",
                 "Phụ kiện",
                 "https://cdnv2.tgdd.vn/mwg-static/tgdd/Products/Images/7077/329157/apple-watch-s10-hong-1-638616619897644968.jpg",
@@ -186,8 +204,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "keychron_k8",
                 "Bàn phím cơ Keychron K8",
-                "2.190.000 ₫",
-                "2.490.000 ₫",
+                "21.900 ₫",
+                "24.900 ₫",
                 "Gateron G Pro, TKL 87 phím, Bluetooth 5.1 & USB-C",
                 "Phụ kiện",
                 "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/b/a/ban-phim-keychron-k8-1.jpg",
@@ -201,8 +219,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "logitech_mx_master_3s",
                 "Chuột Logitech MX Master 3S",
-                "2.390.000 ₫",
-                "2.690.000 ₫",
+                "23.900 ₫",
+                "26.900 ₫",
                 "Cảm biến 8000 DPI trên kính, cuộn MagSpeed, click yên tĩnh",
                 "Phụ kiện",
                 "https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/c/h/chuot-khong-day-bluetooth-logitech-mx-master-3s_6_.png",
@@ -216,8 +234,8 @@ public final class ProductRepository {
         list.add(new Product(
                 "lg_ultrafine_4k",
                 "Màn hình LG UltraFine 27\" 4K",
-                "9.890.000 ₫",
-                "11.290.000 ₫",
+                "98.900 ₫",
+                "112.900 ₫",
                 "IPS 27\" 4K UHD, 99% sRGB, HDR400, sạc ngược USB-C 96W",
                 "Phụ kiện",
                 "https://cdn2.cellphones.com.vn/x/media/catalog/product/m/_/m_n_h_nh_lg_ultrafine_27u711b-b_27_inch_-_1.png",

@@ -14,6 +14,7 @@ import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -23,7 +24,7 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
   private final LinearLayout rootView;
 
   @NonNull
-  public final LinearLayout bannerOrderSuccess;
+  public final MaterialCardView bannerOrderSuccess;
 
   @NonNull
   public final MaterialButton btnContinueShopping;
@@ -83,7 +84,7 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
   public final TextView tvOrderSuccessTitle;
 
   private ActivityOrderDetailBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout bannerOrderSuccess, @NonNull MaterialButton btnContinueShopping,
+      @NonNull MaterialCardView bannerOrderSuccess, @NonNull MaterialButton btnContinueShopping,
       @NonNull MaterialButton btnPayQrNow, @NonNull LinearLayout orderDetailRoot,
       @NonNull RecyclerView rvOrderDetailItems, @NonNull MaterialToolbar toolbarOrderDetail,
       @NonNull TextView tvDetailAddress, @NonNull TextView tvDetailNote,
@@ -144,7 +145,7 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
     int id;
     missingId: {
       id = R.id.bannerOrderSuccess;
-      LinearLayout bannerOrderSuccess = ViewBindings.findChildViewById(rootView, id);
+      MaterialCardView bannerOrderSuccess = ViewBindings.findChildViewById(rootView, id);
       if (bannerOrderSuccess == null) {
         break missingId;
       }

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.main);
+        UiUtils.applyMainShellInsets(binding.main, binding.bottomNav);
 
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {

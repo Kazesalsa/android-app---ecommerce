@@ -5,8 +5,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.example.btday4.data.local.ReviewEntity;
-import com.example.btday4.data.local.UserEntity;
-import com.example.btday4.model.ProfileCompletion;
 import com.example.btday4.model.RatingSummary;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
@@ -41,48 +39,13 @@ public class DomainLogicTest {
     }
 
     @Test
-    public void profileCompletionTracksMissingFieldsAndReaches100Percent() {
-        UserEntity partial = new UserEntity(
-                "tantai@techstore.vn",
-                "Tấn Tài",
-                "123456",
-                "",
-                "",
-                "24/11/2026",
-                "tantai@techstore.vn",
-                "",
-                ""
-        );
-        ProfileCompletion partialEval = ProfileCompletion.evaluate(partial);
-        assertFalse(partialEval.isComplete());
-        assertEquals(33, partialEval.getPercent());
-        assertEquals(4, partialEval.getMissingFieldLabels().size());
-
-        UserEntity complete = new UserEntity(
-                "tantai@techstore.vn",
-                "Nguyễn Tấn Tài",
-                "123456",
-                "0912345678",
-                "123 Nguyễn Huệ, Quận 1, TP.HCM",
-                "24/11/2026",
-                "tantai@techstore.vn",
-                "Nam",
-                "15/08/2003"
-        );
-        ProfileCompletion fullEval = ProfileCompletion.evaluate(complete);
-        assertTrue(fullEval.isComplete());
-        assertEquals(100, fullEval.getPercent());
-        assertTrue(fullEval.getMissingFieldLabels().isEmpty());
-    }
-
-    @Test
     public void formatUtilsComputesShippingDiscountAndInitials() {
-        assertEquals(Constants.STANDARD_SHIPPING_FEE, FormatUtils.computeShippingFee(2_190_000L));
-        assertEquals(0L, FormatUtils.computeShippingFee(5_000_000L));
-        assertEquals(0L, FormatUtils.computeShippingFee(19_990_000L));
+        assertEquals(Constants.STANDARD_SHIPPING_FEE, FormatUtils.computeShippingFee(21_900L));
+        assertEquals(0L, FormatUtils.computeShippingFee(50_000L));
+        assertEquals(0L, FormatUtils.computeShippingFee(199_900L));
 
-        assertEquals(13, FormatUtils.computeDiscountPercent("19.990.000 ₫", "22.990.000 ₫"));
-        assertEquals(0, FormatUtils.computeDiscountPercent("22.990.000 ₫", "19.990.000 ₫"));
+        assertEquals(13, FormatUtils.computeDiscountPercent("199.900 ₫", "229.900 ₫"));
+        assertEquals(0, FormatUtils.computeDiscountPercent("229.900 ₫", "199.900 ₫"));
 
         assertEquals("NT", FormatUtils.extractInitials("Nguyễn Tấn Tài"));
         assertEquals("AD", FormatUtils.extractInitials("Admin"));

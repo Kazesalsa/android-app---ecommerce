@@ -219,9 +219,15 @@ public abstract class AppDatabase extends RoomDatabase {
         List<Product> defaults = ProductRepository.createDefaultProducts();
         if (productDao.count() == 0) {
             productDao.insertMissing(defaults);
-        } else if (productDao.countMissingDetails() > 0) {
-            productDao.insertMissing(defaults);
-            productDao.updateAll(defaults);
+        } else {
+            Product sample = productDao.findById("iphone_15");
+            boolean needsPriceScaleSync = sample != null
+                    && com.example.btday4.util.FormatUtils.parseVnd(sample.getPrice())
+                    >= ProductRepository.LEGACY_UNSCALED_PRICE_THRESHOLD;
+            if (productDao.countMissingDetails() > 0 || needsPriceScaleSync) {
+                productDao.insertMissing(defaults);
+                productDao.updateAll(defaults);
+            }
         }
 
         ReviewDao reviewDao = db.reviewDao();

@@ -4,19 +4,20 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_screen"
+    android:background="@color/bg_card"
     android:orientation="vertical">
 
     <FrameLayout
         android:id="@+id/fragmentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:background="@color/bg_screen" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/divider_hairline" />
+        android:background="@color/border_light" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNav"
@@ -26,6 +27,8 @@
         app:elevation="0dp"
         app:itemActiveIndicatorStyle="@style/Widget.BtDay4.BottomNavIndicator"
         app:itemIconTint="@color/selector_nav_item"
+        app:itemPaddingBottom="8dp"
+        app:itemPaddingTop="8dp"
         app:itemTextColor="@color/selector_nav_item"
         app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_menu" />

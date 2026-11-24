@@ -1,7 +1,7 @@
 [
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_order.xml",
-        "source": "com.example.btday4.app-main-47:/layout/item_order.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_order_detail.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_order_detail.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_edit_profile.xml",
@@ -12,48 +12,48 @@
         "source": "com.example.btday4.app-main-47:/layout/activity_order_detail.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/fragment_products.xml",
-        "source": "com.example.btday4.app-main-47:/layout/fragment_products.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_product_detail.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_order_line.xml",
-        "source": "com.example.btday4.app-main-47:/layout/item_order_line.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_spec_row.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_spec_row.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_edit_profile.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_edit_profile.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_order_history.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_order_history.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_product.xml",
         "source": "com.example.btday4.app-main-47:/layout/item_product.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_my_reviews.xml",
-        "source": "com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_write_review.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_write_review.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_product_detail.xml",
-        "source": "com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_login.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_login.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_order_history.xml",
         "source": "com.example.btday4.app-main-47:/layout/activity_order_history.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_main.xml",
-        "source": "com.example.btday4.app-main-47:/layout/activity_main.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_change_password.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_change_password.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_checkout.xml",
-        "source": "com.example.btday4.app-main-47:/layout/activity_checkout.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_filter_chip.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_filter_chip.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_login.xml",
         "source": "com.example.btday4.app-main-47:/layout/activity_login.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_review.xml",
-        "source": "com.example.btday4.app-main-47:/layout/item_review.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/fragment_profile.xml",
-        "source": "com.example.btday4.app-main-47:/layout/fragment_profile.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_spec_row.xml",
@@ -64,6 +64,90 @@
         "source": "com.example.btday4.app-main-47:/layout/fragment_cart.xml"
     },
     {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_cart.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_cart.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_product.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_product.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_qr_payment.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_qr_payment.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_my_review.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_my_review.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/fragment_cart.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_cart.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_cart.xml",
+        "source": "com.example.btday4.app-main-47:/layout/item_cart.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_rating_bar.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_rating_bar.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_order.xml",
+        "source": "com.example.btday4.app-main-47:/layout/item_order.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_order.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_order.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_main.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_main.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_my_reviews.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/fragment_products.xml",
+        "source": "com.example.btday4.app-main-47:/layout/fragment_products.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_order_line.xml",
+        "source": "com.example.btday4.app-main-47:/layout/item_order_line.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_my_reviews.xml",
+        "source": "com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_product_detail.xml",
+        "source": "com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_order_line.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_order_line.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/activity_checkout.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_checkout.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_checkout.xml",
+        "source": "com.example.btday4.app-main-47:/layout/activity_checkout.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/item_review.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_review.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_review.xml",
+        "source": "com.example.btday4.app-main-47:/layout/item_review.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/fragment_profile.xml",
+        "source": "com.example.btday4.app-main-47:/layout/fragment_profile.xml"
+    },
+    {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_qr_payment.xml",
         "source": "com.example.btday4.app-main-47:/layout/activity_qr_payment.xml"
     },
@@ -72,20 +156,16 @@
         "source": "com.example.btday4.app-main-47:/layout/activity_write_review.xml"
     },
     {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_cart.xml",
-        "source": "com.example.btday4.app-main-47:/layout/item_cart.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/activity_change_password.xml",
-        "source": "com.example.btday4.app-main-47:/layout/activity_change_password.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_filter_chip.xml",
-        "source": "com.example.btday4.app-main-47:/layout/item_filter_chip.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/fragment_products.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_products.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_rating_bar.xml",
         "source": "com.example.btday4.app-main-47:/layout/item_rating_bar.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-mergeDebugResources-44:/layout/fragment_profile.xml",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_profile.xml"
     },
     {
         "merged": "com.example.btday4.app-mergeDebugResources-44:/layout/item_my_review.xml",

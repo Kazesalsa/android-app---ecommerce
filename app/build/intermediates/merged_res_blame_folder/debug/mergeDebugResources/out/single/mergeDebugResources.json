@@ -1,139 +1,75 @@
 [
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xxxhdpi_ic_launcher.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xxxhdpi/ic_launcher.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_check_circle.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_check_circle.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_open_external.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_open_external.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_order_detail.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_order_detail.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_be_vietnam_pro_semibold.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/be_vietnam_pro_semibold.ttf"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_delete.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_delete.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_arrow_back.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_arrow_back.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_sort.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_sort.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/font_be_vietnam_pro_medium.ttf.flat",
-        "source": "com.example.btday4.app-main-47:/font/be_vietnam_pro_medium.ttf"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_activity_my_reviews.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_product_img_box.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_product_img_box.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_add.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_add.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_arrow_back.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_arrow_back.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_activity_edit_profile.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/activity_edit_profile.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/color_selector_nav_item.xml.flat",
-        "source": "com.example.btday4.app-main-47:/color/selector_nav_item.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_order_history.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_order_history.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/layout_activity_main.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/activity_main.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/color_selector_input_stroke.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/color/selector_input_stroke.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_payments.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_payments.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/color_selector_input_stroke.xml.flat",
-        "source": "com.example.btday4.app-main-47:/color/selector_input_stroke.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_write_review.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_write_review.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_star_filled.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_star_filled.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-hdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/color_selector_chip_stroke.xml.flat",
-        "source": "com.example.btday4.app-main-47:/color/selector_chip_stroke.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-mdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_search.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_search.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_roboto_medium.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/roboto_medium.ttf"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_search_pill.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_search_pill.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_qr_code.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_qr_code.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_launcher_foreground.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_launcher_foreground.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_item_my_review.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/item_my_review.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_chevron_right.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_chevron_right.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/xml_backup_rules.xml.flat",
-        "source": "com.example.btday4.app-main-47:/xml/backup_rules.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/font_be_vietnam_pro_bold.ttf.flat",
-        "source": "com.example.btday4.app-main-47:/font/be_vietnam_pro_bold.ttf"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_sort.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_sort.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_fragment_cart.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/fragment_cart.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/layout_activity_product_detail.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-mdpi/ic_launcher_round.webp"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/menu_bottom_nav_menu.xml.flat",
-        "source": "com.example.btday4.app-main-47:/menu/bottom_nav_menu.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_check_circle.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_check_circle.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/xml_data_extraction_rules.xml.flat",
-        "source": "com.example.btday4.app-main-47:/xml/data_extraction_rules.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_freeship_tag.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_freeship_tag.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/font_be_vietnam_pro_regular.ttf.flat",
-        "source": "com.example.btday4.app-main-47:/font/be_vietnam_pro_regular.ttf"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-mdpi/ic_launcher.webp"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_edit.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_edit.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_copy.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_copy.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_item_order.xml.flat",
@@ -144,203 +80,411 @@
         "source": "com.example.btday4.app-main-47:/layout/activity_qr_payment.xml"
     },
     {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_be_vietnam_pro_regular.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/be_vietnam_pro_regular.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_location.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_location.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_profile_header_gradient.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_profile_header_gradient.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_order_line.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_order_line.xml"
+    },
+    {
         "merged": "com.example.btday4.app-debug-45:/layout_item_spec_row.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/item_spec_row.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_price_strip.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_price_strip.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_close.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_close.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_search.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_search.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_calendar.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_calendar.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_lock.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_lock.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_roboto_bold.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/roboto_bold.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_shopping_bag.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_shopping_bag.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_activity_write_review.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/activity_write_review.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_hero_banner.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_hero_banner.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_chevron_right.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_chevron_right.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_location.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_location.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_star_outline.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_star_outline.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_activity_checkout.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/activity_checkout.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "com.example.btday4.app-debug-45:/font_nunito_bold.ttf.flat",
+        "source": "com.example.btday4.app-main-47:/font/nunito_bold.ttf"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_pill_subtle.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_pill_subtle.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_rating_bar.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_rating_bar.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/font_be_vietnam_pro.xml.flat",
-        "source": "com.example.btday4.app-main-47:/font/be_vietnam_pro.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_discount_tag.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_discount_tag.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_edit_profile.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_edit_profile.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_fragment_cart.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_cart.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_search_pill.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_search_pill.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_item_cart.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/item_cart.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_qr_code.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_qr_code.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_delete.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_delete.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_login.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_login.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/color_selector_chip_text.xml.flat",
-        "source": "com.example.btday4.app-main-47:/color/selector_chip_text.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_launcher_foreground.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/layout_fragment_products.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/fragment_products.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_option_selected.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_option_selected.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_nav_profile.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_nav_profile.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_cart.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_cart.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-anydpi-v26/ic_launcher.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_activity_order_detail.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/activity_order_detail.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_discount_tag.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_discount_tag.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_item_review.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/item_review.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_lock.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_lock.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_nav_profile.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_nav_profile.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_activity_order_history.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/activity_order_history.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_circle_button.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_circle_button.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_calendar.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_calendar.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_remove.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_remove.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_item_rating_bar.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/item_rating_bar.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_spec_row.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_spec_row.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_shopping_bag.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_shopping_bag.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-mdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_copy.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_copy.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_open_external.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_open_external.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/xml_backup_rules.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/xml/backup_rules.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_receipt.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_receipt.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_qr_payment.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_qr_payment.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xxxhdpi/ic_launcher_round.webp"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/xml_data_extraction_rules.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/xml/data_extraction_rules.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/layout_item_filter_chip.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/item_filter_chip.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_launcher_background.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/color_selector_chip_bg.xml.flat",
-        "source": "com.example.btday4.app-main-47:/color/selector_chip_bg.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_star_outline.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_star_outline.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_option_selected.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_option_selected.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xxhdpi/ic_launcher_round.webp"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_fragment_profile.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/fragment_profile.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_shield_check.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_shield_check.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_discount_solid.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_discount_solid.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_remove.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_remove.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_payments.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_payments.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_nav_cart.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_nav_cart.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_activity_login.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/activity_login.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_nav_products.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_nav_products.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/ic_launcher_background.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.example.btday4.app-main-47:/mipmap-xhdpi/ic_launcher_round.webp"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_item_product.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/item_product.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/layout_activity_change_password.xml.flat",
-        "source": "com.example.btday4.app-main-47:/layout/activity_change_password.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_circle_avatar.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_circle_avatar.xml"
-    },
-    {
-        "merged": "com.example.btday4.app-debug-45:/font_be_vietnam_pro_semibold.ttf.flat",
-        "source": "com.example.btday4.app-main-47:/font/be_vietnam_pro_semibold.ttf"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_product.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_product.xml"
     },
     {
         "merged": "com.example.btday4.app-debug-45:/layout_item_order_line.xml.flat",
         "source": "com.example.btday4.app-main-47:/layout/item_order_line.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_option_default.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_option_default.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_my_review.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_my_review.xml"
     },
     {
-        "merged": "com.example.btday4.app-debug-45:/drawable_bg_card_white.xml.flat",
-        "source": "com.example.btday4.app-main-47:/drawable/bg_card_white.xml"
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_my_reviews.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_roboto.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/roboto.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_order.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_order.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_nav_cart.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_nav_cart.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_nav_products.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_nav_products.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_roboto_regular.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/roboto_regular.ttf"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_activity_my_reviews.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/activity_my_reviews.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_roboto_semibold.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/roboto_semibold.ttf"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/font_nunito.xml.flat",
+        "source": "com.example.btday4.app-main-47:/font/nunito.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_copy_pill.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_copy_pill.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_star_filled.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_star_filled.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_change_password.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_change_password.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_be_vietnam_pro_medium.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/be_vietnam_pro_medium.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_product_img_box.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_product_img_box.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_circle_avatar.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_circle_avatar.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_fragment_products.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_products.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_qr_frame.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_qr_frame.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_item_my_review.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/item_my_review.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_fragment_profile.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/fragment_profile.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/menu_bottom_nav_menu.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/menu/bottom_nav_menu.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_edit.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_edit.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_hero_banner.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_hero_banner.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_activity_product_detail.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/font_nunito_extrabold.ttf.flat",
+        "source": "com.example.btday4.app-main-47:/font/nunito_extrabold.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_review.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_review.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_add.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_add.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/color_selector_chip_stroke.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/color/selector_chip_stroke.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/font_nunito_semibold.ttf.flat",
+        "source": "com.example.btday4.app-main-47:/font/nunito_semibold.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_item_filter_chip.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/item_filter_chip.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_close.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_close.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_checkout.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_checkout.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/color_selector_chip_text.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/color/selector_chip_text.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_card_white.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_card_white.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_option_default.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_option_default.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_be_vietnam_pro_bold.ttf.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/be_vietnam_pro_bold.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/color_selector_nav_item.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/color/selector_nav_item.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_fragment_products.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/fragment_products.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_activity_order_detail.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/activity_order_detail.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_item_review.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/item_review.xml"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/font_nunito_medium.ttf.flat",
+        "source": "com.example.btday4.app-main-47:/font/nunito_medium.ttf"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/color_selector_chip_bg.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/color/selector_chip_bg.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_circle_button.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_circle_button.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_freeship_tag.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_freeship_tag.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_product_detail.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_product_detail.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_shield_check.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_shield_check.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/font_be_vietnam_pro.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/font/be_vietnam_pro.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_search_pill_accent.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_search_pill_accent.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_bg_pill_subtle.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/bg_pill_subtle.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/drawable_ic_receipt.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/drawable/ic_receipt.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.example.btday4.app-debug-45:/layout_item_product.xml.flat",
+        "source": "com.example.btday4.app-main-47:/layout/item_product.xml"
+    },
+    {
+        "merged": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-debug-45:/layout_activity_main.xml.flat",
+        "source": "/home/tan_tai/.gradle/daemon/9.6.0/com.example.btday4.app-main-47:/layout/activity_main.xml"
     }
 ]

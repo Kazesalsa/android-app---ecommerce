@@ -77,8 +77,8 @@ public class ProductRepositoryTest {
         CartItem item1 = new CartItem(iphone15, 2);
         CartItem item2 = new CartItem(airpods, 1);
 
-        assertEquals(19990000L, FormatUtils.parseVnd("19.990.000 ₫"));
-        assertEquals("39.980.000 ₫", item1.getSubtotalText());
-        assertEquals("45.470.000 ₫", CartRepository.getGrandTotalText(Arrays.asList(item1, item2)));
+        assertEquals(199_900L, FormatUtils.parseVnd("199.900 ₫"));
+        assertEquals("399.800 ₫", item1.getSubtotalText());
+        assertEquals("454.700 ₫", CartRepository.getGrandTotalText(Arrays.asList(item1, item2)));
     }
 }

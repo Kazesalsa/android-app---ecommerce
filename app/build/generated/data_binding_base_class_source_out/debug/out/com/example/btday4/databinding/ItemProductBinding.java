@@ -5,20 +5,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
+import com.google.android.material.card.MaterialCardView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class ItemProductBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final MaterialCardView rootView;
 
   @NonNull
   public final ImageView imgProduct;
@@ -50,7 +50,7 @@ public final class ItemProductBinding implements ViewBinding {
   @NonNull
   public final TextView tvProductStockMini;
 
-  private ItemProductBinding(@NonNull LinearLayout rootView, @NonNull ImageView imgProduct,
+  private ItemProductBinding(@NonNull MaterialCardView rootView, @NonNull ImageView imgProduct,
       @NonNull TextView tvDiscountBadge, @NonNull TextView tvFreeshipTag,
       @NonNull TextView tvProductBrand, @NonNull TextView tvProductName,
       @NonNull TextView tvProductOriginalPrice, @NonNull TextView tvProductPrice,
@@ -71,7 +71,7 @@ public final class ItemProductBinding implements ViewBinding {
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public MaterialCardView getRoot() {
     return rootView;
   }
 
@@ -156,7 +156,7 @@ public final class ItemProductBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemProductBinding((LinearLayout) rootView, imgProduct, tvDiscountBadge,
+      return new ItemProductBinding((MaterialCardView) rootView, imgProduct, tvDiscountBadge,
           tvFreeshipTag, tvProductBrand, tvProductName, tvProductOriginalPrice, tvProductPrice,
           tvProductRating, tvProductReviewCount, tvProductStockMini);
     }

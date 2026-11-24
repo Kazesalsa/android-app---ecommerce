@@ -12,14 +12,11 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import com.example.btday4.R;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.FragmentProfileBinding;
-import com.example.btday4.model.ProfileCompletion;
 import com.example.btday4.ui.auth.LoginActivity;
 import com.example.btday4.ui.orders.OrderHistoryActivity;
 import com.example.btday4.util.FormatUtils;
@@ -27,8 +24,8 @@ import com.example.btday4.util.ValidationUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 /**
- * Full-bleed Account Hub with native list navigation to Orders, My Reviews, Edit Profile, and
- * Change Password, plus two-step inline logout confirmation (zero popups).
+ * Full-bleed Account Hub displaying populated profile fields cleanly (hiding empty fields),
+ * Orders, My Reviews, Edit Profile, Change Password, and two-step inline logout (zero popups).
  */
 public class ProfileFragment extends Fragment {
 
@@ -79,12 +76,9 @@ public class ProfileFragment extends Fragment {
 
         userSession = new UserSession(requireContext());
 
-        View.OnClickListener openEditProfile = v ->
-                editProfileLauncher.launch(new Intent(requireContext(), EditProfileActivity.class));
-        binding.btnEditProfileHeader.setOnClickListener(openEditProfile);
-        binding.btnCompleteProfileNow.setOnClickListener(openEditProfile);
-        binding.rowEditProfile.setOnClickListener(openEditProfile);
-
+        binding.btnEditProfileHeader.setOnClickListener(v ->
+                editProfileLauncher.launch(new Intent(requireContext(), EditProfileActivity.class))
+        );
         binding.rowMyOrders.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), OrderHistoryActivity.class))
         );
@@ -168,30 +162,59 @@ public class ProfileFragment extends Fragment {
 
             binding.tvAvatarInitials.setText(FormatUtils.extractInitials(displayName));
             binding.tvProfileName.setText(displayName);
-            binding.tvProfileUsername.setText(resolvedUsername.isEmpty() ? "(Chưa có)" : resolvedUsername);
+            if (ValidationUtils.isNotBlank(resolvedUsername)) {
+                binding.tvProfileUsername.setVisibility(View.VISIBLE);
+                binding.tvProfileUsername.setText(resolvedUsername.trim());
+            } else {
+                binding.tvProfileUsername.setVisibility(View.GONE);
+            }
 
-            bindFieldValue(binding.tvProfileEmail, email);
-            bindFieldValue(binding.tvProfilePhone, phone);
-            bindFieldValue(binding.tvProfileGender, gender);
-            bindFieldValue(binding.tvProfileBirthDate, birthDate);
-            bindFieldValue(binding.tvProfileAddress, address);
+            bindPersonalInfoCard(email, phone, gender, birthDate, address);
 
             binding.tvProfileLoginTime.setText(
                     ValidationUtils.isNotBlank(loginTime) ? loginTime : "Vừa đăng nhập"
             );
             updatePasswordDisplay();
-
-            ProfileCompletion completion = ProfileCompletion.evaluate(user);
-            binding.tvShortcutCompletion.setText(completion.getPercent() + "%");
-            if (completion.isComplete()) {
-                binding.bannerProfileCompletion.setVisibility(View.GONE);
-            } else {
-                binding.bannerProfileCompletion.setVisibility(View.VISIBLE);
-                binding.tvCompletionPercent.setText(completion.getPercent() + "%");
-                binding.progressCompletion.setProgress(completion.getPercent());
-                binding.tvCompletionMissing.setText("Còn thiếu: " + completion.getMissingSummary());
-            }
         });
+    }
+
+    /**
+     * Renders only populated personal fields with clean single dividers between visible rows,
+     * hiding the entire card when no optional profile fields are set.
+     */
+    private void bindPersonalInfoCard(
+            String email,
+            String phone,
+            String gender,
+            String birthDate,
+            String address
+    ) {
+        boolean anyVisible = false;
+        anyVisible = bindOptionalField(binding.rowProfileEmail, null, binding.tvProfileEmail, email, anyVisible);
+        anyVisible = bindOptionalField(binding.rowProfilePhone, binding.dividerProfilePhone, binding.tvProfilePhone, phone, anyVisible);
+        anyVisible = bindOptionalField(binding.rowProfileGender, binding.dividerProfileGender, binding.tvProfileGender, gender, anyVisible);
+        anyVisible = bindOptionalField(binding.rowProfileBirthDate, binding.dividerProfileBirthDate, binding.tvProfileBirthDate, birthDate, anyVisible);
+        anyVisible = bindOptionalField(binding.rowProfileAddress, binding.dividerProfileAddress, binding.tvProfileAddress, address, anyVisible);
+
+        binding.cardPersonalInfo.setVisibility(anyVisible ? View.VISIBLE : View.GONE);
+    }
+
+    private boolean bindOptionalField(
+            View rowContainer,
+            @Nullable View dividerAbove,
+            TextView valueView,
+            String rawValue,
+            boolean hasVisibleAbove
+    ) {
+        boolean hasValue = ValidationUtils.isNotBlank(rawValue);
+        rowContainer.setVisibility(hasValue ? View.VISIBLE : View.GONE);
+        if (dividerAbove != null) {
+            dividerAbove.setVisibility(hasValue && hasVisibleAbove ? View.VISIBLE : View.GONE);
+        }
+        if (hasValue) {
+            valueView.setText(rawValue.trim());
+        }
+        return hasVisibleAbove || hasValue;
     }
 
     private void showInlineLogoutConfirm(boolean show) {
@@ -203,22 +226,12 @@ public class ProfileFragment extends Fragment {
         binding.llLogoutConfirmBar.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void bindFieldValue(TextView target, String value) {
-        if (ValidationUtils.isNotBlank(value)) {
-            target.setText(value.trim());
-            target.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_primary));
-        } else {
-            target.setText(R.string.not_updated);
-            target.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_muted));
-        }
-    }
-
     private void updatePasswordDisplay() {
         if (binding == null) {
             return;
         }
         if (currentPassword.isEmpty()) {
-            binding.tvProfilePassword.setText("(Không có)");
+            binding.tvProfilePassword.setText("••••••");
             binding.tvTogglePassword.setVisibility(View.GONE);
             return;
         }

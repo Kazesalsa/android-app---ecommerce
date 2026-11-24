@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Modern SEA Flagship Commerce Theme (TikTok Shop / Shopee Mall inspired). -->
     <style name="Base.Theme.BtDay4" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:fontFamily">@font/be_vietnam_pro</item>
-        <item name="fontFamily">@font/be_vietnam_pro</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -14,6 +14,12 @@
         <item name="colorOnSecondaryContainer">@color/teal_trust</item>
         <item name="colorSurface">@color/bg_card</item>
         <item name="colorSurfaceVariant">@color/bg_subtle</item>
+        <item name="colorSurfaceContainer">@color/bg_card</item>
+        <item name="colorSurfaceContainerLow">@color/bg_card</item>
+        <item name="colorSurfaceContainerLowest">@color/bg_card</item>
+        <item name="colorSurfaceContainerHigh">@color/bg_card</item>
+        <item name="colorSurfaceContainerHighest">@color/bg_card</item>
+        <item name="elevationOverlayEnabled">false</item>
         <item name="colorOnSurface">@color/text_primary</item>
         <item name="colorOnSurfaceVariant">@color/text_secondary</item>
         <item name="colorOutline">@color/border_light</item>
@@ -43,7 +49,7 @@
         <item name="chipMinTouchTargetSize">40dp</item>
         <item name="chipMinHeight">34dp</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:fontFamily">@font/be_vietnam_pro_medium</item>
+        <item name="android:fontFamily">@font/nunito_semibold</item>
     </style>
 
     <style name="Widget.BtDay4.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
@@ -64,7 +70,7 @@
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
+        <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="backgroundTint">@color/primary</item>
         <item name="cornerRadius">10dp</item>
         <item name="elevation">0dp</item>
@@ -76,7 +82,7 @@
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
+        <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="android:textColor">@color/primary</item>
         <item name="backgroundTint">@color/primary_soft</item>
         <item name="strokeColor">@color/primary</item>
@@ -91,7 +97,7 @@
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textSize">14.5sp</item>
-        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
+        <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="strokeColor">@color/border_light</item>
         <item name="strokeWidth">1dp</item>

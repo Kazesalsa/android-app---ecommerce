@@ -113,8 +113,8 @@ public class PayOsClientTest {
         assertEquals(PaymentMethod.COD, PaymentMethod.fromCode("COD"));
         assertEquals(PaymentMethod.VIETQR, PaymentMethod.fromCode("VIETQR"));
         assertEquals(PaymentMethod.VIETQR, PaymentMethod.fromCode("ONLINE_GATEWAY"));
-        assertEquals("Thanh toán khi giao hàng", PaymentMethod.COD.getTitle());
-        assertEquals("Thanh toán bằng mã QR", PaymentMethod.VIETQR.getTitle());
+        assertEquals("Thanh toán khi giao", PaymentMethod.COD.getTitle());
+        assertEquals("Thanh toán qua QR", PaymentMethod.VIETQR.getTitle());
 
         assertEquals(OrderStatus.PAID, OrderStatus.fromCode("PAID"));
         assertEquals("Đã thanh toán", OrderStatus.PAID.getLabel());

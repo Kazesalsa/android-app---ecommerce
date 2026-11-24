@@ -41,14 +41,23 @@ public final class FirestoreHelper {
     }
 
     /**
-     * Seeds default products to Firestore using a single batch only when the remote collection is empty.
+     * Seeds default products to Firestore or refreshes legacy unscaled remote prices using a single batch.
      */
     public static void seedProductsIfEmpty(FirestoreCallback<Boolean> callback) {
         FirebaseFirestore db = getDb();
         CollectionReference col = db.collection(Constants.COLLECTION_PRODUCTS);
-        col.limit(1).get()
-                .addOnSuccessListener(snapshot -> {
-                    if (!snapshot.isEmpty()) {
+        col.document("iphone_15").get()
+                .addOnSuccessListener(doc -> {
+                    boolean needsSeed = !doc.exists();
+                    if (!needsSeed) {
+                        Product remoteSample = doc.toObject(Product.class);
+                        if (remoteSample != null
+                                && com.example.btday4.util.FormatUtils.parseVnd(remoteSample.getPrice())
+                                >= ProductRepository.LEGACY_UNSCALED_PRICE_THRESHOLD) {
+                            needsSeed = true;
+                        }
+                    }
+                    if (!needsSeed) {
                         if (callback != null) {
                             callback.onSuccess(false);
                         }
@@ -65,7 +74,7 @@ public final class FirestoreHelper {
                                 }
                             })
                             .addOnFailureListener(e -> {
-                                Log.e(TAG, "Failed to batch seed products", e);
+                                Log.e(TAG, "Failed to batch sync products", e);
                                 if (callback != null) {
                                     callback.onError(e);
                                 }

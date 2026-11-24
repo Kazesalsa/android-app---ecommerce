@@ -80,7 +80,7 @@ public class ProductsFragment extends Fragment {
         refreshGreeting();
 
         adapter = new ProductAdapter(this::openProductDetail);
-        int spacingPx = Math.round(8 * getResources().getDisplayMetrics().density);
+        int spacingPx = Math.round(10 * getResources().getDisplayMetrics().density);
         binding.rvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvProducts.addItemDecoration(new GridSpacingItemDecoration(2, spacingPx));
         binding.rvProducts.setAdapter(adapter);
@@ -298,7 +298,7 @@ public class ProductsFragment extends Fragment {
         label.setTextColor(color);
         label.setTypeface(ResourcesCompat.getFont(
                 requireContext(),
-                active ? R.font.be_vietnam_pro_semibold : R.font.be_vietnam_pro_medium
+                active ? R.font.nunito_bold : R.font.nunito_semibold
         ));
         indicator.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
     }

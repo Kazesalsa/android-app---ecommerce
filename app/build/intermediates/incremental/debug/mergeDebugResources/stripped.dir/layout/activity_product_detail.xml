@@ -77,7 +77,7 @@
                         android:layout_marginTop="2dp"
                         android:layout_marginEnd="2dp"
                         android:background="@drawable/bg_circle_avatar"
-                        android:fontFamily="@font/be_vietnam_pro_bold"
+                        android:fontFamily="@font/nunito_extrabold"
                         android:gravity="center"
                         android:textColor="@color/white"
                         android:textSize="10sp"
@@ -91,7 +91,7 @@
                     android:layout_gravity="bottom|end"
                     android:layout_margin="14dp"
                     android:background="@drawable/bg_pill_subtle"
-                    android:fontFamily="@font/be_vietnam_pro_medium"
+                    android:fontFamily="@font/nunito_semibold"
                     android:paddingHorizontal="10dp"
                     android:paddingVertical="4dp"
                     android:text="Còn hàng"
@@ -104,55 +104,59 @@
                 android:layout_height="1dp"
                 android:background="@color/divider_hairline" />
 
-            <!-- TikTok Shop / Shopee Price-First Header Block -->
+            <!-- Warm Blush Price Showcase Strip (Shopee / TikTok Shop PDP Signature) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_price_strip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="14dp">
+
+                <TextView
+                    android:id="@+id/tvDetailPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nunito_extrabold"
+                    android:letterSpacing="-0.02"
+                    android:text="199.900 ₫"
+                    android:textColor="@color/primary"
+                    android:textSize="26sp" />
+
+                <TextView
+                    android:id="@+id/tvDetailOriginalPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:text="229.900 ₫"
+                    android:textColor="@color/text_muted"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvDetailDiscount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:background="@drawable/bg_discount_solid"
+                    android:fontFamily="@font/nunito_extrabold"
+                    android:paddingHorizontal="7dp"
+                    android:paddingVertical="2dp"
+                    android:text="-13%"
+                    android:textColor="@color/white"
+                    android:textSize="11.5sp"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Product Title & Rating Block -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/bg_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp">
-
-                <!-- Bold Coral Price + Strikethrough + Discount Badge -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tvDetailPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/be_vietnam_pro_bold"
-                        android:letterSpacing="-0.02"
-                        android:text="19.990.000 ₫"
-                        android:textColor="@color/primary"
-                        android:textSize="25sp" />
-
-                    <TextView
-                        android:id="@+id/tvDetailOriginalPrice"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="10dp"
-                        android:text="22.990.000 ₫"
-                        android:textColor="@color/text_muted"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tvDetailDiscount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:background="@drawable/bg_discount_tag"
-                        android:fontFamily="@font/be_vietnam_pro_bold"
-                        android:paddingHorizontal="7dp"
-                        android:paddingVertical="2dp"
-                        android:text="-13%"
-                        android:textColor="@color/primary"
-                        android:textSize="12sp"
-                        android:visibility="gone" />
-                </LinearLayout>
+                android:paddingTop="12dp"
+                android:paddingBottom="14dp">
 
                 <!-- Mall Tag + Brand & Category -->
                 <LinearLayout
@@ -166,7 +170,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_freeship_tag"
-                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:fontFamily="@font/nunito_bold"
                         android:paddingHorizontal="6dp"
                         android:paddingVertical="2dp"
                         android:text="Chính hãng"
@@ -178,7 +182,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:fontFamily="@font/be_vietnam_pro_medium"
+                        android:fontFamily="@font/nunito_semibold"
                         android:text="Apple"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
@@ -199,7 +203,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:fontFamily="@font/nunito_extrabold"
                     android:lineSpacingMultiplier="1.25"
                     android:text="iPhone 15 128GB"
                     android:textColor="@color/text_primary"
@@ -230,7 +234,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:fontFamily="@font/nunito_bold"
                         android:text="4.8"
                         android:textColor="@color/text_primary"
                         android:textSize="14sp" />
@@ -248,7 +252,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/be_vietnam_pro_medium"
+                        android:fontFamily="@font/nunito_semibold"
                         android:text="Xem đánh giá"
                         android:textColor="@color/primary"
                         android:textSize="13sp" />
@@ -266,7 +270,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@color/bg_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
@@ -282,7 +286,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@drawable/bg_freeship_tag"
-                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:fontFamily="@font/nunito_bold"
                         android:paddingHorizontal="7dp"
                         android:paddingVertical="2dp"
                         android:text="Freeship"
@@ -294,7 +298,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="10dp"
                         android:layout_weight="1"
-                        android:text="Miễn phí vận chuyển cho đơn từ 5.000.000 ₫"
+                        android:text="Miễn phí vận chuyển cho đơn từ 50.000 ₫"
                         android:textColor="@color/text_primary"
                         android:textSize="13.5sp" />
                 </LinearLayout>
@@ -334,7 +338,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@color/bg_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
@@ -343,7 +347,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:fontFamily="@font/nunito_extrabold"
                     android:text="@string/section_description"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
@@ -362,7 +366,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@color/bg_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
@@ -371,7 +375,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:fontFamily="@font/nunito_extrabold"
                     android:text="@string/section_specs"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
@@ -389,7 +393,7 @@
                 android:id="@+id/sectionReviews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="12dp"
                 android:background="@color/bg_card"
                 android:orientation="vertical"
                 android:paddingHorizontal="16dp"
@@ -406,7 +410,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/be_vietnam_pro_bold"
+                        android:fontFamily="@font/nunito_extrabold"
                         android:text="@string/section_reviews"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp" />
@@ -418,7 +422,7 @@
                         android:background="@drawable/bg_discount_tag"
                         android:clickable="true"
                         android:focusable="true"
-                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:fontFamily="@font/nunito_bold"
                         android:gravity="center"
                         android:paddingHorizontal="12dp"
                         android:text="@string/btn_write_review"
@@ -446,7 +450,7 @@
                             android:id="@+id/tvRatingAverage"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/be_vietnam_pro_bold"
+                            android:fontFamily="@font/nunito_extrabold"
                             android:text="0.0"
                             android:textColor="@color/primary"
                             android:textSize="32sp" />
@@ -525,11 +529,12 @@
         android:layout_height="1dp"
         android:background="@color/divider_hairline" />
 
-    <!-- Iconic TikTok Shop / Shopee Split Bottom Bar (Tinted Blush Add + Solid Coral Buy Now) -->
+    <!-- Iconic TikTok Shop / Shopee Elevated Split Bottom Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_card"
+        android:elevation="8dp"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
         android:paddingTop="10dp"
@@ -555,8 +560,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/be_vietnam_pro_bold"
-                android:text="19.990.000 ₫"
+                android:fontFamily="@font/nunito_extrabold"
+                android:text="199.900 ₫"
                 android:textColor="@color/primary"
                 android:textSize="15sp" />
 
@@ -581,7 +586,7 @@
                     android:id="@+id/tvQuantity"
                     android:layout_width="34dp"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/be_vietnam_pro_semibold"
+                    android:fontFamily="@font/nunito_bold"
                     android:gravity="center"
                     android:text="1"
                     android:textColor="@color/text_primary"

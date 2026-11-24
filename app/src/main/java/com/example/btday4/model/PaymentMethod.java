@@ -6,13 +6,13 @@ package com.example.btday4.model;
 public enum PaymentMethod {
     COD(
             "COD",
-            "Thanh toán khi giao hàng",
-            "Trả tiền mặt trực tiếp cho nhân viên giao hàng"
+            "Thanh toán khi giao",
+            "Trả tiền mặt trực tiếp khi nhận hàng"
     ),
     VIETQR(
             "VIETQR",
-            "Thanh toán bằng mã QR",
-            "Quét mã VietQR qua PayOS, tự động xác nhận ngay"
+            "Thanh toán qua QR",
+            "Quét mã VietQR qua PayOS, xác nhận tự động"
     );
 
     private final String code;

@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
-                android:fontFamily="@font/be_vietnam_pro_medium"
+                android:fontFamily="@font/nunito_semibold"
                 android:maxLines="2"
                 android:text="iPhone 15 128GB"
                 android:textColor="@color/text_primary"
@@ -55,7 +55,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="19.990.000 ₫ × 1"
+                    android:text="199.900 ₫ × 1"
                     android:textColor="@color/text_muted"
                     android:textSize="12.5sp" />
 
@@ -63,8 +63,8 @@
                     android:id="@+id/tvOrderLineSubtotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/be_vietnam_pro_bold"
-                    android:text="19.990.000 ₫"
+                    android:fontFamily="@font/nunito_extrabold"
+                    android:text="199.900 ₫"
                     android:textColor="@color/primary"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -75,7 +75,7 @@
                 android:layout_height="34dp"
                 android:layout_marginTop="6dp"
                 android:background="@drawable/bg_discount_tag"
-                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:fontFamily="@font/nunito_bold"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:text="Đánh giá sản phẩm"

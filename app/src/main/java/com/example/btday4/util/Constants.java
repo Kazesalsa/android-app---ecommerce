@@ -53,8 +53,8 @@ public final class Constants {
     // ==========================================
     // BUSINESS RULES (Shipping, Cart & PayOS)
     // ==========================================
-    public static final long FREE_SHIPPING_THRESHOLD = 5_000_000L;
-    public static final long STANDARD_SHIPPING_FEE = 30_000L;
+    public static final long FREE_SHIPPING_THRESHOLD = 50_000L;
+    public static final long STANDARD_SHIPPING_FEE = 300L;
     public static final int MAX_CART_QUANTITY = 99;
 
     public static final String PAYOS_API_BASE_URL = "https://api-merchant.payos.vn";

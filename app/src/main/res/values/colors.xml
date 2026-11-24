@@ -6,11 +6,13 @@
     <color name="primary">#DC2645</color>
     <color name="primary_pressed">#BE1E3A</color>
     <color name="primary_soft">#FFF0F3</color>
+    <color name="primary_border_soft">#F4C2CC</color>
+    <color name="price_strip_start">#FFF3F5</color>
     <color name="primary_container">#FFF0F3</color>
 
     <!-- Secondary Deep Ink & Trust Teal (Freeship / Chính hãng) -->
     <color name="ink_dark">#161823</color>
-    <color name="ink_dark_end">#25283B</color>
+    <color name="ink_dark_end">#272B42</color>
 
     <color name="teal_trust">#007A67</color>
     <color name="teal_trust_bg">#E6F7F4</color>
@@ -20,12 +22,13 @@
     <color name="accent_soft">#FFF0F3</color>
 
     <!-- Crisp Commerce Surfaces: Soft Gray Feed Canvas + Pure White Blocks -->
-    <color name="bg_screen">#F4F4F6</color>
+    <color name="bg_screen">#EFEFF4</color>
     <color name="bg_card">#FFFFFF</color>
+    <color name="bg_image_stage">#FFFFFF</color>
     <color name="bg_subtle">#F4F4F6</color>
-    <color name="bg_section_band">#F4F4F6</color>
-    <color name="border_light">#E5E7EB</color>
-    <color name="divider_hairline">#EFEFF2</color>
+    <color name="bg_section_band">#EFEFF4</color>
+    <color name="border_light">#E2E4EA</color>
+    <color name="divider_hairline">#ECEEF2</color>
 
     <!-- High-Contrast Ink Hierarchy -->
     <color name="text_primary">#161823</color>

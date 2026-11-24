@@ -18,6 +18,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.ChipGroup;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -37,7 +38,7 @@ public final class FragmentProductsBinding implements ViewBinding {
   public final MaterialButton btnResetFilter;
 
   @NonNull
-  public final LinearLayout cardSpotlight;
+  public final MaterialCardView cardSpotlight;
 
   @NonNull
   public final ChipGroup chipGroupCategories;
@@ -64,7 +65,7 @@ public final class FragmentProductsBinding implements ViewBinding {
   public final LinearLayout llEmptyProducts;
 
   @NonNull
-  public final LinearLayout rowTrustStrip;
+  public final MaterialCardView rowTrustStrip;
 
   @NonNull
   public final RecyclerView rvProducts;
@@ -119,11 +120,11 @@ public final class FragmentProductsBinding implements ViewBinding {
 
   private FragmentProductsBinding(@NonNull LinearLayout rootView,
       @NonNull ImageButton btnClearSearch, @NonNull FrameLayout btnHomeCart,
-      @NonNull MaterialButton btnResetFilter, @NonNull LinearLayout cardSpotlight,
+      @NonNull MaterialButton btnResetFilter, @NonNull MaterialCardView cardSpotlight,
       @NonNull ChipGroup chipGroupCategories, @NonNull EditText etSearch,
       @NonNull ImageView imgSpotlight, @NonNull View indSortDefault, @NonNull View indSortPriceAsc,
       @NonNull View indSortPriceDesc, @NonNull View indSortRating,
-      @NonNull LinearLayout llEmptyProducts, @NonNull LinearLayout rowTrustStrip,
+      @NonNull LinearLayout llEmptyProducts, @NonNull MaterialCardView rowTrustStrip,
       @NonNull RecyclerView rvProducts, @NonNull NestedScrollView scrollProducts,
       @NonNull LinearLayout tabSortDefault, @NonNull LinearLayout tabSortPriceAsc,
       @NonNull LinearLayout tabSortPriceDesc, @NonNull LinearLayout tabSortRating,
@@ -212,7 +213,7 @@ public final class FragmentProductsBinding implements ViewBinding {
       }
 
       id = R.id.cardSpotlight;
-      LinearLayout cardSpotlight = ViewBindings.findChildViewById(rootView, id);
+      MaterialCardView cardSpotlight = ViewBindings.findChildViewById(rootView, id);
       if (cardSpotlight == null) {
         break missingId;
       }
@@ -266,7 +267,7 @@ public final class FragmentProductsBinding implements ViewBinding {
       }
 
       id = R.id.rowTrustStrip;
-      LinearLayout rowTrustStrip = ViewBindings.findChildViewById(rootView, id);
+      MaterialCardView rowTrustStrip = ViewBindings.findChildViewById(rootView, id);
       if (rowTrustStrip == null) {
         break missingId;
       }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BtDay4 Store</string>
+    <string name="app_name">Cửa Hàng Điện Tử</string>
 
     <!-- Auth -->
     <string name="hint_username">Tên đăng nhập hoặc email</string>
@@ -55,7 +55,6 @@
     <string name="my_reviews_title">Đánh giá của tôi</string>
     <string name="profile_personal_info_title">Hồ sơ cá nhân</string>
     <string name="profile_login_info_title">Phiên đăng nhập</string>
-    <string name="not_updated">Chưa cập nhật</string>
     <string name="btn_logout">Đăng xuất</string>
     <string name="btn_cancel">Hủy</string>
     <string name="btn_confirm">Xác nhận</string>

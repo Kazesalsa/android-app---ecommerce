@@ -4,7 +4,6 @@ package com.example.btday4.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +15,7 @@ import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -34,13 +34,13 @@ public final class ActivityQrPaymentBinding implements ViewBinding {
   public final MaterialButton btnConfirmCancelPayment;
 
   @NonNull
-  public final ImageButton btnCopyAccount;
+  public final TextView btnCopyAccount;
 
   @NonNull
-  public final ImageButton btnCopyAmount;
+  public final TextView btnCopyAmount;
 
   @NonNull
-  public final ImageButton btnCopyDescription;
+  public final TextView btnCopyDescription;
 
   @NonNull
   public final MaterialButton btnKeepPayment;
@@ -61,7 +61,7 @@ public final class ActivityQrPaymentBinding implements ViewBinding {
   public final ImageView imgQrCode;
 
   @NonNull
-  public final LinearLayout llCancelConfirmBar;
+  public final MaterialCardView llCancelConfirmBar;
 
   @NonNull
   public final LinearLayout llQrBottomBar;
@@ -119,12 +119,12 @@ public final class ActivityQrPaymentBinding implements ViewBinding {
 
   private ActivityQrPaymentBinding(@NonNull LinearLayout rootView,
       @NonNull MaterialButton btnCancelPayment, @NonNull MaterialButton btnCheckStatus,
-      @NonNull MaterialButton btnConfirmCancelPayment, @NonNull ImageButton btnCopyAccount,
-      @NonNull ImageButton btnCopyAmount, @NonNull ImageButton btnCopyDescription,
+      @NonNull MaterialButton btnConfirmCancelPayment, @NonNull TextView btnCopyAccount,
+      @NonNull TextView btnCopyAmount, @NonNull TextView btnCopyDescription,
       @NonNull MaterialButton btnKeepPayment, @NonNull MaterialButton btnOpenPayOsWeb,
       @NonNull MaterialButton btnRetryQr, @NonNull MaterialButton btnViewOrderFromError,
       @NonNull View dividerQrBottom, @NonNull ImageView imgQrCode,
-      @NonNull LinearLayout llCancelConfirmBar, @NonNull LinearLayout llQrBottomBar,
+      @NonNull MaterialCardView llCancelConfirmBar, @NonNull LinearLayout llQrBottomBar,
       @NonNull LinearLayout llQrError, @NonNull LinearLayout llQrLoading,
       @NonNull LinearLayout qrContentContainer, @NonNull LinearLayout qrPaymentRoot,
       @NonNull NestedScrollView scrollQrContent, @NonNull MaterialToolbar toolbarQrPayment,
@@ -213,19 +213,19 @@ public final class ActivityQrPaymentBinding implements ViewBinding {
       }
 
       id = R.id.btnCopyAccount;
-      ImageButton btnCopyAccount = ViewBindings.findChildViewById(rootView, id);
+      TextView btnCopyAccount = ViewBindings.findChildViewById(rootView, id);
       if (btnCopyAccount == null) {
         break missingId;
       }
 
       id = R.id.btnCopyAmount;
-      ImageButton btnCopyAmount = ViewBindings.findChildViewById(rootView, id);
+      TextView btnCopyAmount = ViewBindings.findChildViewById(rootView, id);
       if (btnCopyAmount == null) {
         break missingId;
       }
 
       id = R.id.btnCopyDescription;
-      ImageButton btnCopyDescription = ViewBindings.findChildViewById(rootView, id);
+      TextView btnCopyDescription = ViewBindings.findChildViewById(rootView, id);
       if (btnCopyDescription == null) {
         break missingId;
       }
@@ -267,7 +267,7 @@ public final class ActivityQrPaymentBinding implements ViewBinding {
       }
 
       id = R.id.llCancelConfirmBar;
-      LinearLayout llCancelConfirmBar = ViewBindings.findChildViewById(rootView, id);
+      MaterialCardView llCancelConfirmBar = ViewBindings.findChildViewById(rootView, id);
       if (llCancelConfirmBar == null) {
         break missingId;
       }

@@ -6,20 +6,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
+import com.google.android.material.card.MaterialCardView;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
 
 public final class ItemCartBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final MaterialCardView rootView;
 
   @NonNull
   public final ImageButton btnCartMinus;
@@ -45,7 +45,7 @@ public final class ItemCartBinding implements ViewBinding {
   @NonNull
   public final TextView tvCartUnitPrice;
 
-  private ItemCartBinding(@NonNull LinearLayout rootView, @NonNull ImageButton btnCartMinus,
+  private ItemCartBinding(@NonNull MaterialCardView rootView, @NonNull ImageButton btnCartMinus,
       @NonNull ImageButton btnCartPlus, @NonNull ImageButton btnCartRemove,
       @NonNull ImageView imgCartProduct, @NonNull TextView tvCartProductName,
       @NonNull TextView tvCartQty, @NonNull TextView tvCartSubtotal,
@@ -63,7 +63,7 @@ public final class ItemCartBinding implements ViewBinding {
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public MaterialCardView getRoot() {
     return rootView;
   }
 
@@ -136,8 +136,9 @@ public final class ItemCartBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemCartBinding((LinearLayout) rootView, btnCartMinus, btnCartPlus, btnCartRemove,
-          imgCartProduct, tvCartProductName, tvCartQty, tvCartSubtotal, tvCartUnitPrice);
+      return new ItemCartBinding((MaterialCardView) rootView, btnCartMinus, btnCartPlus,
+          btnCartRemove, imgCartProduct, tvCartProductName, tvCartQty, tvCartSubtotal,
+          tvCartUnitPrice);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

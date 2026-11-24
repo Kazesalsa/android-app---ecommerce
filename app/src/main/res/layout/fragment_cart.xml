@@ -19,7 +19,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/be_vietnam_pro_bold"
+            android:fontFamily="@font/nunito_extrabold"
             android:letterSpacing="-0.02"
             android:text="@string/cart_title"
             android:textColor="@color/text_primary"
@@ -57,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_freeship_tag"
                 android:backgroundTint="@color/white"
-                android:fontFamily="@font/be_vietnam_pro_bold"
+                android:fontFamily="@font/nunito_extrabold"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="1dp"
                 android:text="Freeship"
@@ -70,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/be_vietnam_pro_medium"
+                android:fontFamily="@font/nunito_semibold"
                 android:textColor="@color/teal_trust"
                 android:textSize="12.5sp" />
         </LinearLayout>
@@ -136,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/be_vietnam_pro_bold"
+                android:fontFamily="@font/nunito_extrabold"
                 android:text="Giỏ hàng đang trống"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp" />
@@ -163,12 +163,13 @@
         </LinearLayout>
     </FrameLayout>
 
-    <!-- TikTok Shop / Shopee Compact Bottom Checkout Bar -->
+    <!-- TikTok Shop / Shopee Elevated Bottom Checkout Bar -->
     <LinearLayout
         android:id="@+id/llCartTotalBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_card"
+        android:elevation="8dp"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -203,7 +204,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
-                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:fontFamily="@font/nunito_extrabold"
                     android:text="0 ₫"
                     android:textColor="@color/primary"
                     android:textSize="19sp" />
