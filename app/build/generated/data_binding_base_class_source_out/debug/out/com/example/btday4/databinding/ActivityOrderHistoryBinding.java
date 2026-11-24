@@ -4,7 +4,9 @@ package com.example.btday4.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +23,9 @@ public final class ActivityOrderHistoryBinding implements ViewBinding {
   private final LinearLayout rootView;
 
   @NonNull
+  public final LinearLayout llOrderTabs;
+
+  @NonNull
   public final LinearLayout llOrdersEmpty;
 
   @NonNull
@@ -30,16 +35,31 @@ public final class ActivityOrderHistoryBinding implements ViewBinding {
   public final RecyclerView rvOrders;
 
   @NonNull
+  public final HorizontalScrollView scrollOrderTabs;
+
+  @NonNull
   public final MaterialToolbar toolbarOrders;
 
+  @NonNull
+  public final TextView tvOrdersEmptySubtitle;
+
+  @NonNull
+  public final TextView tvOrdersEmptyTitle;
+
   private ActivityOrderHistoryBinding(@NonNull LinearLayout rootView,
-      @NonNull LinearLayout llOrdersEmpty, @NonNull LinearLayout orderHistoryRoot,
-      @NonNull RecyclerView rvOrders, @NonNull MaterialToolbar toolbarOrders) {
+      @NonNull LinearLayout llOrderTabs, @NonNull LinearLayout llOrdersEmpty,
+      @NonNull LinearLayout orderHistoryRoot, @NonNull RecyclerView rvOrders,
+      @NonNull HorizontalScrollView scrollOrderTabs, @NonNull MaterialToolbar toolbarOrders,
+      @NonNull TextView tvOrdersEmptySubtitle, @NonNull TextView tvOrdersEmptyTitle) {
     this.rootView = rootView;
+    this.llOrderTabs = llOrderTabs;
     this.llOrdersEmpty = llOrdersEmpty;
     this.orderHistoryRoot = orderHistoryRoot;
     this.rvOrders = rvOrders;
+    this.scrollOrderTabs = scrollOrderTabs;
     this.toolbarOrders = toolbarOrders;
+    this.tvOrdersEmptySubtitle = tvOrdersEmptySubtitle;
+    this.tvOrdersEmptyTitle = tvOrdersEmptyTitle;
   }
 
   @Override
@@ -69,6 +89,12 @@ public final class ActivityOrderHistoryBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.llOrderTabs;
+      LinearLayout llOrderTabs = ViewBindings.findChildViewById(rootView, id);
+      if (llOrderTabs == null) {
+        break missingId;
+      }
+
       id = R.id.llOrdersEmpty;
       LinearLayout llOrdersEmpty = ViewBindings.findChildViewById(rootView, id);
       if (llOrdersEmpty == null) {
@@ -83,14 +109,33 @@ public final class ActivityOrderHistoryBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.scrollOrderTabs;
+      HorizontalScrollView scrollOrderTabs = ViewBindings.findChildViewById(rootView, id);
+      if (scrollOrderTabs == null) {
+        break missingId;
+      }
+
       id = R.id.toolbarOrders;
       MaterialToolbar toolbarOrders = ViewBindings.findChildViewById(rootView, id);
       if (toolbarOrders == null) {
         break missingId;
       }
 
-      return new ActivityOrderHistoryBinding((LinearLayout) rootView, llOrdersEmpty,
-          orderHistoryRoot, rvOrders, toolbarOrders);
+      id = R.id.tvOrdersEmptySubtitle;
+      TextView tvOrdersEmptySubtitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvOrdersEmptySubtitle == null) {
+        break missingId;
+      }
+
+      id = R.id.tvOrdersEmptyTitle;
+      TextView tvOrdersEmptyTitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvOrdersEmptyTitle == null) {
+        break missingId;
+      }
+
+      return new ActivityOrderHistoryBinding((LinearLayout) rootView, llOrderTabs, llOrdersEmpty,
+          orderHistoryRoot, rvOrders, scrollOrderTabs, toolbarOrders, tvOrdersEmptySubtitle,
+          tvOrdersEmptyTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

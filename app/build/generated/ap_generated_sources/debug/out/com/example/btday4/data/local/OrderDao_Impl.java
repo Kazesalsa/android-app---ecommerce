@@ -6,6 +6,7 @@ import androidx.room.EntityInsertAdapter;
 import androidx.room.RoomDatabase;
 import androidx.room.util.DBUtil;
 import androidx.room.util.RelationUtil;
+import androidx.room.util.SQLiteConnectionUtil;
 import androidx.room.util.SQLiteStatementUtil;
 import androidx.room.util.StringUtil;
 import androidx.sqlite.SQLiteConnection;
@@ -444,6 +445,55 @@ public final class OrderDao_Impl implements OrderDao {
         }
         _stmt.step();
         return null;
+      } finally {
+        _stmt.close();
+      }
+    });
+  }
+
+  @Override
+  public int transitionStatus(final String orderId, final String status,
+      final List<String> fromStatuses) {
+    final StringBuilder _stringBuilder = new StringBuilder();
+    _stringBuilder.append("UPDATE orders SET status = ");
+    _stringBuilder.append("?");
+    _stringBuilder.append(" WHERE id = ");
+    _stringBuilder.append("?");
+    _stringBuilder.append(" AND status IN (");
+    final int _inputSize = fromStatuses == null ? 1 : fromStatuses.size();
+    StringUtil.appendPlaceholders(_stringBuilder, _inputSize);
+    _stringBuilder.append(")");
+    final String _sql = _stringBuilder.toString();
+    return DBUtil.performBlocking(__db, false, true, (_connection) -> {
+      final SQLiteStatement _stmt = _connection.prepare(_sql);
+      try {
+        int _argIndex = 1;
+        if (status == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, status);
+        }
+        _argIndex = 2;
+        if (orderId == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, orderId);
+        }
+        _argIndex = 3;
+        if (fromStatuses == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          for (String _item : fromStatuses) {
+            if (_item == null) {
+              _stmt.bindNull(_argIndex);
+            } else {
+              _stmt.bindText(_argIndex, _item);
+            }
+            _argIndex++;
+          }
+        }
+        _stmt.step();
+        return SQLiteConnectionUtil.getTotalChangedRows(_connection);
       } finally {
         _stmt.close();
       }

@@ -23,12 +23,6 @@ public final class FragmentProfileBinding implements ViewBinding {
   private final NestedScrollView rootView;
 
   @NonNull
-  public final MaterialButton btnCancelLogout;
-
-  @NonNull
-  public final MaterialButton btnConfirmLogout;
-
-  @NonNull
   public final TextView btnEditProfileHeader;
 
   @NonNull
@@ -51,9 +45,6 @@ public final class FragmentProfileBinding implements ViewBinding {
 
   @NonNull
   public final View dividerProfilePhone;
-
-  @NonNull
-  public final MaterialCardView llLogoutConfirmBar;
 
   @NonNull
   public final LinearLayout profileContentRoot;
@@ -121,30 +112,23 @@ public final class FragmentProfileBinding implements ViewBinding {
   @NonNull
   public final TextView tvReviewsCount;
 
-  @NonNull
-  public final TextView tvTogglePassword;
-
   private FragmentProfileBinding(@NonNull NestedScrollView rootView,
-      @NonNull MaterialButton btnCancelLogout, @NonNull MaterialButton btnConfirmLogout,
       @NonNull TextView btnEditProfileHeader, @NonNull MaterialButton btnLogout,
       @NonNull TextView btnViewAllOrders, @NonNull MaterialCardView cardPersonalInfo,
       @NonNull View dividerProfileAddress, @NonNull View dividerProfileBirthDate,
       @NonNull View dividerProfileGender, @NonNull View dividerProfilePhone,
-      @NonNull MaterialCardView llLogoutConfirmBar, @NonNull LinearLayout profileContentRoot,
-      @NonNull TextView rowChangePassword, @NonNull LinearLayout rowMyOrders,
-      @NonNull LinearLayout rowMyReviews, @NonNull LinearLayout rowProfileAddress,
-      @NonNull LinearLayout rowProfileBirthDate, @NonNull LinearLayout rowProfileEmail,
-      @NonNull LinearLayout rowProfileGender, @NonNull LinearLayout rowProfilePhone,
-      @NonNull TextView tvAvatarInitials, @NonNull TextView tvOrdersCount,
-      @NonNull TextView tvProfileAddress, @NonNull TextView tvProfileBirthDate,
-      @NonNull TextView tvProfileEmail, @NonNull TextView tvProfileGender,
-      @NonNull TextView tvProfileLoginTime, @NonNull TextView tvProfileName,
-      @NonNull TextView tvProfilePassword, @NonNull TextView tvProfilePhone,
-      @NonNull TextView tvProfileRememberMe, @NonNull TextView tvProfileUsername,
-      @NonNull TextView tvReviewsCount, @NonNull TextView tvTogglePassword) {
+      @NonNull LinearLayout profileContentRoot, @NonNull TextView rowChangePassword,
+      @NonNull LinearLayout rowMyOrders, @NonNull LinearLayout rowMyReviews,
+      @NonNull LinearLayout rowProfileAddress, @NonNull LinearLayout rowProfileBirthDate,
+      @NonNull LinearLayout rowProfileEmail, @NonNull LinearLayout rowProfileGender,
+      @NonNull LinearLayout rowProfilePhone, @NonNull TextView tvAvatarInitials,
+      @NonNull TextView tvOrdersCount, @NonNull TextView tvProfileAddress,
+      @NonNull TextView tvProfileBirthDate, @NonNull TextView tvProfileEmail,
+      @NonNull TextView tvProfileGender, @NonNull TextView tvProfileLoginTime,
+      @NonNull TextView tvProfileName, @NonNull TextView tvProfilePassword,
+      @NonNull TextView tvProfilePhone, @NonNull TextView tvProfileRememberMe,
+      @NonNull TextView tvProfileUsername, @NonNull TextView tvReviewsCount) {
     this.rootView = rootView;
-    this.btnCancelLogout = btnCancelLogout;
-    this.btnConfirmLogout = btnConfirmLogout;
     this.btnEditProfileHeader = btnEditProfileHeader;
     this.btnLogout = btnLogout;
     this.btnViewAllOrders = btnViewAllOrders;
@@ -153,7 +137,6 @@ public final class FragmentProfileBinding implements ViewBinding {
     this.dividerProfileBirthDate = dividerProfileBirthDate;
     this.dividerProfileGender = dividerProfileGender;
     this.dividerProfilePhone = dividerProfilePhone;
-    this.llLogoutConfirmBar = llLogoutConfirmBar;
     this.profileContentRoot = profileContentRoot;
     this.rowChangePassword = rowChangePassword;
     this.rowMyOrders = rowMyOrders;
@@ -176,7 +159,6 @@ public final class FragmentProfileBinding implements ViewBinding {
     this.tvProfileRememberMe = tvProfileRememberMe;
     this.tvProfileUsername = tvProfileUsername;
     this.tvReviewsCount = tvReviewsCount;
-    this.tvTogglePassword = tvTogglePassword;
   }
 
   @Override
@@ -206,18 +188,6 @@ public final class FragmentProfileBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.btnCancelLogout;
-      MaterialButton btnCancelLogout = ViewBindings.findChildViewById(rootView, id);
-      if (btnCancelLogout == null) {
-        break missingId;
-      }
-
-      id = R.id.btnConfirmLogout;
-      MaterialButton btnConfirmLogout = ViewBindings.findChildViewById(rootView, id);
-      if (btnConfirmLogout == null) {
-        break missingId;
-      }
-
       id = R.id.btnEditProfileHeader;
       TextView btnEditProfileHeader = ViewBindings.findChildViewById(rootView, id);
       if (btnEditProfileHeader == null) {
@@ -263,12 +233,6 @@ public final class FragmentProfileBinding implements ViewBinding {
       id = R.id.dividerProfilePhone;
       View dividerProfilePhone = ViewBindings.findChildViewById(rootView, id);
       if (dividerProfilePhone == null) {
-        break missingId;
-      }
-
-      id = R.id.llLogoutConfirmBar;
-      MaterialCardView llLogoutConfirmBar = ViewBindings.findChildViewById(rootView, id);
-      if (llLogoutConfirmBar == null) {
         break missingId;
       }
 
@@ -404,20 +368,14 @@ public final class FragmentProfileBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tvTogglePassword;
-      TextView tvTogglePassword = ViewBindings.findChildViewById(rootView, id);
-      if (tvTogglePassword == null) {
-        break missingId;
-      }
-
-      return new FragmentProfileBinding((NestedScrollView) rootView, btnCancelLogout,
-          btnConfirmLogout, btnEditProfileHeader, btnLogout, btnViewAllOrders, cardPersonalInfo,
-          dividerProfileAddress, dividerProfileBirthDate, dividerProfileGender, dividerProfilePhone,
-          llLogoutConfirmBar, profileContentRoot, rowChangePassword, rowMyOrders, rowMyReviews,
-          rowProfileAddress, rowProfileBirthDate, rowProfileEmail, rowProfileGender,
-          rowProfilePhone, tvAvatarInitials, tvOrdersCount, tvProfileAddress, tvProfileBirthDate,
-          tvProfileEmail, tvProfileGender, tvProfileLoginTime, tvProfileName, tvProfilePassword,
-          tvProfilePhone, tvProfileRememberMe, tvProfileUsername, tvReviewsCount, tvTogglePassword);
+      return new FragmentProfileBinding((NestedScrollView) rootView, btnEditProfileHeader,
+          btnLogout, btnViewAllOrders, cardPersonalInfo, dividerProfileAddress,
+          dividerProfileBirthDate, dividerProfileGender, dividerProfilePhone, profileContentRoot,
+          rowChangePassword, rowMyOrders, rowMyReviews, rowProfileAddress, rowProfileBirthDate,
+          rowProfileEmail, rowProfileGender, rowProfilePhone, tvAvatarInitials, tvOrdersCount,
+          tvProfileAddress, tvProfileBirthDate, tvProfileEmail, tvProfileGender, tvProfileLoginTime,
+          tvProfileName, tvProfilePassword, tvProfilePhone, tvProfileRememberMe, tvProfileUsername,
+          tvReviewsCount);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -12,6 +12,7 @@ import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.util.Constants;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.WriteBatch;
@@ -223,6 +224,16 @@ public final class FirestoreHelper {
                         callback.onError(e);
                     }
                 });
+    }
+
+    /**
+     * Best-effort mirror of a local stock change using an atomic server-side increment.
+     */
+    public static void adjustProductStock(@NonNull String productId, int delta) {
+        getDb().collection(Constants.COLLECTION_PRODUCTS)
+                .document(productId)
+                .update("stock", FieldValue.increment(delta))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to sync product stock", e));
     }
 
     public static void savePayment(@NonNull PaymentEntity payment, FirestoreCallback<Void> callback) {

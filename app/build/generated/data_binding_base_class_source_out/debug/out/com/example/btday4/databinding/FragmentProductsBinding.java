@@ -104,9 +104,6 @@ public final class FragmentProductsBinding implements ViewBinding {
   public final TextView tvSortRating;
 
   @NonNull
-  public final TextView tvSpotlightBrand;
-
-  @NonNull
   public final TextView tvSpotlightName;
 
   @NonNull
@@ -131,9 +128,8 @@ public final class FragmentProductsBinding implements ViewBinding {
       @NonNull TextView tvHomeCartBadge, @NonNull TextView tvProductCount,
       @NonNull TextView tvSortDefault, @NonNull TextView tvSortPriceAsc,
       @NonNull TextView tvSortPriceDesc, @NonNull TextView tvSortRating,
-      @NonNull TextView tvSpotlightBrand, @NonNull TextView tvSpotlightName,
-      @NonNull TextView tvSpotlightPrice, @NonNull TextView tvSpotlightSubtitle,
-      @NonNull TextView tvWelcomeUser) {
+      @NonNull TextView tvSpotlightName, @NonNull TextView tvSpotlightPrice,
+      @NonNull TextView tvSpotlightSubtitle, @NonNull TextView tvWelcomeUser) {
     this.rootView = rootView;
     this.btnClearSearch = btnClearSearch;
     this.btnHomeCart = btnHomeCart;
@@ -160,7 +156,6 @@ public final class FragmentProductsBinding implements ViewBinding {
     this.tvSortPriceAsc = tvSortPriceAsc;
     this.tvSortPriceDesc = tvSortPriceDesc;
     this.tvSortRating = tvSortRating;
-    this.tvSpotlightBrand = tvSpotlightBrand;
     this.tvSpotlightName = tvSpotlightName;
     this.tvSpotlightPrice = tvSpotlightPrice;
     this.tvSpotlightSubtitle = tvSpotlightSubtitle;
@@ -344,12 +339,6 @@ public final class FragmentProductsBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tvSpotlightBrand;
-      TextView tvSpotlightBrand = ViewBindings.findChildViewById(rootView, id);
-      if (tvSpotlightBrand == null) {
-        break missingId;
-      }
-
       id = R.id.tvSpotlightName;
       TextView tvSpotlightName = ViewBindings.findChildViewById(rootView, id);
       if (tvSpotlightName == null) {
@@ -379,8 +368,8 @@ public final class FragmentProductsBinding implements ViewBinding {
           indSortDefault, indSortPriceAsc, indSortPriceDesc, indSortRating, llEmptyProducts,
           rowTrustStrip, rvProducts, scrollProducts, tabSortDefault, tabSortPriceAsc,
           tabSortPriceDesc, tabSortRating, tvHomeCartBadge, tvProductCount, tvSortDefault,
-          tvSortPriceAsc, tvSortPriceDesc, tvSortRating, tvSpotlightBrand, tvSpotlightName,
-          tvSpotlightPrice, tvSpotlightSubtitle, tvWelcomeUser);
+          tvSortPriceAsc, tvSortPriceDesc, tvSortRating, tvSpotlightName, tvSpotlightPrice,
+          tvSpotlightSubtitle, tvWelcomeUser);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

@@ -3,7 +3,6 @@ package com.example.btday4.ui.profile;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.example.btday4.R;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.data.repository.UserSession;
@@ -20,19 +20,18 @@ import com.example.btday4.databinding.FragmentProfileBinding;
 import com.example.btday4.ui.auth.LoginActivity;
 import com.example.btday4.ui.orders.OrderHistoryActivity;
 import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Full-bleed Account Hub displaying populated profile fields cleanly (hiding empty fields),
- * Orders, My Reviews, Edit Profile, Change Password, and two-step inline logout (zero popups).
+ * Orders, My Reviews, Edit Profile, Change Password, and logout with a confirmation popup.
  */
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding binding;
     private UserSession userSession;
-    private String currentPassword = "";
-    private boolean isPasswordVisible = false;
 
     private final ActivityResultLauncher<Intent> editProfileLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -49,12 +48,8 @@ public class ProfileFragment extends Fragment {
     private final ActivityResultLauncher<Intent> changePasswordLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    isPasswordVisible = false;
-                    refreshProfileData();
-                    if (isAdded() && binding != null) {
-                        Snackbar.make(binding.getRoot(), "Đã cập nhật mật khẩu", Snackbar.LENGTH_SHORT).show();
-                    }
+                if (result.getResultCode() == Activity.RESULT_OK && isAdded() && binding != null) {
+                    Snackbar.make(binding.getRoot(), "Đã cập nhật mật khẩu", Snackbar.LENGTH_SHORT).show();
                 }
             }
     );
@@ -92,15 +87,13 @@ public class ProfileFragment extends Fragment {
                 changePasswordLauncher.launch(new Intent(requireContext(), ChangePasswordActivity.class))
         );
 
-        binding.tvTogglePassword.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
-            updatePasswordDisplay();
-        });
-
-        // Two-step inline logout confirmation (no AlertDialog popup)
-        binding.btnLogout.setOnClickListener(v -> showInlineLogoutConfirm(true));
-        binding.btnCancelLogout.setOnClickListener(v -> showInlineLogoutConfirm(false));
-        binding.btnConfirmLogout.setOnClickListener(v -> performLogout());
+        binding.btnLogout.setOnClickListener(v -> UiUtils.showConfirmDialog(
+                requireContext(),
+                "Đăng xuất?",
+                "Bạn sẽ quay về màn hình đăng nhập.",
+                getString(R.string.btn_logout),
+                this::performLogout
+        ));
 
         refreshProfileData();
     }
@@ -115,7 +108,6 @@ public class ProfileFragment extends Fragment {
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (!hidden) {
-            showInlineLogoutConfirm(false);
             refreshProfileData();
         }
     }
@@ -158,7 +150,6 @@ public class ProfileFragment extends Fragment {
             String birthDate = user != null ? user.getBirthDate() : "";
             String address = user != null ? user.getAddress() : "";
             String loginTime = user != null ? user.getLoginTime() : "";
-            currentPassword = user != null && user.getPassword() != null ? user.getPassword() : "";
 
             binding.tvAvatarInitials.setText(FormatUtils.extractInitials(displayName));
             binding.tvProfileName.setText(displayName);
@@ -174,7 +165,6 @@ public class ProfileFragment extends Fragment {
             binding.tvProfileLoginTime.setText(
                     ValidationUtils.isNotBlank(loginTime) ? loginTime : "Vừa đăng nhập"
             );
-            updatePasswordDisplay();
         });
     }
 
@@ -217,47 +207,11 @@ public class ProfileFragment extends Fragment {
         return hasVisibleAbove || hasValue;
     }
 
-    private void showInlineLogoutConfirm(boolean show) {
-        if (binding == null) {
-            return;
-        }
-        TransitionManager.beginDelayedTransition(binding.profileContentRoot);
-        binding.btnLogout.setVisibility(show ? View.GONE : View.VISIBLE);
-        binding.llLogoutConfirmBar.setVisibility(show ? View.VISIBLE : View.GONE);
-    }
-
-    private void updatePasswordDisplay() {
-        if (binding == null) {
-            return;
-        }
-        if (currentPassword.isEmpty()) {
-            binding.tvProfilePassword.setText("••••••");
-            binding.tvTogglePassword.setVisibility(View.GONE);
-            return;
-        }
-        binding.tvTogglePassword.setVisibility(View.VISIBLE);
-        if (isPasswordVisible) {
-            binding.tvProfilePassword.setText(currentPassword);
-            binding.tvTogglePassword.setText("Ẩn");
-        } else {
-            StringBuilder masked = new StringBuilder();
-            for (int i = 0; i < currentPassword.length(); i++) {
-                masked.append('•');
-            }
-            binding.tvProfilePassword.setText(masked.toString());
-            binding.tvTogglePassword.setText("Hiện");
-        }
-    }
-
     private void performLogout() {
-        userSession.logout(() -> {
-            if (!isAdded()) {
-                return;
-            }
-            Intent intent = new Intent(requireContext(), LoginActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            requireActivity().finish();
-        });
+        userSession.logout();
+        Intent intent = new Intent(requireContext(), LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        requireActivity().finish();
     }
 }

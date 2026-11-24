@@ -6,6 +6,7 @@ import com.example.btday4.data.local.AppDatabase;
 import com.example.btday4.data.local.UserEntity;
 import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.util.Constants;
+import com.example.btday4.util.PasswordHasher;
 import com.example.btday4.util.ValidationUtils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +19,13 @@ import java.util.function.Consumer;
  */
 public class UserSession {
 
+    public enum AuthResult {
+        SUCCESS,
+        ACCOUNT_NOT_FOUND,
+        WRONG_PASSWORD,
+        ACCOUNT_EXISTS
+    }
+
     private final Context appContext;
     private final SharedPreferences prefs;
 
@@ -26,52 +34,79 @@ public class UserSession {
         this.prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    public void saveLogin(String username, String password, boolean rememberMe, Runnable onDone) {
+    /**
+     * Verifies credentials against the stored salted hash. Legacy plaintext rows are re-hashed on
+     * the first successful login.
+     */
+    public void login(String username, String password, boolean rememberMe, Consumer<AuthResult> callback) {
         String cleanUsername = username == null ? "" : username.trim();
-        String defaultDisplayName = deriveDisplayName(cleanUsername);
-        String loginTime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
-        String cleanPassword = password == null ? "" : password;
+        AppDatabase.runAsync(appContext, db -> {
+            UserEntity user = db.userDao().findByUsername(cleanUsername);
+            AuthResult result;
+            if (user == null) {
+                result = AuthResult.ACCOUNT_NOT_FOUND;
+            } else if (!PasswordHasher.matches(password, user.getPassword())) {
+                result = AuthResult.WRONG_PASSWORD;
+            } else {
+                if (!PasswordHasher.isHashed(user.getPassword())) {
+                    db.userDao().updatePassword(user.getUsername(), PasswordHasher.hash(password));
+                }
+                startSession(db, user, rememberMe);
+                result = AuthResult.SUCCESS;
+            }
+            AppDatabase.postToMain(() -> callback.accept(result));
+        });
+    }
 
+    public void register(
+            String username,
+            String displayName,
+            String password,
+            boolean rememberMe,
+            Consumer<AuthResult> callback
+    ) {
+        String cleanUsername = username == null ? "" : username.trim();
+        String cleanDisplayName = ValidationUtils.isNotBlank(displayName)
+                ? displayName.trim()
+                : deriveDisplayName(cleanUsername);
+        AppDatabase.runAsync(appContext, db -> {
+            AuthResult result;
+            if (db.userDao().findByUsername(cleanUsername) != null) {
+                result = AuthResult.ACCOUNT_EXISTS;
+            } else {
+                UserEntity user = new UserEntity(
+                        cleanUsername,
+                        cleanDisplayName,
+                        PasswordHasher.hash(password),
+                        "",
+                        "",
+                        "",
+                        ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "",
+                        "",
+                        ""
+                );
+                db.userDao().insert(user);
+                startSession(db, user, rememberMe);
+                result = AuthResult.SUCCESS;
+            }
+            AppDatabase.postToMain(() -> callback.accept(result));
+        });
+    }
+
+    private void startSession(AppDatabase db, UserEntity user, boolean rememberMe) {
+        String loginTime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+        db.userDao().updateLoginTime(user.getUsername(), loginTime);
+        user.setLoginTime(loginTime);
+        String displayName = ValidationUtils.isNotBlank(user.getDisplayName())
+                ? user.getDisplayName()
+                : deriveDisplayName(user.getUsername());
         prefs.edit()
                 .putBoolean(Constants.KEY_IS_LOGGED_IN, true)
-                .putString(Constants.KEY_USERNAME, cleanUsername)
-                .putString(Constants.KEY_DISPLAY_NAME, defaultDisplayName)
+                .putString(Constants.KEY_USERNAME, user.getUsername())
+                .putString(Constants.KEY_DISPLAY_NAME, displayName)
                 .putBoolean(Constants.KEY_REMEMBER_ME, rememberMe)
-                .apply();
-
-        AppDatabase.runAsync(appContext, db -> {
-            UserEntity existing = db.userDao().findByUsername(cleanUsername);
-            String finalDisplayName = existing != null && ValidationUtils.isNotBlank(existing.getDisplayName())
-                    ? existing.getDisplayName()
-                    : defaultDisplayName;
-            String existingPhone = existing != null && existing.getPhone() != null ? existing.getPhone() : "";
-            String existingAddress = existing != null && existing.getAddress() != null ? existing.getAddress() : "";
-            String existingEmail = existing != null && ValidationUtils.isNotBlank(existing.getEmail())
-                    ? existing.getEmail()
-                    : (ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "");
-            String existingGender = existing != null && existing.getGender() != null ? existing.getGender() : "";
-            String existingBirthDate = existing != null && existing.getBirthDate() != null ? existing.getBirthDate() : "";
-
-            prefs.edit().putString(Constants.KEY_DISPLAY_NAME, finalDisplayName).apply();
-
-            UserEntity entity = new UserEntity(
-                    cleanUsername,
-                    finalDisplayName,
-                    cleanPassword,
-                    existingPhone,
-                    existingAddress,
-                    loginTime,
-                    existingEmail,
-                    existingGender,
-                    existingBirthDate
-            );
-            db.userDao().upsert(entity);
-            FirestoreHelper.saveUser(entity, null);
-
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
-            }
-        });
+                .commit();
+        FirestoreHelper.saveUser(user, null);
     }
 
     public void updateProfile(
@@ -151,25 +186,16 @@ public class UserSession {
     public void changePassword(String currentPassword, String newPassword, Consumer<Boolean> callback) {
         String username = getUsername();
         if (username.isEmpty() || !ValidationUtils.isValidPassword(newPassword)) {
-            if (callback != null) {
-                callback.accept(false);
-            }
+            callback.accept(false);
             return;
         }
         AppDatabase.runAsync(appContext, db -> {
             UserEntity user = db.userDao().findByUsername(username);
-            if (user == null || user.getPassword() == null || !user.getPassword().equals(currentPassword)) {
-                if (callback != null) {
-                    AppDatabase.postToMain(() -> callback.accept(false));
-                }
-                return;
+            boolean verified = user != null && PasswordHasher.matches(currentPassword, user.getPassword());
+            if (verified) {
+                db.userDao().updatePassword(user.getUsername(), PasswordHasher.hash(newPassword));
             }
-            db.userDao().updatePassword(username, newPassword);
-            user.setPassword(newPassword);
-            FirestoreHelper.saveUser(user, null);
-            if (callback != null) {
-                AppDatabase.postToMain(() -> callback.accept(true));
-            }
+            AppDatabase.postToMain(() -> callback.accept(verified));
         });
     }
 
@@ -185,25 +211,16 @@ public class UserSession {
         });
     }
 
-    public void logout(Runnable onDone) {
-        boolean keepSavedUsername = isRemembered();
-        String currentUsername = getUsername();
-
+    /**
+     * Ends the session only; the registered account and its cart stay stored for the next login.
+     */
+    public void logout() {
         SharedPreferences.Editor editor = prefs.edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false);
-        if (!keepSavedUsername) {
+        if (!isRemembered()) {
             editor.remove(Constants.KEY_USERNAME);
             editor.remove(Constants.KEY_DISPLAY_NAME);
         }
         editor.apply();
-
-        AppDatabase.runAsync(appContext, db -> {
-            if (!currentUsername.isEmpty() && !keepSavedUsername) {
-                db.userDao().deleteByUsername(currentUsername);
-            }
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
-            }
-        });
     }
 
     public boolean isLoggedIn() {

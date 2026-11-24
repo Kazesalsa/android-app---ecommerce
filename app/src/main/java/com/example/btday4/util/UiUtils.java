@@ -1,12 +1,19 @@
 package com.example.btday4.util;
 
+import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import com.example.btday4.R;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 /**
@@ -73,5 +80,37 @@ public final class UiUtils {
             public void afterTextChanged(Editable s) {
             }
         });
+    }
+
+    /**
+     * Styles a Shopee-like underline tab: coral bold label + visible indicator when active.
+     */
+    public static void styleUnderlineTab(TextView label, View indicator, boolean active) {
+        Context context = label.getContext();
+        label.setTextColor(ContextCompat.getColor(context, active ? R.color.primary : R.color.text_secondary));
+        label.setTypeface(ResourcesCompat.getFont(context, active ? R.font.nunito_bold : R.font.nunito_semibold));
+        indicator.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
+    }
+
+    /**
+     * Simple confirmation popup for destructive actions (logout, cancel order).
+     */
+    public static void showConfirmDialog(
+            Context context,
+            String title,
+            String message,
+            String confirmLabel,
+            Runnable onConfirm
+    ) {
+        AlertDialog dialog = new MaterialAlertDialogBuilder(context)
+                .setTitle(title)
+                .setMessage(message)
+                .setNegativeButton(R.string.btn_cancel, null)
+                .setPositiveButton(confirmLabel, (d, which) -> onConfirm.run())
+                .show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                .setTextColor(ContextCompat.getColor(context, R.color.danger_red));
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                .setTextColor(ContextCompat.getColor(context, R.color.text_secondary));
     }
 }

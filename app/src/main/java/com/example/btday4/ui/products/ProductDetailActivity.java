@@ -111,12 +111,9 @@ public class ProductDetailActivity extends AppCompatActivity {
         });
 
         binding.btnQtyPlus.setOnClickListener(v -> {
-            if (product != null) {
-                int maxAllowed = Math.min(Constants.MAX_CART_QUANTITY, Math.max(1, product.getStock()));
-                if (quantity < maxAllowed) {
-                    quantity++;
-                    updateQuantityUi();
-                }
+            if (product != null && quantity < CartRepository.maxPurchasable(product)) {
+                quantity++;
+                updateQuantityUi();
             }
         });
 
@@ -134,8 +131,6 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
             product = loaded;
             bindProduct(loaded);
-            binding.btnAddToCart.setEnabled(true);
-            binding.btnBuyNow.setEnabled(true);
             loadReviews();
         });
 
@@ -146,6 +141,14 @@ public class ProductDetailActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshCartBadge();
+        if (product != null) {
+            ProductRepository.findById(this, product.getId(), latest -> {
+                if (latest != null && !isFinishing() && !isDestroyed()) {
+                    product = latest;
+                    bindStockState(latest);
+                }
+            });
+        }
     }
 
     private void bindProduct(Product item) {
@@ -153,7 +156,6 @@ public class ProductDetailActivity extends AppCompatActivity {
 
         binding.tvDetailBrand.setText(ValidationUtils.isNotBlank(item.getBrand()) ? item.getBrand() : "");
         binding.tvDetailCategory.setText(ValidationUtils.isNotBlank(item.getCategory()) ? item.getCategory() : "");
-        binding.tvStockStatus.setText(item.getStock() > 0 ? "Còn hàng (" + item.getStock() + ")" : "Hết hàng");
         binding.tvDetailName.setText(item.getName());
         binding.tvDetailPrice.setText(item.getPrice());
 
@@ -182,6 +184,22 @@ public class ProductDetailActivity extends AppCompatActivity {
         binding.tvDetailDescription.setText(fullDescription);
 
         bindSpecifications(item.parseSpecs());
+        bindStockState(item);
+    }
+
+    /**
+     * Clamps the selected quantity to available stock and locks purchase actions when sold out.
+     */
+    private void bindStockState(Product item) {
+        int maxPurchasable = CartRepository.maxPurchasable(item);
+        boolean inStock = maxPurchasable > 0;
+        binding.tvStockStatus.setText(inStock ? "Còn hàng (" + item.getStock() + ")" : getString(R.string.out_of_stock));
+        quantity = inStock ? Math.max(1, Math.min(quantity, maxPurchasable)) : 1;
+        binding.btnQtyMinus.setEnabled(inStock);
+        binding.btnQtyPlus.setEnabled(inStock);
+        binding.btnAddToCart.setEnabled(inStock);
+        binding.btnBuyNow.setEnabled(inStock);
+        binding.btnBuyNow.setText(inStock ? R.string.btn_buy_now : R.string.out_of_stock);
         updateQuantityUi();
     }
 
@@ -353,17 +371,16 @@ public class ProductDetailActivity extends AppCompatActivity {
             return;
         }
         binding.btnAddToCart.setEnabled(false);
-        CartRepository.addItem(this, product.getId(), quantity, () -> {
+        CartRepository.addItem(this, product.getId(), quantity, added -> {
             if (isFinishing() || isDestroyed()) {
                 return;
             }
             binding.btnAddToCart.setEnabled(true);
             refreshCartBadge();
-            Snackbar.make(
-                            binding.getRoot(),
-                            "Đã thêm " + quantity + " × " + product.getName() + " vào giỏ",
-                            Snackbar.LENGTH_LONG
-                    )
+            String message = added > 0
+                    ? "Đã thêm " + added + " × " + product.getName() + " vào giỏ"
+                    : "Giỏ hàng đã có tối đa " + CartRepository.maxPurchasable(product) + " sản phẩm còn trong kho";
+            Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG)
                     .setAction("Xem giỏ", v -> openCartAndFinish())
                     .show();
         });

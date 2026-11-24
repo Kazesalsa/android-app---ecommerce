@@ -4,6 +4,7 @@ package com.example.btday4.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -30,13 +31,40 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final MaterialCheckBox cbRememberMe;
 
   @NonNull
+  public final TextInputEditText etConfirmPassword;
+
+  @NonNull
+  public final TextInputEditText etDisplayName;
+
+  @NonNull
   public final TextInputEditText etPassword;
 
   @NonNull
   public final TextInputEditText etUsername;
 
   @NonNull
+  public final View indTabLogin;
+
+  @NonNull
+  public final View indTabRegister;
+
+  @NonNull
+  public final LinearLayout llAuthForm;
+
+  @NonNull
   public final ScrollView loginRoot;
+
+  @NonNull
+  public final LinearLayout tabModeLogin;
+
+  @NonNull
+  public final LinearLayout tabModeRegister;
+
+  @NonNull
+  public final TextInputLayout tilConfirmPassword;
+
+  @NonNull
+  public final TextInputLayout tilDisplayName;
 
   @NonNull
   public final TextInputLayout tilPassword;
@@ -45,22 +73,52 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final TextInputLayout tilUsername;
 
   @NonNull
+  public final TextView tvAuthSubtitle;
+
+  @NonNull
+  public final TextView tvAuthTitle;
+
+  @NonNull
   public final TextView tvFillDemo;
 
+  @NonNull
+  public final TextView tvTabLogin;
+
+  @NonNull
+  public final TextView tvTabRegister;
+
   private ActivityLoginBinding(@NonNull ScrollView rootView, @NonNull MaterialButton btnLogin,
-      @NonNull MaterialCheckBox cbRememberMe, @NonNull TextInputEditText etPassword,
-      @NonNull TextInputEditText etUsername, @NonNull ScrollView loginRoot,
+      @NonNull MaterialCheckBox cbRememberMe, @NonNull TextInputEditText etConfirmPassword,
+      @NonNull TextInputEditText etDisplayName, @NonNull TextInputEditText etPassword,
+      @NonNull TextInputEditText etUsername, @NonNull View indTabLogin,
+      @NonNull View indTabRegister, @NonNull LinearLayout llAuthForm, @NonNull ScrollView loginRoot,
+      @NonNull LinearLayout tabModeLogin, @NonNull LinearLayout tabModeRegister,
+      @NonNull TextInputLayout tilConfirmPassword, @NonNull TextInputLayout tilDisplayName,
       @NonNull TextInputLayout tilPassword, @NonNull TextInputLayout tilUsername,
-      @NonNull TextView tvFillDemo) {
+      @NonNull TextView tvAuthSubtitle, @NonNull TextView tvAuthTitle, @NonNull TextView tvFillDemo,
+      @NonNull TextView tvTabLogin, @NonNull TextView tvTabRegister) {
     this.rootView = rootView;
     this.btnLogin = btnLogin;
     this.cbRememberMe = cbRememberMe;
+    this.etConfirmPassword = etConfirmPassword;
+    this.etDisplayName = etDisplayName;
     this.etPassword = etPassword;
     this.etUsername = etUsername;
+    this.indTabLogin = indTabLogin;
+    this.indTabRegister = indTabRegister;
+    this.llAuthForm = llAuthForm;
     this.loginRoot = loginRoot;
+    this.tabModeLogin = tabModeLogin;
+    this.tabModeRegister = tabModeRegister;
+    this.tilConfirmPassword = tilConfirmPassword;
+    this.tilDisplayName = tilDisplayName;
     this.tilPassword = tilPassword;
     this.tilUsername = tilUsername;
+    this.tvAuthSubtitle = tvAuthSubtitle;
+    this.tvAuthTitle = tvAuthTitle;
     this.tvFillDemo = tvFillDemo;
+    this.tvTabLogin = tvTabLogin;
+    this.tvTabRegister = tvTabRegister;
   }
 
   @Override
@@ -102,6 +160,18 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.etConfirmPassword;
+      TextInputEditText etConfirmPassword = ViewBindings.findChildViewById(rootView, id);
+      if (etConfirmPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.etDisplayName;
+      TextInputEditText etDisplayName = ViewBindings.findChildViewById(rootView, id);
+      if (etDisplayName == null) {
+        break missingId;
+      }
+
       id = R.id.etPassword;
       TextInputEditText etPassword = ViewBindings.findChildViewById(rootView, id);
       if (etPassword == null) {
@@ -114,7 +184,49 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.indTabLogin;
+      View indTabLogin = ViewBindings.findChildViewById(rootView, id);
+      if (indTabLogin == null) {
+        break missingId;
+      }
+
+      id = R.id.indTabRegister;
+      View indTabRegister = ViewBindings.findChildViewById(rootView, id);
+      if (indTabRegister == null) {
+        break missingId;
+      }
+
+      id = R.id.llAuthForm;
+      LinearLayout llAuthForm = ViewBindings.findChildViewById(rootView, id);
+      if (llAuthForm == null) {
+        break missingId;
+      }
+
       ScrollView loginRoot = (ScrollView) rootView;
+
+      id = R.id.tabModeLogin;
+      LinearLayout tabModeLogin = ViewBindings.findChildViewById(rootView, id);
+      if (tabModeLogin == null) {
+        break missingId;
+      }
+
+      id = R.id.tabModeRegister;
+      LinearLayout tabModeRegister = ViewBindings.findChildViewById(rootView, id);
+      if (tabModeRegister == null) {
+        break missingId;
+      }
+
+      id = R.id.tilConfirmPassword;
+      TextInputLayout tilConfirmPassword = ViewBindings.findChildViewById(rootView, id);
+      if (tilConfirmPassword == null) {
+        break missingId;
+      }
+
+      id = R.id.tilDisplayName;
+      TextInputLayout tilDisplayName = ViewBindings.findChildViewById(rootView, id);
+      if (tilDisplayName == null) {
+        break missingId;
+      }
 
       id = R.id.tilPassword;
       TextInputLayout tilPassword = ViewBindings.findChildViewById(rootView, id);
@@ -128,14 +240,41 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvAuthSubtitle;
+      TextView tvAuthSubtitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvAuthSubtitle == null) {
+        break missingId;
+      }
+
+      id = R.id.tvAuthTitle;
+      TextView tvAuthTitle = ViewBindings.findChildViewById(rootView, id);
+      if (tvAuthTitle == null) {
+        break missingId;
+      }
+
       id = R.id.tvFillDemo;
       TextView tvFillDemo = ViewBindings.findChildViewById(rootView, id);
       if (tvFillDemo == null) {
         break missingId;
       }
 
-      return new ActivityLoginBinding((ScrollView) rootView, btnLogin, cbRememberMe, etPassword,
-          etUsername, loginRoot, tilPassword, tilUsername, tvFillDemo);
+      id = R.id.tvTabLogin;
+      TextView tvTabLogin = ViewBindings.findChildViewById(rootView, id);
+      if (tvTabLogin == null) {
+        break missingId;
+      }
+
+      id = R.id.tvTabRegister;
+      TextView tvTabRegister = ViewBindings.findChildViewById(rootView, id);
+      if (tvTabRegister == null) {
+        break missingId;
+      }
+
+      return new ActivityLoginBinding((ScrollView) rootView, btnLogin, cbRememberMe,
+          etConfirmPassword, etDisplayName, etPassword, etUsername, indTabLogin, indTabRegister,
+          llAuthForm, loginRoot, tabModeLogin, tabModeRegister, tilConfirmPassword, tilDisplayName,
+          tilPassword, tilUsername, tvAuthSubtitle, tvAuthTitle, tvFillDemo, tvTabLogin,
+          tvTabRegister);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

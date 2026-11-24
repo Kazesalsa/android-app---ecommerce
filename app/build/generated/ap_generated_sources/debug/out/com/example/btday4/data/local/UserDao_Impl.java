@@ -27,7 +27,7 @@ public final class UserDao_Impl implements UserDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `users` (`username`,`display_name`,`password`,`phone`,`address`,`login_time`,`email`,`gender`,`birth_date`) VALUES (?,?,?,?,?,?,?,?,?)";
+        return "INSERT OR IGNORE INTO `users` (`username`,`display_name`,`password`,`phone`,`address`,`login_time`,`email`,`gender`,`birth_date`) VALUES (?,?,?,?,?,?,?,?,?)";
       }
 
       @Override
@@ -82,16 +82,15 @@ public final class UserDao_Impl implements UserDao {
   }
 
   @Override
-  public void upsert(final UserEntity user) {
-    DBUtil.performBlocking(__db, false, true, (_connection) -> {
-      __insertAdapterOfUserEntity.insert(_connection, user);
-      return null;
+  public long insert(final UserEntity user) {
+    return DBUtil.performBlocking(__db, false, true, (_connection) -> {
+      return __insertAdapterOfUserEntity.insertAndReturnId(_connection, user);
     });
   }
 
   @Override
   public UserEntity findByUsername(final String username) {
-    final String _sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
+    final String _sql = "SELECT * FROM users WHERE username = ? COLLATE NOCASE LIMIT 1";
     return DBUtil.performBlocking(__db, true, false, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
@@ -274,16 +273,16 @@ public final class UserDao_Impl implements UserDao {
   }
 
   @Override
-  public void updatePassword(final String username, final String newPassword) {
+  public void updatePassword(final String username, final String passwordHash) {
     final String _sql = "UPDATE users SET password = ? WHERE username = ?";
     DBUtil.performBlocking(__db, false, true, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
         int _argIndex = 1;
-        if (newPassword == null) {
+        if (passwordHash == null) {
           _stmt.bindNull(_argIndex);
         } else {
-          _stmt.bindText(_argIndex, newPassword);
+          _stmt.bindText(_argIndex, passwordHash);
         }
         _argIndex = 2;
         if (username == null) {
@@ -300,12 +299,18 @@ public final class UserDao_Impl implements UserDao {
   }
 
   @Override
-  public void deleteByUsername(final String username) {
-    final String _sql = "DELETE FROM users WHERE username = ?";
+  public void updateLoginTime(final String username, final String loginTime) {
+    final String _sql = "UPDATE users SET login_time = ? WHERE username = ?";
     DBUtil.performBlocking(__db, false, true, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
         int _argIndex = 1;
+        if (loginTime == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, loginTime);
+        }
+        _argIndex = 2;
         if (username == null) {
           _stmt.bindNull(_argIndex);
         } else {

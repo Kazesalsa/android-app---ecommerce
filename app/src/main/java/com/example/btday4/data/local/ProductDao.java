@@ -55,4 +55,16 @@ public interface ProductDao {
 
     @Update
     void updateSingle(Product product);
+
+    /**
+     * Reserves stock only when enough units remain; returns 0 when the product is out of stock.
+     */
+    @Query("UPDATE products SET stock = stock - :quantity WHERE id = :id AND stock >= :quantity")
+    int decrementStock(String id, int quantity);
+
+    @Query("UPDATE products SET stock = stock + :quantity WHERE id = :id")
+    void incrementStock(String id, int quantity);
+
+    @Query("SELECT stock FROM products WHERE id = :id")
+    int getStock(String id);
 }

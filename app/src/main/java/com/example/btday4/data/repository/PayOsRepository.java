@@ -218,24 +218,20 @@ public final class PayOsRepository {
                 paidAt
         );
 
-        String targetOrderStatus = null;
-        if (PayOsPaymentInfo.STATUS_PAID.equals(normalized)) {
-            targetOrderStatus = OrderStatus.PAID.getCode();
-        } else if (PayOsPaymentInfo.STATUS_CANCELLED.equals(normalized)) {
-            targetOrderStatus = OrderStatus.CANCELLED.getCode();
-        }
-
-        final String finalOrderStatus = targetOrderStatus;
+        boolean isPaid = PayOsPaymentInfo.STATUS_PAID.equals(normalized);
         db.runInTransaction(() -> {
             db.paymentDao().upsert(updated);
-            if (finalOrderStatus != null) {
-                db.orderDao().updateStatus(updated.getOrderId(), finalOrderStatus);
+            if (isPaid) {
+                db.orderDao().updateStatus(updated.getOrderId(), OrderStatus.PAID.getCode());
             }
         });
+        if (PayOsPaymentInfo.STATUS_CANCELLED.equals(normalized)) {
+            OrderRepository.cancelAndRestock(db, updated.getOrderId());
+        }
 
         FirestoreHelper.savePayment(updated, null);
-        if (finalOrderStatus != null) {
-            FirestoreHelper.updateOrderStatus(updated.getOrderId(), finalOrderStatus, null);
+        if (isPaid) {
+            FirestoreHelper.updateOrderStatus(updated.getOrderId(), OrderStatus.PAID.getCode(), null);
         }
         return updated;
     }

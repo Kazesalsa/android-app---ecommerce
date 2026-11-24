@@ -7,11 +7,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.btday4.R;
@@ -27,6 +24,7 @@ import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.GridSpacingItemDecoration;
 import com.example.btday4.util.ProductImageLoader;
+import com.example.btday4.util.UiUtils;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
@@ -227,7 +225,6 @@ public class ProductsFragment extends Fragment {
             spotlightProduct = allProducts.get(0).product;
         }
         if (spotlightProduct != null) {
-            binding.tvSpotlightBrand.setText("Chính hãng");
             binding.tvSpotlightName.setText(spotlightProduct.getName());
             binding.tvSpotlightSubtitle.setText(spotlightProduct.getShortInfo());
             binding.tvSpotlightPrice.setText(spotlightProduct.getPrice());
@@ -284,23 +281,10 @@ public class ProductsFragment extends Fragment {
         if (binding == null) {
             return;
         }
-        styleSortTab(binding.tvSortDefault, binding.indSortDefault, currentSort == SortOption.DEFAULT);
-        styleSortTab(binding.tvSortRating, binding.indSortRating, currentSort == SortOption.RATING_DESC);
-        styleSortTab(binding.tvSortPriceAsc, binding.indSortPriceAsc, currentSort == SortOption.PRICE_ASC);
-        styleSortTab(binding.tvSortPriceDesc, binding.indSortPriceDesc, currentSort == SortOption.PRICE_DESC);
-    }
-
-    private void styleSortTab(TextView label, View indicator, boolean active) {
-        int color = ContextCompat.getColor(
-                requireContext(),
-                active ? R.color.primary : R.color.text_secondary
-        );
-        label.setTextColor(color);
-        label.setTypeface(ResourcesCompat.getFont(
-                requireContext(),
-                active ? R.font.nunito_bold : R.font.nunito_semibold
-        ));
-        indicator.setVisibility(active ? View.VISIBLE : View.INVISIBLE);
+        UiUtils.styleUnderlineTab(binding.tvSortDefault, binding.indSortDefault, currentSort == SortOption.DEFAULT);
+        UiUtils.styleUnderlineTab(binding.tvSortRating, binding.indSortRating, currentSort == SortOption.RATING_DESC);
+        UiUtils.styleUnderlineTab(binding.tvSortPriceAsc, binding.indSortPriceAsc, currentSort == SortOption.PRICE_ASC);
+        UiUtils.styleUnderlineTab(binding.tvSortPriceDesc, binding.indSortPriceDesc, currentSort == SortOption.PRICE_DESC);
     }
 
     private void resetFilters() {

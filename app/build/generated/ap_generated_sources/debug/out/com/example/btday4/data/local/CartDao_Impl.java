@@ -35,18 +35,23 @@ public final class CartDao_Impl implements CartDao {
       @Override
       @NonNull
       protected String createQuery() {
-        return "INSERT OR REPLACE INTO `cart_items` (`product_id`,`quantity`,`updated_at`) VALUES (?,?,?)";
+        return "INSERT OR REPLACE INTO `cart_items` (`username`,`product_id`,`quantity`,`updated_at`) VALUES (?,?,?,?)";
       }
 
       @Override
       protected void bind(@NonNull final SQLiteStatement statement, final CartItemEntity entity) {
-        if (entity.getProductId() == null) {
+        if (entity.getUsername() == null) {
           statement.bindNull(1);
         } else {
-          statement.bindText(1, entity.getProductId());
+          statement.bindText(1, entity.getUsername());
         }
-        statement.bindLong(2, entity.getQuantity());
-        statement.bindLong(3, entity.getUpdatedAt());
+        if (entity.getProductId() == null) {
+          statement.bindNull(2);
+        } else {
+          statement.bindText(2, entity.getProductId());
+        }
+        statement.bindLong(3, entity.getQuantity());
+        statement.bindLong(4, entity.getUpdatedAt());
       }
     };
   }
@@ -60,11 +65,18 @@ public final class CartDao_Impl implements CartDao {
   }
 
   @Override
-  public List<CartDao.CartRow> getAllWithProduct() {
-    final String _sql = "SELECT * FROM cart_items ORDER BY updated_at DESC";
+  public List<CartDao.CartRow> getAllWithProduct(final String username) {
+    final String _sql = "SELECT * FROM cart_items WHERE username = ? ORDER BY updated_at DESC";
     return DBUtil.performBlocking(__db, true, true, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
+        int _argIndex = 1;
+        if (username == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, username);
+        }
+        final int _columnIndexOfUsername = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "username");
         final int _columnIndexOfProductId = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "product_id");
         final int _columnIndexOfQuantity = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "quantity");
         final int _columnIndexOfUpdatedAt = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "updated_at");
@@ -86,7 +98,13 @@ public final class CartDao_Impl implements CartDao {
         while (_stmt.step()) {
           final CartDao.CartRow _item;
           final CartItemEntity _tmpEntry;
-          if (!(_stmt.isNull(_columnIndexOfProductId) && _stmt.isNull(_columnIndexOfQuantity) && _stmt.isNull(_columnIndexOfUpdatedAt))) {
+          if (!(_stmt.isNull(_columnIndexOfUsername) && _stmt.isNull(_columnIndexOfProductId) && _stmt.isNull(_columnIndexOfQuantity) && _stmt.isNull(_columnIndexOfUpdatedAt))) {
+            final String _tmpUsername;
+            if (_stmt.isNull(_columnIndexOfUsername)) {
+              _tmpUsername = null;
+            } else {
+              _tmpUsername = _stmt.getText(_columnIndexOfUsername);
+            }
             final String _tmpProductId;
             if (_stmt.isNull(_columnIndexOfProductId)) {
               _tmpProductId = null;
@@ -97,7 +115,7 @@ public final class CartDao_Impl implements CartDao {
             _tmpQuantity = (int) (_stmt.getLong(_columnIndexOfQuantity));
             final long _tmpUpdatedAt;
             _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt);
-            _tmpEntry = new CartItemEntity(_tmpProductId,_tmpQuantity,_tmpUpdatedAt);
+            _tmpEntry = new CartItemEntity(_tmpUsername,_tmpProductId,_tmpQuantity,_tmpUpdatedAt);
           } else {
             _tmpEntry = null;
           }
@@ -126,22 +144,35 @@ public final class CartDao_Impl implements CartDao {
   }
 
   @Override
-  public CartItemEntity findByProductId(final String productId) {
-    final String _sql = "SELECT * FROM cart_items WHERE product_id = ? LIMIT 1";
+  public CartItemEntity find(final String username, final String productId) {
+    final String _sql = "SELECT * FROM cart_items WHERE username = ? AND product_id = ? LIMIT 1";
     return DBUtil.performBlocking(__db, true, false, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
         int _argIndex = 1;
+        if (username == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, username);
+        }
+        _argIndex = 2;
         if (productId == null) {
           _stmt.bindNull(_argIndex);
         } else {
           _stmt.bindText(_argIndex, productId);
         }
+        final int _columnIndexOfUsername = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "username");
         final int _columnIndexOfProductId = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "product_id");
         final int _columnIndexOfQuantity = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "quantity");
         final int _columnIndexOfUpdatedAt = SQLiteStatementUtil.getColumnIndexOrThrow(_stmt, "updated_at");
         final CartItemEntity _result;
         if (_stmt.step()) {
+          final String _tmpUsername;
+          if (_stmt.isNull(_columnIndexOfUsername)) {
+            _tmpUsername = null;
+          } else {
+            _tmpUsername = _stmt.getText(_columnIndexOfUsername);
+          }
           final String _tmpProductId;
           if (_stmt.isNull(_columnIndexOfProductId)) {
             _tmpProductId = null;
@@ -152,7 +183,7 @@ public final class CartDao_Impl implements CartDao {
           _tmpQuantity = (int) (_stmt.getLong(_columnIndexOfQuantity));
           final long _tmpUpdatedAt;
           _tmpUpdatedAt = _stmt.getLong(_columnIndexOfUpdatedAt);
-          _result = new CartItemEntity(_tmpProductId,_tmpQuantity,_tmpUpdatedAt);
+          _result = new CartItemEntity(_tmpUsername,_tmpProductId,_tmpQuantity,_tmpUpdatedAt);
         } else {
           _result = null;
         }
@@ -164,11 +195,17 @@ public final class CartDao_Impl implements CartDao {
   }
 
   @Override
-  public int getTotalQuantity() {
-    final String _sql = "SELECT COALESCE(SUM(quantity), 0) FROM cart_items";
+  public int getTotalQuantity(final String username) {
+    final String _sql = "SELECT COALESCE(SUM(quantity), 0) FROM cart_items WHERE username = ?";
     return DBUtil.performBlocking(__db, true, false, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
+        int _argIndex = 1;
+        if (username == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, username);
+        }
         final int _result;
         if (_stmt.step()) {
           _result = (int) (_stmt.getLong(0));
@@ -183,12 +220,18 @@ public final class CartDao_Impl implements CartDao {
   }
 
   @Override
-  public void deleteByProductId(final String productId) {
-    final String _sql = "DELETE FROM cart_items WHERE product_id = ?";
+  public void delete(final String username, final String productId) {
+    final String _sql = "DELETE FROM cart_items WHERE username = ? AND product_id = ?";
     DBUtil.performBlocking(__db, false, true, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
         int _argIndex = 1;
+        if (username == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, username);
+        }
+        _argIndex = 2;
         if (productId == null) {
           _stmt.bindNull(_argIndex);
         } else {
@@ -203,11 +246,37 @@ public final class CartDao_Impl implements CartDao {
   }
 
   @Override
-  public void clearAll() {
-    final String _sql = "DELETE FROM cart_items";
+  public void deleteProducts(final String username, final List<String> productIds) {
+    final StringBuilder _stringBuilder = new StringBuilder();
+    _stringBuilder.append("DELETE FROM cart_items WHERE username = ");
+    _stringBuilder.append("?");
+    _stringBuilder.append(" AND product_id IN (");
+    final int _inputSize = productIds == null ? 1 : productIds.size();
+    StringUtil.appendPlaceholders(_stringBuilder, _inputSize);
+    _stringBuilder.append(")");
+    final String _sql = _stringBuilder.toString();
     DBUtil.performBlocking(__db, false, true, (_connection) -> {
       final SQLiteStatement _stmt = _connection.prepare(_sql);
       try {
+        int _argIndex = 1;
+        if (username == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, username);
+        }
+        _argIndex = 2;
+        if (productIds == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          for (String _item : productIds) {
+            if (_item == null) {
+              _stmt.bindNull(_argIndex);
+            } else {
+              _stmt.bindText(_argIndex, _item);
+            }
+            _argIndex++;
+          }
+        }
         _stmt.step();
         return null;
       } finally {

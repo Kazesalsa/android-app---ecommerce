@@ -34,17 +34,25 @@
     <color name="warning_bg">#FFFBEB</color>
     <color name="white">#FFFFFFFF</color>
     <string name="app_name">Cửa Hàng Điện Tử</string>
+    <string name="auth_subtitle_login">Mua sắm thiết bị công nghệ chính hãng, bảo hành minh bạch và hỗ trợ đổi trả dễ dàng.</string>
+    <string name="auth_subtitle_register">Lưu giỏ hàng, theo dõi đơn mua và đánh giá sản phẩm trên mọi phiên đăng nhập.</string>
+    <string name="auth_title_login">Chào mừng trở lại</string>
+    <string name="auth_title_register">Tạo tài khoản mới</string>
     <string name="btn_add_to_cart">Thêm vào giỏ</string>
+    <string name="btn_buy_again">Mua lại</string>
     <string name="btn_buy_now">Mua ngay</string>
     <string name="btn_cancel">Hủy</string>
+    <string name="btn_cancel_order">Hủy đơn hàng</string>
     <string name="btn_checkout">Tiến hành thanh toán</string>
     <string name="btn_confirm">Xác nhận</string>
+    <string name="btn_create_account">Tạo tài khoản</string>
     <string name="btn_edit_review">Sửa đánh giá</string>
     <string name="btn_login">Đăng nhập</string>
     <string name="btn_logout">Đăng xuất</string>
     <string name="btn_pay_qr_now">Thanh toán mã QR ngay</string>
     <string name="btn_place_order">Đặt hàng</string>
     <string name="btn_place_order_qr">Tạo mã QR</string>
+    <string name="btn_register">Đăng ký</string>
     <string name="btn_save">Lưu thay đổi</string>
     <string name="btn_write_review">Viết đánh giá</string>
     <string name="cart_title">Giỏ hàng</string>
@@ -56,15 +64,22 @@
     <string name="empty_orders">Bạn chưa có đơn hàng nào</string>
     <string name="empty_products">Không có sản phẩm phù hợp</string>
     <string name="empty_reviews">Chưa có đánh giá nào cho bộ lọc này.</string>
+    <string name="error_account_exists">Tài khoản này đã tồn tại</string>
+    <string name="error_account_not_found">Tài khoản chưa được đăng ký</string>
+    <string name="error_display_name_empty">Vui lòng nhập họ và tên</string>
     <string name="error_password_empty">Vui lòng nhập mật khẩu</string>
-    <string name="error_password_short">Mật khẩu phải có ít nhất 4 ký tự</string>
+    <string name="error_password_mismatch">Mật khẩu nhập lại không khớp</string>
+    <string name="error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
     <string name="error_username_empty">Vui lòng nhập tên đăng nhập hoặc email</string>
+    <string name="error_wrong_password">Mật khẩu không đúng</string>
     <string name="free_shipping">Miễn phí</string>
     <string name="gcm_defaultSenderId" translatable="false">183128094259</string>
     <string name="google_api_key" translatable="false">AIzaSyBwSB6UH5HS9RQvpyTJHv9UHv-CcU8eY3c</string>
     <string name="google_app_id" translatable="false">1:183128094259:android:66f7a8913bca15b1449546</string>
     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBwSB6UH5HS9RQvpyTJHv9UHv-CcU8eY3c</string>
     <string name="google_storage_bucket" translatable="false">tantai-dea4b.firebasestorage.app</string>
+    <string name="hint_confirm_password">Nhập lại mật khẩu</string>
+    <string name="hint_display_name">Họ và tên</string>
     <string name="hint_password">Mật khẩu</string>
     <string name="hint_username">Tên đăng nhập hoặc email</string>
     <string name="my_reviews_title">Đánh giá của tôi</string>
@@ -73,6 +88,7 @@
     <string name="nav_profile">Tài khoản</string>
     <string name="order_detail_title">Chi tiết đơn hàng</string>
     <string name="orders_title">Đơn hàng của tôi</string>
+    <string name="out_of_stock">Hết hàng</string>
     <string name="product_detail_title">Chi tiết sản phẩm</string>
     <string name="products_title">Cửa hàng</string>
     <string name="profile_login_info_title">Phiên đăng nhập</string>

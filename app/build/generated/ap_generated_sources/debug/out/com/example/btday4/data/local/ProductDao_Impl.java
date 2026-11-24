@@ -5,6 +5,7 @@ import androidx.room.EntityDeleteOrUpdateAdapter;
 import androidx.room.EntityInsertAdapter;
 import androidx.room.RoomDatabase;
 import androidx.room.util.DBUtil;
+import androidx.room.util.SQLiteConnectionUtil;
 import androidx.room.util.SQLiteStatementUtil;
 import androidx.sqlite.SQLiteStatement;
 import com.example.btday4.model.ProductWithRating;
@@ -546,6 +547,77 @@ public final class ProductDao_Impl implements ProductDao {
           _result = 0;
         }
         return _result;
+      } finally {
+        _stmt.close();
+      }
+    });
+  }
+
+  @Override
+  public int getStock(final String id) {
+    final String _sql = "SELECT stock FROM products WHERE id = ?";
+    return DBUtil.performBlocking(__db, true, false, (_connection) -> {
+      final SQLiteStatement _stmt = _connection.prepare(_sql);
+      try {
+        int _argIndex = 1;
+        if (id == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, id);
+        }
+        final int _result;
+        if (_stmt.step()) {
+          _result = (int) (_stmt.getLong(0));
+        } else {
+          _result = 0;
+        }
+        return _result;
+      } finally {
+        _stmt.close();
+      }
+    });
+  }
+
+  @Override
+  public int decrementStock(final String id, final int quantity) {
+    final String _sql = "UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?";
+    return DBUtil.performBlocking(__db, false, true, (_connection) -> {
+      final SQLiteStatement _stmt = _connection.prepare(_sql);
+      try {
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, quantity);
+        _argIndex = 2;
+        if (id == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, id);
+        }
+        _argIndex = 3;
+        _stmt.bindLong(_argIndex, quantity);
+        _stmt.step();
+        return SQLiteConnectionUtil.getTotalChangedRows(_connection);
+      } finally {
+        _stmt.close();
+      }
+    });
+  }
+
+  @Override
+  public void incrementStock(final String id, final int quantity) {
+    final String _sql = "UPDATE products SET stock = stock + ? WHERE id = ?";
+    DBUtil.performBlocking(__db, false, true, (_connection) -> {
+      final SQLiteStatement _stmt = _connection.prepare(_sql);
+      try {
+        int _argIndex = 1;
+        _stmt.bindLong(_argIndex, quantity);
+        _argIndex = 2;
+        if (id == null) {
+          _stmt.bindNull(_argIndex);
+        } else {
+          _stmt.bindText(_argIndex, id);
+        }
+        _stmt.step();
+        return null;
       } finally {
         _stmt.close();
       }

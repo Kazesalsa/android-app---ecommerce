@@ -27,6 +27,12 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
   public final MaterialCardView bannerOrderSuccess;
 
   @NonNull
+  public final MaterialButton btnBuyAgain;
+
+  @NonNull
+  public final MaterialButton btnCancelOrder;
+
+  @NonNull
   public final MaterialButton btnContinueShopping;
 
   @NonNull
@@ -84,7 +90,8 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
   public final TextView tvOrderSuccessTitle;
 
   private ActivityOrderDetailBinding(@NonNull LinearLayout rootView,
-      @NonNull MaterialCardView bannerOrderSuccess, @NonNull MaterialButton btnContinueShopping,
+      @NonNull MaterialCardView bannerOrderSuccess, @NonNull MaterialButton btnBuyAgain,
+      @NonNull MaterialButton btnCancelOrder, @NonNull MaterialButton btnContinueShopping,
       @NonNull MaterialButton btnPayQrNow, @NonNull LinearLayout orderDetailRoot,
       @NonNull RecyclerView rvOrderDetailItems, @NonNull MaterialToolbar toolbarOrderDetail,
       @NonNull TextView tvDetailAddress, @NonNull TextView tvDetailNote,
@@ -96,6 +103,8 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
       @NonNull TextView tvOrderSuccessSubtitle, @NonNull TextView tvOrderSuccessTitle) {
     this.rootView = rootView;
     this.bannerOrderSuccess = bannerOrderSuccess;
+    this.btnBuyAgain = btnBuyAgain;
+    this.btnCancelOrder = btnCancelOrder;
     this.btnContinueShopping = btnContinueShopping;
     this.btnPayQrNow = btnPayQrNow;
     this.orderDetailRoot = orderDetailRoot;
@@ -147,6 +156,18 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
       id = R.id.bannerOrderSuccess;
       MaterialCardView bannerOrderSuccess = ViewBindings.findChildViewById(rootView, id);
       if (bannerOrderSuccess == null) {
+        break missingId;
+      }
+
+      id = R.id.btnBuyAgain;
+      MaterialButton btnBuyAgain = ViewBindings.findChildViewById(rootView, id);
+      if (btnBuyAgain == null) {
+        break missingId;
+      }
+
+      id = R.id.btnCancelOrder;
+      MaterialButton btnCancelOrder = ViewBindings.findChildViewById(rootView, id);
+      if (btnCancelOrder == null) {
         break missingId;
       }
 
@@ -261,11 +282,11 @@ public final class ActivityOrderDetailBinding implements ViewBinding {
       }
 
       return new ActivityOrderDetailBinding((LinearLayout) rootView, bannerOrderSuccess,
-          btnContinueShopping, btnPayQrNow, orderDetailRoot, rvOrderDetailItems, toolbarOrderDetail,
-          tvDetailAddress, tvDetailNote, tvDetailOrderCode, tvDetailOrderDate, tvDetailOrderStatus,
-          tvDetailPayOsRef, tvDetailPaymentMethod, tvDetailRecipientName, tvDetailRecipientPhone,
-          tvDetailShippingFee, tvDetailSubtotal, tvDetailTotal, tvOrderSuccessSubtitle,
-          tvOrderSuccessTitle);
+          btnBuyAgain, btnCancelOrder, btnContinueShopping, btnPayQrNow, orderDetailRoot,
+          rvOrderDetailItems, toolbarOrderDetail, tvDetailAddress, tvDetailNote, tvDetailOrderCode,
+          tvDetailOrderDate, tvDetailOrderStatus, tvDetailPayOsRef, tvDetailPaymentMethod,
+          tvDetailRecipientName, tvDetailRecipientPhone, tvDetailShippingFee, tvDetailSubtotal,
+          tvDetailTotal, tvOrderSuccessSubtitle, tvOrderSuccessTitle);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

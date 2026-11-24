@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.btday4.R;
+import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.OrderItemEntity;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.OrderRepository;
@@ -130,17 +131,20 @@ public class CheckoutActivity extends AppCompatActivity {
             });
         } else {
             isCartCheckout = true;
+            List<String> selectedIds = getIntent().getStringArrayListExtra(Constants.EXTRA_SELECTED_PRODUCT_IDS);
             CartRepository.getItems(this, items -> {
                 if (isFinishing() || isDestroyed()) {
                     return;
                 }
-                if (items == null || items.isEmpty()) {
-                    finish();
-                    return;
-                }
                 checkoutItems.clear();
                 for (CartItem cartItem : items) {
-                    checkoutItems.add(cartItem.toOrderItemSnapshot(""));
+                    if (selectedIds == null || selectedIds.contains(cartItem.getProduct().getId())) {
+                        checkoutItems.add(cartItem.toOrderItemSnapshot(""));
+                    }
+                }
+                if (checkoutItems.isEmpty()) {
+                    finish();
+                    return;
                 }
                 bindItemsAndPricing();
             });
@@ -300,24 +304,30 @@ public class CheckoutActivity extends AppCompatActivity {
                 selectedPaymentMethod,
                 checkoutItems,
                 isCartCheckout,
-                createdOrder -> {
-                    if (isFinishing() || isDestroyed()) {
-                        return;
+                new OrderRepository.PlaceOrderCallback() {
+                    @Override
+                    public void onSuccess(OrderEntity createdOrder) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
+                        setResult(RESULT_OK);
+                        Intent nextIntent = selectedPaymentMethod == PaymentMethod.VIETQR
+                                ? new Intent(CheckoutActivity.this, QrPaymentActivity.class)
+                                : new Intent(CheckoutActivity.this, OrderDetailActivity.class);
+                        nextIntent.putExtra(Constants.EXTRA_ORDER_ID, createdOrder.getId());
+                        nextIntent.putExtra(Constants.EXTRA_IS_NEW_ORDER, true);
+                        startActivity(nextIntent);
+                        finish();
                     }
-                    if (createdOrder == null) {
+
+                    @Override
+                    public void onError(String message) {
+                        if (isFinishing() || isDestroyed()) {
+                            return;
+                        }
                         binding.btnPlaceOrder.setEnabled(true);
-                        Snackbar.make(binding.getRoot(), "Không thể tạo đơn hàng, vui lòng thử lại", Snackbar.LENGTH_SHORT)
-                                .show();
-                        return;
+                        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG).show();
                     }
-                    setResult(RESULT_OK);
-                    Intent nextIntent = selectedPaymentMethod == PaymentMethod.VIETQR
-                            ? new Intent(this, QrPaymentActivity.class)
-                            : new Intent(this, OrderDetailActivity.class);
-                    nextIntent.putExtra(Constants.EXTRA_ORDER_ID, createdOrder.getId());
-                    nextIntent.putExtra(Constants.EXTRA_IS_NEW_ORDER, true);
-                    startActivity(nextIntent);
-                    finish();
                 }
         );
     }

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.btday4.PayOsClientTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-24T08:19:09.105Z" hostname="archlinux" time="0.075">
+<testsuite name="com.example.btday4.PayOsClientTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-24T09:45:49.724Z" hostname="archlinux" time="0.041">
   <properties/>
-  <testcase name="parsePaymentResponseHandlesSuccessAndErrorEnvelopes" classname="com.example.btday4.PayOsClientTest" time="0.015"/>
-  <testcase name="signatureMatchesHmacSha256CanonicalSpec" classname="com.example.btday4.PayOsClientTest" time="0.053"/>
+  <testcase name="parsePaymentResponseHandlesSuccessAndErrorEnvelopes" classname="com.example.btday4.PayOsClientTest" time="0.007"/>
+  <testcase name="signatureMatchesHmacSha256CanonicalSpec" classname="com.example.btday4.PayOsClientTest" time="0.03"/>
   <testcase name="transferDescriptionIsAsciiSafeAndWithinPayOsLimit" classname="com.example.btday4.PayOsClientTest" time="0.001"/>
-  <testcase name="paymentMethodAndOrderStatusAndBankBinMappingWork" classname="com.example.btday4.PayOsClientTest" time="0.006"/>
+  <testcase name="paymentMethodAndOrderStatusAndBankBinMappingWork" classname="com.example.btday4.PayOsClientTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

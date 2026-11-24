@@ -23,6 +23,7 @@ public final class Constants {
     public static final String EXTRA_PRODUCT_NAME = "product_name";
     public static final String EXTRA_PRODUCT_IMAGE_URL = "product_image_url";
     public static final String EXTRA_QUANTITY = "quantity";
+    public static final String EXTRA_SELECTED_PRODUCT_IDS = "selected_product_ids";
     public static final String EXTRA_OPEN_CART = "open_cart";
     public static final String EXTRA_OPEN_PRODUCTS = "open_products";
     public static final String EXTRA_OPEN_REVIEW = "open_review";
@@ -49,6 +50,13 @@ public final class Constants {
     public static final String KEY_USERNAME = "username";
     public static final String KEY_DISPLAY_NAME = "display_name";
     public static final String KEY_REMEMBER_ME = "remember_me";
+
+    // ==========================================
+    // DEMO ACCOUNT (seeded with a hashed password)
+    // ==========================================
+    public static final String DEMO_USERNAME = "tantai@techstore.vn";
+    public static final String DEMO_PASSWORD = "123456";
+    public static final String DEMO_DISPLAY_NAME = "Tantai";
 
     // ==========================================
     // BUSINESS RULES (Shipping, Cart & PayOS)

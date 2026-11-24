@@ -92,7 +92,8 @@ public final class ProductRepository {
                             pickNonBlank(remote.getDescription(), existing.getDescription()),
                             pickNonBlank(remote.getSpecs(), existing.getSpecs()),
                             pickNonBlank(remote.getWarranty(), existing.getWarranty()),
-                            remote.getStock() > 0 ? remote.getStock() : existing.getStock()
+                            // Local stock is authoritative: orders reserve/restock it transactionally.
+                            existing.getStock()
                     );
                     dao.updateSingle(merged);
                 }

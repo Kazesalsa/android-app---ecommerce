@@ -62,8 +62,8 @@ public class DomainLogicTest {
         assertTrue(ValidationUtils.isValidEmail("tantai@techstore.vn"));
         assertFalse(ValidationUtils.isValidEmail("invalid-email"));
 
-        assertTrue(ValidationUtils.isValidPassword("1234"));
-        assertFalse(ValidationUtils.isValidPassword("123"));
+        assertTrue(ValidationUtils.isValidPassword("123456"));
+        assertFalse(ValidationUtils.isValidPassword("12345"));
 
         assertTrue(ValidationUtils.isValidBirthDate(29, 2, 2000, 2026));
         assertFalse(ValidationUtils.isValidBirthDate(29, 2, 2001, 2026));

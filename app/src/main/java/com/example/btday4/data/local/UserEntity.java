@@ -5,9 +5,10 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.Exclude;
 
 /**
- * Room and Firestore entity storing user authentication and personal profile details.
+ * Room and Firestore entity storing user credentials (hashed) and personal profile details.
  */
 @Entity(tableName = "users")
 public class UserEntity {
@@ -84,10 +85,15 @@ public class UserEntity {
         this.displayName = displayName;
     }
 
+    /**
+     * Salted hash only; excluded from Firestore so credentials never leave the device.
+     */
+    @Exclude
     public String getPassword() {
         return password;
     }
 
+    @Exclude
     public void setPassword(String password) {
         this.password = password;
     }

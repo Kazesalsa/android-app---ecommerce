@@ -11,6 +11,9 @@ import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.ReviewRepository;
+import com.example.btday4.util.Constants;
+import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.PasswordHasher;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,7 +31,7 @@ import java.util.concurrent.Executors;
                 OrderItemEntity.class,
                 PaymentEntity.class
         },
-        version = 6,
+        version = 7,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -164,6 +167,40 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * Rebuilds cart_items with a composite (username, product_id) key, assigning legacy shared-cart
+     * rows to the currently signed-in account (or dropping them when nobody is signed in).
+     */
+    private static Migration migration6To7(Context appContext) {
+        return new Migration(6, 7) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase db) {
+                String owner = appContext
+                        .getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+                        .getString(Constants.KEY_USERNAME, "");
+                db.execSQL(
+                        "CREATE TABLE IF NOT EXISTS `cart_items_new` ("
+                                + "`username` TEXT NOT NULL, "
+                                + "`product_id` TEXT NOT NULL, "
+                                + "`quantity` INTEGER NOT NULL, "
+                                + "`updated_at` INTEGER NOT NULL, "
+                                + "PRIMARY KEY(`username`, `product_id`), "
+                                + "FOREIGN KEY(`product_id`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE)"
+                );
+                if (owner != null && !owner.trim().isEmpty()) {
+                    db.execSQL(
+                            "INSERT INTO `cart_items_new` (`username`, `product_id`, `quantity`, `updated_at`) "
+                                    + "SELECT ?, `product_id`, `quantity`, `updated_at` FROM `cart_items`",
+                            new Object[]{owner.trim()}
+                    );
+                }
+                db.execSQL("DROP TABLE `cart_items`");
+                db.execSQL("ALTER TABLE `cart_items_new` RENAME TO `cart_items`");
+                db.execSQL("CREATE INDEX IF NOT EXISTS `index_cart_items_product_id` ON `cart_items` (`product_id`)");
+            }
+        };
+    }
+
     public abstract ProductDao productDao();
 
     public abstract CartDao cartDao();
@@ -180,17 +217,15 @@ public abstract class AppDatabase extends RoomDatabase {
         if (instance == null) {
             synchronized (AppDatabase.class) {
                 if (instance == null) {
-                    instance = Room.databaseBuilder(
-                                    context.getApplicationContext(),
-                                    AppDatabase.class,
-                                    "btday4_room.db"
-                            )
+                    Context appContext = context.getApplicationContext();
+                    instance = Room.databaseBuilder(appContext, AppDatabase.class, "btday4_room.db")
                             .addMigrations(
                                     MIGRATION_1_2,
                                     MIGRATION_2_3,
                                     MIGRATION_3_4,
                                     MIGRATION_4_5,
-                                    MIGRATION_5_6
+                                    MIGRATION_5_6,
+                                    migration6To7(appContext)
                             )
                             .build();
                 }
@@ -222,7 +257,7 @@ public abstract class AppDatabase extends RoomDatabase {
         } else {
             Product sample = productDao.findById("iphone_15");
             boolean needsPriceScaleSync = sample != null
-                    && com.example.btday4.util.FormatUtils.parseVnd(sample.getPrice())
+                    && FormatUtils.parseVnd(sample.getPrice())
                     >= ProductRepository.LEGACY_UNSCALED_PRICE_THRESHOLD;
             if (productDao.countMissingDetails() > 0 || needsPriceScaleSync) {
                 productDao.insertMissing(defaults);
@@ -233,6 +268,27 @@ public abstract class AppDatabase extends RoomDatabase {
         ReviewDao reviewDao = db.reviewDao();
         if (reviewDao.countAll() == 0) {
             reviewDao.insertMissing(ReviewRepository.createDefaultReviews());
+        }
+
+        ensureDemoAccount(db.userDao());
+    }
+
+    private static void ensureDemoAccount(UserDao userDao) {
+        UserEntity demo = userDao.findByUsername(Constants.DEMO_USERNAME);
+        if (demo == null) {
+            userDao.insert(new UserEntity(
+                    Constants.DEMO_USERNAME,
+                    Constants.DEMO_DISPLAY_NAME,
+                    PasswordHasher.hash(Constants.DEMO_PASSWORD),
+                    "",
+                    "",
+                    "",
+                    Constants.DEMO_USERNAME,
+                    "",
+                    ""
+            ));
+        } else if (!PasswordHasher.isHashed(demo.getPassword())) {
+            userDao.updatePassword(demo.getUsername(), PasswordHasher.hash(Constants.DEMO_PASSWORD));
         }
     }
 

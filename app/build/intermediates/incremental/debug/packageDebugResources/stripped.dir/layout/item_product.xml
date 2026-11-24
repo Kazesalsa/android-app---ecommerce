@@ -42,7 +42,7 @@
                 android:paddingVertical="2dp"
                 android:text="-13%"
                 android:textColor="@color/white"
-                android:textSize="10.5sp"
+                android:textSize="12sp"
                 android:visibility="gone" />
         </FrameLayout>
 
@@ -65,7 +65,7 @@
                 android:lines="2"
                 android:text="iPhone 15 128GB"
                 android:textColor="@color/text_primary"
-                android:textSize="13.5sp" />
+                android:textSize="15.5sp" />
 
             <!-- Dynamic Trust Tags Row (Freeship / Brand) -->
             <LinearLayout
@@ -86,7 +86,7 @@
                     android:paddingVertical="1dp"
                     android:text="Freeship"
                     android:textColor="@color/teal_trust"
-                    android:textSize="10sp"
+                    android:textSize="11.5sp"
                     android:visibility="gone" />
 
                 <TextView
@@ -97,7 +97,7 @@
                     android:maxLines="1"
                     android:text="Apple"
                     android:textColor="@color/text_muted"
-                    android:textSize="11.5sp" />
+                    android:textSize="13sp" />
             </LinearLayout>
 
             <!-- Signature Coral Price + Strikethrough Original Price -->
@@ -111,7 +111,7 @@
                 android:maxLines="1"
                 android:text="199.900 ₫"
                 android:textColor="@color/primary"
-                android:textSize="16sp" />
+                android:textSize="18.5sp" />
 
             <TextView
                 android:id="@+id/tvProductOriginalPrice"
@@ -121,7 +121,7 @@
                 android:maxLines="1"
                 android:text="229.900 ₫"
                 android:textColor="@color/text_muted"
-                android:textSize="11.5sp" />
+                android:textSize="13sp" />
 
             <!-- Rating & Stock Footer -->
             <LinearLayout
@@ -132,8 +132,8 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="12dp"
-                    android:layout_height="12dp"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_star_filled"
                     app:tint="@color/star_amber" />
@@ -146,7 +146,7 @@
                     android:fontFamily="@font/nunito_bold"
                     android:text="4.8"
                     android:textColor="@color/text_primary"
-                    android:textSize="12sp" />
+                    android:textSize="13.5sp" />
 
                 <TextView
                     android:id="@+id/tvProductReviewCount"
@@ -156,7 +156,7 @@
                     android:layout_weight="1"
                     android:text="(3)"
                     android:textColor="@color/text_muted"
-                    android:textSize="11.5sp" />
+                    android:textSize="13sp" />
 
                 <TextView
                     android:id="@+id/tvProductStockMini"
@@ -164,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:text="Còn 18"
                     android:textColor="@color/text_muted"
-                    android:textSize="11sp" />
+                    android:textSize="12.5sp" />
             </LinearLayout>
         </LinearLayout>
 

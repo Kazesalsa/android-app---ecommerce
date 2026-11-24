@@ -11,10 +11,13 @@ import androidx.room.Query;
 @Dao
 public interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void upsert(UserEntity user);
+    /**
+     * Returns -1 when the username already exists so registration never overwrites an account.
+     */
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    long insert(UserEntity user);
 
-    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
+    @Query("SELECT * FROM users WHERE username = :username COLLATE NOCASE LIMIT 1")
     UserEntity findByUsername(String username);
 
     @Query(
@@ -38,9 +41,9 @@ public interface UserDao {
     )
     void updateShippingInfo(String username, String displayName, String phone, String address);
 
-    @Query("UPDATE users SET password = :newPassword WHERE username = :username")
-    void updatePassword(String username, String newPassword);
+    @Query("UPDATE users SET password = :passwordHash WHERE username = :username")
+    void updatePassword(String username, String passwordHash);
 
-    @Query("DELETE FROM users WHERE username = :username")
-    void deleteByUsername(String username);
+    @Query("UPDATE users SET login_time = :loginTime WHERE username = :username")
+    void updateLoginTime(String username, String loginTime);
 }

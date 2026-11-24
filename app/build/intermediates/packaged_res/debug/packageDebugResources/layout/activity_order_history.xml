@@ -23,6 +23,23 @@
         android:layout_height="1dp"
         android:background="@color/divider_hairline" />
 
+    <!-- Shopee-like inline status filter tabs (zero popups) -->
+    <HorizontalScrollView
+        android:id="@+id/scrollOrderTabs"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="@color/bg_card"
+        android:elevation="0.5dp"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/llOrderTabs"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -53,6 +70,7 @@
                 app:tint="@color/text_muted" />
 
             <TextView
+                android:id="@+id/tvOrdersEmptyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -62,6 +80,7 @@
                 android:textSize="17sp" />
 
             <TextView
+                android:id="@+id/tvOrdersEmptySubtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"

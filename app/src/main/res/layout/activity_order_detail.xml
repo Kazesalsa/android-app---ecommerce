@@ -368,6 +368,15 @@
                         app:iconTint="@color/white" />
 
                     <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBuyAgain"
+                        style="@style/Widget.BtDay4.PrimaryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="16dp"
+                        android:text="@string/btn_buy_again"
+                        android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnContinueShopping"
                         style="@style/Widget.BtDay4.SecondaryButton"
                         android:layout_width="match_parent"
@@ -375,9 +384,19 @@
                         android:layout_marginTop="10dp"
                         android:text="Tiếp tục mua sắm"
                         android:visibility="gone" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCancelOrder"
+                        style="@style/Widget.BtDay4.SecondaryButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/btn_cancel_order"
+                        android:textColor="@color/danger_red"
+                        android:visibility="gone"
+                        app:strokeColor="@color/danger_red" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

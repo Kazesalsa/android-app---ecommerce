@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
 import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import java.lang.NullPointerException;
 import java.lang.Override;
 import java.lang.String;
@@ -31,6 +32,9 @@ public final class ItemCartBinding implements ViewBinding {
   public final ImageButton btnCartRemove;
 
   @NonNull
+  public final MaterialCheckBox cbCartSelect;
+
+  @NonNull
   public final ImageView imgCartProduct;
 
   @NonNull
@@ -40,6 +44,9 @@ public final class ItemCartBinding implements ViewBinding {
   public final TextView tvCartQty;
 
   @NonNull
+  public final TextView tvCartStockWarning;
+
+  @NonNull
   public final TextView tvCartSubtotal;
 
   @NonNull
@@ -47,16 +54,19 @@ public final class ItemCartBinding implements ViewBinding {
 
   private ItemCartBinding(@NonNull MaterialCardView rootView, @NonNull ImageButton btnCartMinus,
       @NonNull ImageButton btnCartPlus, @NonNull ImageButton btnCartRemove,
-      @NonNull ImageView imgCartProduct, @NonNull TextView tvCartProductName,
-      @NonNull TextView tvCartQty, @NonNull TextView tvCartSubtotal,
+      @NonNull MaterialCheckBox cbCartSelect, @NonNull ImageView imgCartProduct,
+      @NonNull TextView tvCartProductName, @NonNull TextView tvCartQty,
+      @NonNull TextView tvCartStockWarning, @NonNull TextView tvCartSubtotal,
       @NonNull TextView tvCartUnitPrice) {
     this.rootView = rootView;
     this.btnCartMinus = btnCartMinus;
     this.btnCartPlus = btnCartPlus;
     this.btnCartRemove = btnCartRemove;
+    this.cbCartSelect = cbCartSelect;
     this.imgCartProduct = imgCartProduct;
     this.tvCartProductName = tvCartProductName;
     this.tvCartQty = tvCartQty;
+    this.tvCartStockWarning = tvCartStockWarning;
     this.tvCartSubtotal = tvCartSubtotal;
     this.tvCartUnitPrice = tvCartUnitPrice;
   }
@@ -106,6 +116,12 @@ public final class ItemCartBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.cbCartSelect;
+      MaterialCheckBox cbCartSelect = ViewBindings.findChildViewById(rootView, id);
+      if (cbCartSelect == null) {
+        break missingId;
+      }
+
       id = R.id.imgCartProduct;
       ImageView imgCartProduct = ViewBindings.findChildViewById(rootView, id);
       if (imgCartProduct == null) {
@@ -124,6 +140,12 @@ public final class ItemCartBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tvCartStockWarning;
+      TextView tvCartStockWarning = ViewBindings.findChildViewById(rootView, id);
+      if (tvCartStockWarning == null) {
+        break missingId;
+      }
+
       id = R.id.tvCartSubtotal;
       TextView tvCartSubtotal = ViewBindings.findChildViewById(rootView, id);
       if (tvCartSubtotal == null) {
@@ -137,8 +159,8 @@ public final class ItemCartBinding implements ViewBinding {
       }
 
       return new ItemCartBinding((MaterialCardView) rootView, btnCartMinus, btnCartPlus,
-          btnCartRemove, imgCartProduct, tvCartProductName, tvCartQty, tvCartSubtotal,
-          tvCartUnitPrice);
+          btnCartRemove, cbCartSelect, imgCartProduct, tvCartProductName, tvCartQty,
+          tvCartStockWarning, tvCartSubtotal, tvCartUnitPrice);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

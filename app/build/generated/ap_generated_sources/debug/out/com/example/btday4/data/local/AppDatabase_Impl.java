@@ -40,11 +40,12 @@ public final class AppDatabase_Impl extends AppDatabase {
   @Override
   @NonNull
   protected RoomOpenDelegate createOpenDelegate() {
-    final RoomOpenDelegate _openDelegate = new RoomOpenDelegate(6, "beabfe180c91ff6a45cd4d640daacd2c", "501e321b3c1f0b302f776721d5b447a4") {
+    final RoomOpenDelegate _openDelegate = new RoomOpenDelegate(7, "b7816861bf60eb2b977090eef8d2721e", "dcc93daca33b86bd405238ab383b16aa") {
       @Override
       public void createAllTables(@NonNull final SQLiteConnection connection) {
         SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `products` (`id` TEXT NOT NULL, `name` TEXT, `price` TEXT, `original_price` TEXT, `short_info` TEXT, `category` TEXT, `image_url` TEXT, `brand` TEXT, `description` TEXT, `specs` TEXT, `warranty` TEXT, `stock` INTEGER NOT NULL DEFAULT 15, PRIMARY KEY(`id`))");
-        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `cart_items` (`product_id` TEXT NOT NULL, `quantity` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, PRIMARY KEY(`product_id`), FOREIGN KEY(`product_id`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+        SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `cart_items` (`username` TEXT NOT NULL, `product_id` TEXT NOT NULL, `quantity` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, PRIMARY KEY(`username`, `product_id`), FOREIGN KEY(`product_id`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+        SQLite.execSQL(connection, "CREATE INDEX IF NOT EXISTS `index_cart_items_product_id` ON `cart_items` (`product_id`)");
         SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `users` (`username` TEXT NOT NULL, `display_name` TEXT, `password` TEXT, `phone` TEXT, `address` TEXT, `login_time` TEXT, `email` TEXT, `gender` TEXT, `birth_date` TEXT, PRIMARY KEY(`username`))");
         SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `reviews` (`id` TEXT NOT NULL, `product_id` TEXT NOT NULL, `username` TEXT NOT NULL, `author_name` TEXT NOT NULL, `rating` INTEGER NOT NULL, `comment` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`product_id`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
         SQLite.execSQL(connection, "CREATE INDEX IF NOT EXISTS `index_reviews_product_id` ON `reviews` (`product_id`)");
@@ -56,7 +57,7 @@ public final class AppDatabase_Impl extends AppDatabase {
         SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS `payments` (`order_code` INTEGER NOT NULL, `order_id` TEXT NOT NULL, `payment_link_id` TEXT, `amount` INTEGER NOT NULL, `description` TEXT, `checkout_url` TEXT, `qr_code` TEXT, `bank_bin` TEXT, `account_number` TEXT, `account_name` TEXT, `status` TEXT NOT NULL, `expired_at` INTEGER NOT NULL, `created_at` INTEGER NOT NULL, `paid_at` INTEGER NOT NULL, PRIMARY KEY(`order_code`), FOREIGN KEY(`order_id`) REFERENCES `orders`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
         SQLite.execSQL(connection, "CREATE INDEX IF NOT EXISTS `index_payments_order_id` ON `payments` (`order_id`)");
         SQLite.execSQL(connection, "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        SQLite.execSQL(connection, "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'beabfe180c91ff6a45cd4d640daacd2c')");
+        SQLite.execSQL(connection, "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b7816861bf60eb2b977090eef8d2721e')");
       }
 
       @Override
@@ -115,13 +116,15 @@ public final class AppDatabase_Impl extends AppDatabase {
                   + " Expected:\n" + _infoProducts + "\n"
                   + " Found:\n" + _existingProducts);
         }
-        final Map<String, TableInfo.Column> _columnsCartItems = new HashMap<String, TableInfo.Column>(3);
-        _columnsCartItems.put("product_id", new TableInfo.Column("product_id", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        final Map<String, TableInfo.Column> _columnsCartItems = new HashMap<String, TableInfo.Column>(4);
+        _columnsCartItems.put("username", new TableInfo.Column("username", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsCartItems.put("product_id", new TableInfo.Column("product_id", "TEXT", true, 2, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCartItems.put("quantity", new TableInfo.Column("quantity", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         _columnsCartItems.put("updated_at", new TableInfo.Column("updated_at", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
         final Set<TableInfo.ForeignKey> _foreignKeysCartItems = new HashSet<TableInfo.ForeignKey>(1);
         _foreignKeysCartItems.add(new TableInfo.ForeignKey("products", "CASCADE", "NO ACTION", Arrays.asList("product_id"), Arrays.asList("id")));
-        final Set<TableInfo.Index> _indicesCartItems = new HashSet<TableInfo.Index>(0);
+        final Set<TableInfo.Index> _indicesCartItems = new HashSet<TableInfo.Index>(1);
+        _indicesCartItems.add(new TableInfo.Index("index_cart_items_product_id", false, Arrays.asList("product_id"), Arrays.asList("ASC")));
         final TableInfo _infoCartItems = new TableInfo("cart_items", _columnsCartItems, _foreignKeysCartItems, _indicesCartItems);
         final TableInfo _existingCartItems = TableInfo.read(connection, "cart_items");
         if (!_infoCartItems.equals(_existingCartItems)) {

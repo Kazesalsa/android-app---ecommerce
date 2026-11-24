@@ -217,22 +217,9 @@
                         android:paddingEnd="12dp">
 
                         <TextView
-                            android:id="@+id/tvSpotlightBrand"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:background="@drawable/bg_freeship_tag"
-                            android:fontFamily="@font/nunito_extrabold"
-                            android:paddingHorizontal="8dp"
-                            android:paddingVertical="2dp"
-                            android:text="Chính hãng"
-                            android:textColor="@color/teal_trust"
-                            android:textSize="10.5sp" />
-
-                        <TextView
                             android:id="@+id/tvSpotlightName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
                             android:fontFamily="@font/nunito_extrabold"
                             android:letterSpacing="-0.02"
                             android:maxLines="2"

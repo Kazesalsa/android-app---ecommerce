@@ -10,6 +10,8 @@ public final class ValidationUtils {
     private static final Pattern PHONE_PATTERN = Pattern.compile("^(\\+?84|0)[0-9]{8,10}$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
+    public static final int MIN_PASSWORD_LENGTH = 6;
+
     private ValidationUtils() {
     }
 
@@ -37,7 +39,7 @@ public final class ValidationUtils {
     }
 
     public static boolean isValidPassword(String password) {
-        return password != null && password.length() >= 4;
+        return password != null && password.length() >= MIN_PASSWORD_LENGTH;
     }
 
     public static boolean isValidBirthDate(int day, int month, int year, int currentYear) {

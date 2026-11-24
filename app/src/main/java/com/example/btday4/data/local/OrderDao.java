@@ -33,4 +33,11 @@ public interface OrderDao {
 
     @Query("UPDATE orders SET status = :status WHERE id = :orderId")
     void updateStatus(String orderId, String status);
+
+    /**
+     * Atomically moves an order to {@code status} only from one of {@code fromStatuses};
+     * returns 1 when the transition happened, 0 when the order was already in another state.
+     */
+    @Query("UPDATE orders SET status = :status WHERE id = :orderId AND status IN (:fromStatuses)")
+    int transitionStatus(String orderId, String status, List<String> fromStatuses);
 }

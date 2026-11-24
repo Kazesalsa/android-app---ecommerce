@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.example.btday4.R;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -27,6 +28,9 @@ public final class FragmentCartBinding implements ViewBinding {
 
   @NonNull
   public final MaterialButton btnCheckout;
+
+  @NonNull
+  public final MaterialCheckBox cbSelectAll;
 
   @NonNull
   public final LinearLayout llCartEmpty;
@@ -54,14 +58,15 @@ public final class FragmentCartBinding implements ViewBinding {
 
   private FragmentCartBinding(@NonNull LinearLayout rootView,
       @NonNull MaterialButton btnBrowseProducts, @NonNull MaterialButton btnCheckout,
-      @NonNull LinearLayout llCartEmpty, @NonNull LinearLayout llCartTotalBar,
-      @NonNull LinearLayout llShippingProgress,
+      @NonNull MaterialCheckBox cbSelectAll, @NonNull LinearLayout llCartEmpty,
+      @NonNull LinearLayout llCartTotalBar, @NonNull LinearLayout llShippingProgress,
       @NonNull LinearProgressIndicator progressFreeShipping, @NonNull RecyclerView rvCart,
       @NonNull TextView tvCartGrandTotal, @NonNull TextView tvCartSummary,
       @NonNull TextView tvShippingProgressText) {
     this.rootView = rootView;
     this.btnBrowseProducts = btnBrowseProducts;
     this.btnCheckout = btnCheckout;
+    this.cbSelectAll = cbSelectAll;
     this.llCartEmpty = llCartEmpty;
     this.llCartTotalBar = llCartTotalBar;
     this.llShippingProgress = llShippingProgress;
@@ -108,6 +113,12 @@ public final class FragmentCartBinding implements ViewBinding {
       id = R.id.btnCheckout;
       MaterialButton btnCheckout = ViewBindings.findChildViewById(rootView, id);
       if (btnCheckout == null) {
+        break missingId;
+      }
+
+      id = R.id.cbSelectAll;
+      MaterialCheckBox cbSelectAll = ViewBindings.findChildViewById(rootView, id);
+      if (cbSelectAll == null) {
         break missingId;
       }
 
@@ -160,8 +171,8 @@ public final class FragmentCartBinding implements ViewBinding {
       }
 
       return new FragmentCartBinding((LinearLayout) rootView, btnBrowseProducts, btnCheckout,
-          llCartEmpty, llCartTotalBar, llShippingProgress, progressFreeShipping, rvCart,
-          tvCartGrandTotal, tvCartSummary, tvShippingProgressText);
+          cbSelectAll, llCartEmpty, llCartTotalBar, llShippingProgress, progressFreeShipping,
+          rvCart, tvCartGrandTotal, tvCartSummary, tvShippingProgressText);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));
