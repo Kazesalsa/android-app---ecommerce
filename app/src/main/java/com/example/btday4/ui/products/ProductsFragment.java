@@ -2,11 +2,14 @@ package com.example.btday4.ui.products;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -19,6 +22,8 @@ import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.FragmentProductsBinding;
 import com.example.btday4.model.ProductWithRating;
+import com.example.btday4.tracking.BehaviorTracker;
+import com.example.btday4.tracking.RecommendationEngine;
 import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
@@ -29,9 +34,11 @@ import com.google.android.material.chip.Chip;
 import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -54,10 +61,15 @@ public class ProductsFragment extends Fragment {
 
     private final List<ProductWithRating> allProducts = new ArrayList<>();
     private final List<String> categories = new ArrayList<>();
+    private final Map<String, Double> recommendationScores = new HashMap<>();
+    private String currentUserGender = "";
     private String selectedCategory = "";
     private String searchQuery = "";
     private SortOption currentSort = SortOption.DEFAULT;
     private Product spotlightProduct;
+    private int lastFilteredCount = 0;
+    private final Handler searchTrackHandler = new Handler(Looper.getMainLooper());
+    private Runnable pendingSearchTrack;
 
     @Nullable
     @Override
@@ -76,6 +88,7 @@ public class ProductsFragment extends Fragment {
 
         userSession = new UserSession(requireContext());
         refreshGreeting();
+        refreshUserGender();
 
         adapter = new ProductAdapter(this::openProductDetail);
         int spacingPx = Math.round(10 * getResources().getDisplayMetrics().density);
@@ -91,6 +104,14 @@ public class ProductsFragment extends Fragment {
 
         binding.btnClearSearch.setOnClickListener(v -> binding.etSearch.setText(""));
 
+        binding.etSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
+                flushPendingSearchTrack();
+                return true;
+            }
+            return false;
+        });
+
         binding.etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -101,6 +122,7 @@ public class ProductsFragment extends Fragment {
                 searchQuery = s == null ? "" : s.toString().trim().toLowerCase(Locale.getDefault());
                 binding.btnClearSearch.setVisibility(searchQuery.isEmpty() ? View.GONE : View.VISIBLE);
                 applyFilterAndSort();
+                scheduleSearchTracking(searchQuery);
             }
 
             @Override
@@ -122,16 +144,17 @@ public class ProductsFragment extends Fragment {
 
         binding.btnResetFilter.setOnClickListener(v -> resetFilters());
 
-        refreshCatalog();
-        refreshHeaderCartBadge();
-
         productsListener = FirestoreHelper.listenProducts(new FirestoreHelper.FirestoreCallback<List<Product>>() {
             @Override
             public void onSuccess(List<Product> remoteProducts) {
                 if (!isAdded() || binding == null || remoteProducts == null || remoteProducts.isEmpty()) {
                     return;
                 }
-                ProductRepository.syncFromRemote(requireContext(), remoteProducts, synced -> {
+                // Render products immediately on first paint instead of blocking on a 2nd reviews round-trip.
+                if (allProducts.isEmpty()) {
+                    updateProductData(ProductRepository.withoutRatings(remoteProducts));
+                }
+                ProductRepository.combineWithLiveRatings(remoteProducts, synced -> {
                     if (!isAdded() || binding == null) {
                         return;
                     }
@@ -150,16 +173,22 @@ public class ProductsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         refreshGreeting();
-        refreshCatalog();
         refreshHeaderCartBadge();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        flushPendingSearchTrack();
     }
 
     @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
-        if (!hidden) {
+        if (hidden) {
+            flushPendingSearchTrack();
+        } else {
             refreshGreeting();
-            refreshCatalog();
             refreshHeaderCartBadge();
         }
     }
@@ -167,6 +196,10 @@ public class ProductsFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (pendingSearchTrack != null) {
+            searchTrackHandler.removeCallbacks(pendingSearchTrack);
+            pendingSearchTrack = null;
+        }
         if (productsListener != null) {
             productsListener.remove();
             productsListener = null;
@@ -211,14 +244,67 @@ public class ProductsFragment extends Fragment {
         bindSpotlightProduct();
         rebuildCategoryChipsIfNeeded();
         applyFilterAndSort();
+        refreshRecommendationScores();
+    }
+
+    private void refreshUserGender() {
+        if (userSession == null) {
+            return;
+        }
+        userSession.loadCurrentUser(user -> {
+            if (!isAdded() || binding == null) {
+                return;
+            }
+            String loadedGender = user != null && user.getGender() != null ? user.getGender() : "";
+            if (!loadedGender.equals(currentUserGender)) {
+                currentUserGender = loadedGender;
+                refreshRecommendationScores();
+            }
+        });
+    }
+
+    private void refreshRecommendationScores() {
+        if (!isAdded() || binding == null || allProducts.isEmpty() || userSession == null) {
+            return;
+        }
+        RecommendationEngine.loadScores(
+                requireContext(),
+                userSession.getUsername(),
+                currentUserGender,
+                allProducts,
+                scores -> {
+                    if (!isAdded() || binding == null) {
+                        return;
+                    }
+                    recommendationScores.clear();
+                    recommendationScores.putAll(scores);
+                    bindSpotlightProduct();
+                    applyFilterAndSort();
+                }
+        );
     }
 
     private void bindSpotlightProduct() {
         spotlightProduct = null;
-        for (ProductWithRating item : allProducts) {
-            if ("iphone_16_pro_max".equals(item.product.getId())) {
-                spotlightProduct = item.product;
-                break;
+        if (!recommendationScores.isEmpty()) {
+            double bestScore = Double.NEGATIVE_INFINITY;
+            for (ProductWithRating item : allProducts) {
+                if (item.product.getStock() <= 0) {
+                    continue;
+                }
+                double score = recommendationScores.getOrDefault(item.product.getId(), Double.NEGATIVE_INFINITY);
+                if (score > bestScore) {
+                    bestScore = score;
+                    spotlightProduct = item.product;
+                }
+            }
+        }
+        if (spotlightProduct == null) {
+            for (ProductWithRating item : allProducts) {
+                if ("iphone_16_pro_max".equals(item.product.getId())) {
+                    spotlightProduct = item.product;
+                    break;
+                }
             }
         }
         if (spotlightProduct == null && !allProducts.isEmpty()) {
@@ -263,6 +349,10 @@ public class ProductsFragment extends Fragment {
             chip.setOnClickListener(v -> {
                 selectedCategory = category;
                 applyFilterAndSort();
+                BehaviorTracker tracker = BehaviorTracker.getInstance();
+                if (tracker != null) {
+                    tracker.trackCategoryFilter(category);
+                }
             });
             binding.chipGroupCategories.addView(chip);
         }
@@ -275,6 +365,10 @@ public class ProductsFragment extends Fragment {
         currentSort = option;
         updateSortTabStyles();
         applyFilterAndSort();
+        BehaviorTracker tracker = BehaviorTracker.getInstance();
+        if (tracker != null) {
+            tracker.trackSort(option.name());
+        }
     }
 
     private void updateSortTabStyles() {
@@ -333,7 +427,12 @@ public class ProductsFragment extends Fragment {
             filtered.add(item);
         }
 
-        if (currentSort == SortOption.PRICE_ASC) {
+        if (currentSort == SortOption.DEFAULT && !recommendationScores.isEmpty()) {
+            filtered.sort((a, b) -> Double.compare(
+                    recommendationScores.getOrDefault(b.product.getId(), 0.0),
+                    recommendationScores.getOrDefault(a.product.getId(), 0.0)
+            ));
+        } else if (currentSort == SortOption.PRICE_ASC) {
             filtered.sort(Comparator.comparingLong(i -> FormatUtils.parseVnd(i.product.getPrice())));
         } else if (currentSort == SortOption.PRICE_DESC) {
             filtered.sort((a, b) -> Long.compare(
@@ -347,15 +446,43 @@ public class ProductsFragment extends Fragment {
             });
         }
 
+        lastFilteredCount = filtered.size();
         adapter.submitList(filtered);
         binding.tvProductCount.setText(filtered.size() + " sản phẩm");
         binding.llEmptyProducts.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void scheduleSearchTracking(String query) {
+        if (pendingSearchTrack != null) {
+            searchTrackHandler.removeCallbacks(pendingSearchTrack);
+            pendingSearchTrack = null;
+        }
+        if (query.length() < 2) {
+            return;
+        }
+        pendingSearchTrack = () -> {
+            BehaviorTracker tracker = BehaviorTracker.getInstance();
+            if (tracker != null) {
+                tracker.trackSearch(query, lastFilteredCount);
+            }
+            pendingSearchTrack = null;
+        };
+        searchTrackHandler.postDelayed(pendingSearchTrack, 1_000L);
+    }
+
+    private void flushPendingSearchTrack() {
+        if (pendingSearchTrack != null) {
+            searchTrackHandler.removeCallbacks(pendingSearchTrack);
+            pendingSearchTrack.run();
+        }
     }
 
     private void openProductDetail(Product selected) {
         if (selected == null || !isAdded()) {
             return;
         }
+        // Flush any pending search query immediately before navigating away.
+        flushPendingSearchTrack();
         Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
         intent.putExtra(Constants.EXTRA_PRODUCT_ID, selected.getId());
         startActivity(intent);

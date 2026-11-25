@@ -1,20 +1,25 @@
 package com.example.btday4.data.repository;
 
 import android.content.Context;
-import com.example.btday4.data.local.AppDatabase;
+import android.os.Handler;
+import android.os.Looper;
 import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.data.remote.PayOsClient;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.PayOsPaymentInfo;
+import com.example.btday4.util.Constants;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- * Coordinates PayOS network operations on a dedicated I/O executor while keeping Room SQLite
- * and Firestore synchronized atomically.
+ * Coordinates PayOS network operations on a dedicated I/O executor backed 100% by Cloud Firestore.
  */
 public final class PayOsRepository {
 
@@ -30,24 +35,38 @@ public final class PayOsRepository {
     }
 
     /**
-     * Loads the latest saved payment record for an order from local Room SQLite.
+     * Loads the latest saved payment record for an order from Cloud Firestore.
      */
     public static void getLatestPaymentForOrder(
             Context context,
             String orderId,
             Consumer<PaymentEntity> callback
     ) {
-        AppDatabase.runAsync(context, db -> {
-            PaymentEntity payment = db.paymentDao().findLatestByOrderId(orderId);
+        if (orderId == null || orderId.trim().isEmpty()) {
             if (callback != null) {
-                AppDatabase.postToMain(() -> callback.accept(payment));
+                callback.accept(null);
             }
-        });
+            return;
+        }
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_PAYMENTS)
+                .whereEqualTo("orderId", orderId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (callback != null) {
+                        callback.accept(pickLatest(snapshot));
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (callback != null) {
+                        callback.accept(null);
+                    }
+                });
     }
 
     /**
      * Reuses a still-valid pending PayOS QR for the order if one exists, otherwise generates
-     * a fresh PayOS payment link and persists it locally and in Firestore.
+     * a fresh PayOS payment link and persists it in Firestore.
      */
     public static void createOrResumePayment(
             Context context,
@@ -59,25 +78,21 @@ public final class PayOsRepository {
             notifyError(callback, "Không tìm thấy thông tin đơn hàng");
             return;
         }
-        Context appContext = context.getApplicationContext();
         NETWORK_EXECUTOR.execute(() -> {
             try {
-                AppDatabase db = AppDatabase.getInstance(appContext);
-                PaymentEntity existing = db.paymentDao().findLatestByOrderId(order.getId());
+                PaymentEntity existing = findLatestSync(order.getId());
                 long nowSeconds = System.currentTimeMillis() / 1000L;
 
                 if (!forceNew && existing != null && existing.isStillReusable(nowSeconds)) {
-                    // Check live PayOS status in case the user already transferred while away.
                     try {
                         PayOsPaymentInfo live = PayOsClient.getPaymentStatus(existing.getOrderCode());
-                        PaymentEntity synced = applyStatusUpdate(db, existing, live.getStatus());
+                        PaymentEntity synced = applyStatusUpdate(existing, live.getStatus());
                         if (!synced.getStatus().equalsIgnoreCase(PayOsPaymentInfo.STATUS_CANCELLED)
                                 && !synced.getStatus().equalsIgnoreCase(PayOsPaymentInfo.STATUS_EXPIRED)) {
                             notifySuccess(callback, synced);
                             return;
                         }
                     } catch (PayOsClient.PayOsException ignored) {
-                        // Still show the valid cached QR if status check transiently failed.
                         notifySuccess(callback, existing);
                         return;
                     }
@@ -109,7 +124,6 @@ public final class PayOsRepository {
                         0L
                 );
 
-                db.paymentDao().upsert(entity);
                 FirestoreHelper.savePayment(entity, null);
                 notifySuccess(callback, entity);
             } catch (PayOsClient.PayOsException e) {
@@ -121,7 +135,7 @@ public final class PayOsRepository {
     }
 
     /**
-     * Polls PayOS for the current payment status and atomically marks the order PAID when confirmed.
+     * Polls PayOS for the current payment status and marks the order PAID in Firestore when confirmed.
      */
     public static void refreshPaymentStatus(
             Context context,
@@ -132,12 +146,10 @@ public final class PayOsRepository {
             notifyError(callback, "Không có giao dịch PayOS để kiểm tra");
             return;
         }
-        Context appContext = context.getApplicationContext();
         NETWORK_EXECUTOR.execute(() -> {
             try {
                 PayOsPaymentInfo live = PayOsClient.getPaymentStatus(payment.getOrderCode());
-                AppDatabase db = AppDatabase.getInstance(appContext);
-                PaymentEntity updated = applyStatusUpdate(db, payment, live.getStatus());
+                PaymentEntity updated = applyStatusUpdate(payment, live.getStatus());
                 notifySuccess(callback, updated);
             } catch (PayOsClient.PayOsException e) {
                 notifyError(callback, e.getMessage());
@@ -148,7 +160,7 @@ public final class PayOsRepository {
     }
 
     /**
-     * Cancels an active PayOS QR link and marks both the payment and order as CANCELLED.
+     * Cancels an active PayOS QR link and marks both the payment and order as CANCELLED in Firestore.
      */
     public static void cancelPayment(
             Context context,
@@ -160,18 +172,15 @@ public final class PayOsRepository {
             notifyError(callback, "Không có giao dịch để hủy");
             return;
         }
-        Context appContext = context.getApplicationContext();
         NETWORK_EXECUTOR.execute(() -> {
             try {
                 try {
                     PayOsClient.cancelPaymentRequest(payment.getOrderCode(), reason);
                 } catch (PayOsClient.PayOsException e) {
-                    // Check if PayOS already marked it PAID before letting cancellation proceed.
                     try {
                         PayOsPaymentInfo live = PayOsClient.getPaymentStatus(payment.getOrderCode());
                         if (live.isPaid()) {
-                            AppDatabase db = AppDatabase.getInstance(appContext);
-                            PaymentEntity paidEntity = applyStatusUpdate(db, payment, PayOsPaymentInfo.STATUS_PAID);
+                            PaymentEntity paidEntity = applyStatusUpdate(payment, PayOsPaymentInfo.STATUS_PAID);
                             notifySuccess(callback, paidEntity);
                             return;
                         }
@@ -180,8 +189,7 @@ public final class PayOsRepository {
                     }
                 }
 
-                AppDatabase db = AppDatabase.getInstance(appContext);
-                PaymentEntity cancelled = applyStatusUpdate(db, payment, PayOsPaymentInfo.STATUS_CANCELLED);
+                PaymentEntity cancelled = applyStatusUpdate(payment, PayOsPaymentInfo.STATUS_CANCELLED);
                 notifySuccess(callback, cancelled);
             } catch (Exception e) {
                 notifyError(callback, "Không thể hủy giao dịch: " + e.getMessage());
@@ -189,11 +197,38 @@ public final class PayOsRepository {
         });
     }
 
-    private static PaymentEntity applyStatusUpdate(
-            AppDatabase db,
-            PaymentEntity original,
-            String newStatus
-    ) {
+    private static PaymentEntity findLatestSync(String orderId) {
+        try {
+            QuerySnapshot snap = Tasks.await(
+                    FirebaseFirestore.getInstance()
+                            .collection(Constants.COLLECTION_PAYMENTS)
+                            .whereEqualTo("orderId", orderId)
+                            .get()
+            );
+            return pickLatest(snap);
+        } catch (Exception ignored) {
+            return null;
+        }
+    }
+
+    private static PaymentEntity pickLatest(QuerySnapshot snapshot) {
+        if (snapshot == null || snapshot.isEmpty()) {
+            return null;
+        }
+        PaymentEntity latest = null;
+        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+            PaymentEntity candidate = doc.toObject(PaymentEntity.class);
+            if (candidate == null) {
+                continue;
+            }
+            if (latest == null || candidate.getCreatedAtMillis() > latest.getCreatedAtMillis()) {
+                latest = candidate;
+            }
+        }
+        return latest;
+    }
+
+    private static PaymentEntity applyStatusUpdate(PaymentEntity original, String newStatus) {
         String normalized = newStatus == null || newStatus.trim().isEmpty()
                 ? original.getStatus()
                 : newStatus.trim().toUpperCase();
@@ -218,27 +253,18 @@ public final class PayOsRepository {
                 paidAt
         );
 
-        boolean isPaid = PayOsPaymentInfo.STATUS_PAID.equals(normalized);
-        db.runInTransaction(() -> {
-            db.paymentDao().upsert(updated);
-            if (isPaid) {
-                db.orderDao().updateStatus(updated.getOrderId(), OrderStatus.PAID.getCode());
-            }
-        });
-        if (PayOsPaymentInfo.STATUS_CANCELLED.equals(normalized)) {
-            OrderRepository.cancelAndRestock(db, updated.getOrderId());
-        }
-
         FirestoreHelper.savePayment(updated, null);
-        if (isPaid) {
+        if (PayOsPaymentInfo.STATUS_PAID.equals(normalized)) {
             FirestoreHelper.updateOrderStatus(updated.getOrderId(), OrderStatus.PAID.getCode(), null);
+        } else if (PayOsPaymentInfo.STATUS_CANCELLED.equals(normalized)) {
+            OrderRepository.cancelAndRestockSync(updated.getOrderId());
         }
         return updated;
     }
 
     private static void notifySuccess(PaymentCallback callback, PaymentEntity payment) {
         if (callback != null) {
-            AppDatabase.postToMain(() -> callback.onSuccess(payment));
+            new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(payment));
         }
     }
 
@@ -247,7 +273,7 @@ public final class PayOsRepository {
             String safeMessage = message == null || message.trim().isEmpty()
                     ? "Không thể kết nối cổng thanh toán PayOS"
                     : message;
-            AppDatabase.postToMain(() -> callback.onError(safeMessage));
+            new Handler(Looper.getMainLooper()).post(() -> callback.onError(safeMessage));
         }
     }
 }

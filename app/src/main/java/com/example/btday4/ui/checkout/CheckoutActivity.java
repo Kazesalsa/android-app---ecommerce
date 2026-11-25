@@ -17,6 +17,7 @@ import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityCheckoutBinding;
 import com.example.btday4.model.CartItem;
 import com.example.btday4.model.PaymentMethod;
+import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.orders.OrderDetailActivity;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
@@ -309,6 +310,25 @@ public class CheckoutActivity extends AppCompatActivity {
                     public void onSuccess(OrderEntity createdOrder) {
                         if (isFinishing() || isDestroyed()) {
                             return;
+                        }
+                        BehaviorTracker tracker = BehaviorTracker.getInstance();
+                        if (tracker != null) {
+                            StringBuilder purchasedIds = new StringBuilder();
+                            for (OrderItemEntity item : checkoutItems) {
+                                if (purchasedIds.length() > 0) {
+                                    purchasedIds.append(',');
+                                }
+                                purchasedIds.append(item.getProductId());
+                            }
+                            tracker.trackAction(
+                                    "CheckoutActivity",
+                                    BehaviorTracker.EVENT_PURCHASE,
+                                    createdOrder.getId(),
+                                    "method=" + selectedPaymentMethod.name()
+                                            + "|total=" + createdOrder.getTotalAmount()
+                                            + "|items=" + checkoutItems.size()
+                                            + "|products=" + purchasedIds
+                            );
                         }
                         setResult(RESULT_OK);
                         Intent nextIntent = selectedPaymentMethod == PaymentMethod.VIETQR

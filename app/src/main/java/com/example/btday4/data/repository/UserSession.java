@@ -2,28 +2,41 @@ package com.example.btday4.data.repository;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.example.btday4.data.local.AppDatabase;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import com.example.btday4.data.local.UserEntity;
 import com.example.btday4.data.remote.FirestoreHelper;
+import com.example.btday4.tracking.RecommendationEngine;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.PasswordHasher;
 import com.example.btday4.util.ValidationUtils;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 /**
- * Manages active user session state and synchronizes user profile details across SharedPreferences,
- * Room SQLite, and Cloud Firestore.
+ * Manages active user session state in SharedPreferences backed 100% by Cloud Firestore.
  */
 public class UserSession {
+
+    private static final String TAG = "UserSession";
+    private static final ExecutorService AUTH_EXECUTOR = Executors.newSingleThreadExecutor();
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     public enum AuthResult {
         SUCCESS,
         ACCOUNT_NOT_FOUND,
         WRONG_PASSWORD,
-        ACCOUNT_EXISTS
+        ACCOUNT_EXISTS,
+        NETWORK_ERROR
     }
 
     private final Context appContext;
@@ -34,27 +47,57 @@ public class UserSession {
         this.prefs = appContext.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
     }
 
-    /**
-     * Verifies credentials against the stored salted hash. Legacy plaintext rows are re-hashed on
-     * the first successful login.
-     */
     public void login(String username, String password, boolean rememberMe, Consumer<AuthResult> callback) {
         String cleanUsername = username == null ? "" : username.trim();
-        AppDatabase.runAsync(appContext, db -> {
-            UserEntity user = db.userDao().findByUsername(cleanUsername);
-            AuthResult result;
-            if (user == null) {
-                result = AuthResult.ACCOUNT_NOT_FOUND;
-            } else if (!PasswordHasher.matches(password, user.getPassword())) {
-                result = AuthResult.WRONG_PASSWORD;
-            } else {
-                if (!PasswordHasher.isHashed(user.getPassword())) {
-                    db.userDao().updatePassword(user.getUsername(), PasswordHasher.hash(password));
+        if (cleanUsername.isEmpty()) {
+            callback.accept(AuthResult.ACCOUNT_NOT_FOUND);
+            return;
+        }
+        DocumentReference docRef = usersRef().document(cleanUsername);
+        docRef.get().addOnSuccessListener(snapshot -> AUTH_EXECUTOR.execute(() -> {
+            UserEntity user = snapshot.exists() ? snapshot.toObject(UserEntity.class) : null;
+            if (user == null && Constants.DEMO_USERNAME.equals(cleanUsername)) {
+                UserEntity demo = createDemoUser();
+                if (!PasswordHasher.matches(password, demo.getPassword())) {
+                    MAIN_HANDLER.post(() -> callback.accept(AuthResult.WRONG_PASSWORD));
+                    return;
                 }
-                startSession(db, user, rememberMe);
-                result = AuthResult.SUCCESS;
+                startSession(demo, rememberMe);
+                MAIN_HANDLER.post(() -> callback.accept(AuthResult.SUCCESS));
+                return;
             }
-            AppDatabase.postToMain(() -> callback.accept(result));
+            if (user == null) {
+                MAIN_HANDLER.post(() -> callback.accept(AuthResult.ACCOUNT_NOT_FOUND));
+                return;
+            }
+            String storedPassword = user.getPassword();
+            if (storedPassword == null || storedPassword.isEmpty()) {
+                if (Constants.DEMO_USERNAME.equals(cleanUsername)) {
+                    if (!Constants.DEMO_PASSWORD.equals(password)) {
+                        MAIN_HANDLER.post(() -> callback.accept(AuthResult.WRONG_PASSWORD));
+                        return;
+                    }
+                    user.setPassword(PasswordHasher.hash(password));
+                } else if (ValidationUtils.isValidPassword(password)) {
+                    user.setPassword(PasswordHasher.hash(password));
+                } else {
+                    MAIN_HANDLER.post(() -> callback.accept(AuthResult.WRONG_PASSWORD));
+                    return;
+                }
+            } else if (!PasswordHasher.matches(password, storedPassword)) {
+                MAIN_HANDLER.post(() -> callback.accept(AuthResult.WRONG_PASSWORD));
+                return;
+            } else if (!PasswordHasher.isHashed(storedPassword)) {
+                user.setPassword(PasswordHasher.hash(password));
+            }
+            if (user.getUsername().isEmpty()) {
+                user.setUsername(cleanUsername);
+            }
+            startSession(user, rememberMe);
+            MAIN_HANDLER.post(() -> callback.accept(AuthResult.SUCCESS));
+        })).addOnFailureListener(e -> {
+            Log.e(TAG, "Firestore login failed for " + cleanUsername, e);
+            callback.accept(AuthResult.NETWORK_ERROR);
         });
     }
 
@@ -69,43 +112,45 @@ public class UserSession {
         String cleanDisplayName = ValidationUtils.isNotBlank(displayName)
                 ? displayName.trim()
                 : deriveDisplayName(cleanUsername);
-        AppDatabase.runAsync(appContext, db -> {
-            AuthResult result;
-            if (db.userDao().findByUsername(cleanUsername) != null) {
-                result = AuthResult.ACCOUNT_EXISTS;
-            } else {
-                UserEntity user = new UserEntity(
-                        cleanUsername,
-                        cleanDisplayName,
-                        PasswordHasher.hash(password),
-                        "",
-                        "",
-                        "",
-                        ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "",
-                        "",
-                        ""
-                );
-                db.userDao().insert(user);
-                startSession(db, user, rememberMe);
-                result = AuthResult.SUCCESS;
+        DocumentReference docRef = usersRef().document(cleanUsername);
+        docRef.get().addOnSuccessListener(snapshot -> {
+            if (snapshot.exists()) {
+                callback.accept(AuthResult.ACCOUNT_EXISTS);
+                return;
             }
-            AppDatabase.postToMain(() -> callback.accept(result));
+            UserEntity user = new UserEntity(
+                    cleanUsername,
+                    cleanDisplayName,
+                    PasswordHasher.hash(password),
+                    "",
+                    "",
+                    "",
+                    ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "",
+                    "",
+                    ""
+            );
+            startSession(user, rememberMe);
+            callback.accept(AuthResult.SUCCESS);
+        }).addOnFailureListener(e -> {
+            Log.e(TAG, "Firestore register failed for " + cleanUsername, e);
+            callback.accept(AuthResult.NETWORK_ERROR);
         });
     }
 
-    private void startSession(AppDatabase db, UserEntity user, boolean rememberMe) {
+    private void startSession(UserEntity user, boolean rememberMe) {
         String loginTime = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
-        db.userDao().updateLoginTime(user.getUsername(), loginTime);
         user.setLoginTime(loginTime);
         String displayName = ValidationUtils.isNotBlank(user.getDisplayName())
                 ? user.getDisplayName()
                 : deriveDisplayName(user.getUsername());
+        user.setDisplayName(displayName);
         prefs.edit()
                 .putBoolean(Constants.KEY_IS_LOGGED_IN, true)
                 .putString(Constants.KEY_USERNAME, user.getUsername())
                 .putString(Constants.KEY_DISPLAY_NAME, displayName)
                 .putBoolean(Constants.KEY_REMEMBER_ME, rememberMe)
                 .commit();
+        RecommendationEngine.clearCache();
         FirestoreHelper.saveUser(user, null);
     }
 
@@ -135,24 +180,21 @@ public class UserSession {
 
         prefs.edit().putString(Constants.KEY_DISPLAY_NAME, finalName).apply();
 
-        AppDatabase.runAsync(appContext, db -> {
-            db.userDao().updateProfile(
-                    username,
-                    finalName,
-                    cleanEmail,
-                    cleanPhone,
-                    cleanGender,
-                    cleanBirthDate,
-                    cleanAddress
-            );
-            UserEntity updated = db.userDao().findByUsername(username);
-            if (updated != null) {
-                FirestoreHelper.saveUser(updated, null);
-            }
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
-            }
-        });
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("displayName", finalName);
+        updates.put("email", cleanEmail);
+        updates.put("phone", cleanPhone);
+        updates.put("gender", cleanGender);
+        updates.put("birthDate", cleanBirthDate);
+        updates.put("address", cleanAddress);
+
+        usersRef().document(username)
+                .update(updates)
+                .addOnCompleteListener(task -> {
+                    if (onDone != null) {
+                        onDone.run();
+                    }
+                });
     }
 
     public void updateShippingInfo(String displayName, String phone, String address, Runnable onDone) {
@@ -171,16 +213,18 @@ public class UserSession {
 
         prefs.edit().putString(Constants.KEY_DISPLAY_NAME, finalName).apply();
 
-        AppDatabase.runAsync(appContext, db -> {
-            db.userDao().updateShippingInfo(username, finalName, cleanPhone, cleanAddress);
-            UserEntity updated = db.userDao().findByUsername(username);
-            if (updated != null) {
-                FirestoreHelper.saveUser(updated, null);
-            }
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
-            }
-        });
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("displayName", finalName);
+        updates.put("phone", cleanPhone);
+        updates.put("address", cleanAddress);
+
+        usersRef().document(username)
+                .update(updates)
+                .addOnCompleteListener(task -> {
+                    if (onDone != null) {
+                        onDone.run();
+                    }
+                });
     }
 
     public void changePassword(String currentPassword, String newPassword, Consumer<Boolean> callback) {
@@ -189,14 +233,18 @@ public class UserSession {
             callback.accept(false);
             return;
         }
-        AppDatabase.runAsync(appContext, db -> {
-            UserEntity user = db.userDao().findByUsername(username);
+        DocumentReference docRef = usersRef().document(username);
+        docRef.get().addOnSuccessListener(snapshot -> {
+            UserEntity user = snapshot.exists() ? snapshot.toObject(UserEntity.class) : null;
             boolean verified = user != null && PasswordHasher.matches(currentPassword, user.getPassword());
-            if (verified) {
-                db.userDao().updatePassword(user.getUsername(), PasswordHasher.hash(newPassword));
+            if (!verified) {
+                callback.accept(false);
+                return;
             }
-            AppDatabase.postToMain(() -> callback.accept(verified));
-        });
+            docRef.update("password", PasswordHasher.hash(newPassword))
+                    .addOnSuccessListener(unused -> callback.accept(true))
+                    .addOnFailureListener(e -> callback.accept(false));
+        }).addOnFailureListener(e -> callback.accept(false));
     }
 
     public void loadCurrentUser(Consumer<UserEntity> callback) {
@@ -205,22 +253,30 @@ public class UserSession {
             callback.accept(null);
             return;
         }
-        AppDatabase.runAsync(appContext, db -> {
-            UserEntity user = db.userDao().findByUsername(username);
-            AppDatabase.postToMain(() -> callback.accept(user));
-        });
+        usersRef().document(username)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    UserEntity user = snapshot.exists() ? snapshot.toObject(UserEntity.class) : null;
+                    callback.accept(user);
+                })
+                .addOnFailureListener(e -> callback.accept(null));
     }
 
     /**
-     * Ends the session only; the registered account and its cart stay stored for the next login.
+     * Ends the session, flushes the user's tracking summary once to Firestore, and clears the ranking cache.
      */
     public void logout() {
+        String username = getUsername();
+        if (!username.isEmpty()) {
+            RecommendationEngine.syncTrackingSummaryToFirestore(appContext, username);
+        }
         SharedPreferences.Editor editor = prefs.edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false);
         if (!isRemembered()) {
             editor.remove(Constants.KEY_USERNAME);
             editor.remove(Constants.KEY_DISPLAY_NAME);
         }
         editor.apply();
+        RecommendationEngine.clearCache();
     }
 
     public boolean isLoggedIn() {
@@ -238,6 +294,24 @@ public class UserSession {
     public String getDisplayName() {
         String name = prefs.getString(Constants.KEY_DISPLAY_NAME, "");
         return name.isEmpty() ? getUsername() : name;
+    }
+
+    private static com.google.firebase.firestore.CollectionReference usersRef() {
+        return FirebaseFirestore.getInstance().collection(Constants.COLLECTION_USERS);
+    }
+
+    private static UserEntity createDemoUser() {
+        return new UserEntity(
+                Constants.DEMO_USERNAME,
+                Constants.DEMO_DISPLAY_NAME,
+                PasswordHasher.hash(Constants.DEMO_PASSWORD),
+                "",
+                "",
+                "",
+                Constants.DEMO_USERNAME,
+                "",
+                ""
+        );
     }
 
     private String deriveDisplayName(String username) {

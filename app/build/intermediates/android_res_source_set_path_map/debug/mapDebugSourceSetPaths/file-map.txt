@@ -1,9 +1,0 @@
-com.example.btday4.app-pngs-0 /home/tan_tai/Documents/ltdd/BtDay4/app/build/generated/res/pngs/debug
-com.example.btday4.app-res-1 /home/tan_tai/Documents/ltdd/BtDay4/app/build/generated/res/processDebugGoogleServices
-com.example.btday4.app-updated_navigation_xml-2 /home/tan_tai/Documents/ltdd/BtDay4/app/build/generated/updated_navigation_xml/debug
-com.example.btday4.app-packageDebugResources-3 /home/tan_tai/Documents/ltdd/BtDay4/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-com.example.btday4.app-packageDebugResources-4 /home/tan_tai/Documents/ltdd/BtDay4/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-com.example.btday4.app-debug-5 /home/tan_tai/Documents/ltdd/BtDay4/app/build/intermediates/merged_res/debug/mergeDebugResources
-com.example.btday4.app-debug-6 /home/tan_tai/Documents/ltdd/BtDay4/app/src/debug/res
-com.example.btday4.app-main-7 /home/tan_tai/Documents/ltdd/BtDay4/app/src/main/res
-gradleHome-0 /home/tan_tai/.gradle

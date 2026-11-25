@@ -13,6 +13,7 @@ import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityMainBinding;
+import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.auth.LoginActivity;
 import com.example.btday4.ui.cart.CartFragment;
 import com.example.btday4.ui.products.ProductsFragment;
@@ -99,8 +100,8 @@ public class MainActivity extends AppCompatActivity {
             binding.bottomNav.setSelectedItemId(selectedNavId);
         }
 
-        refreshCartBadge();
         FirestoreHelper.seedProductsIfEmpty(null);
+        FirestoreHelper.seedReviewsIfEmpty(null);
     }
 
     @Override
@@ -121,6 +122,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         refreshCartBadge();
+        BehaviorTracker tracker = BehaviorTracker.getInstance();
+        if (tracker != null) {
+            tracker.onMainResumed(tabNameFor(selectedNavId));
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        BehaviorTracker tracker = BehaviorTracker.getInstance();
+        if (tracker != null) {
+            tracker.onMainPaused();
+        }
     }
 
     public void openProductsTab() {
@@ -167,6 +181,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectTab(int navId) {
         selectedNavId = navId;
+        BehaviorTracker tracker = BehaviorTracker.getInstance();
+        if (tracker != null) {
+            tracker.onTabSelected(tabNameFor(navId));
+        }
         Fragment target;
         if (navId == R.id.nav_cart) {
             target = cartFragment;
@@ -195,6 +213,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         tx.commit();
+    }
+
+    private String tabNameFor(int navId) {
+        if (navId == R.id.nav_cart) {
+            return "Cart";
+        }
+        if (navId == R.id.nav_profile) {
+            return "Profile";
+        }
+        return "Products";
     }
 
     private String tagFor(Fragment fragment) {

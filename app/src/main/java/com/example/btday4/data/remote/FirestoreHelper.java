@@ -9,14 +9,17 @@ import com.example.btday4.data.local.Product;
 import com.example.btday4.data.local.ReviewEntity;
 import com.example.btday4.data.local.UserEntity;
 import com.example.btday4.data.repository.ProductRepository;
+import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.util.Constants;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +124,7 @@ public final class FirestoreHelper {
     public static void saveUser(@NonNull UserEntity user, FirestoreCallback<Void> callback) {
         getDb().collection(Constants.COLLECTION_USERS)
                 .document(user.getUsername())
-                .set(user)
+                .set(user, SetOptions.merge())
                 .addOnSuccessListener(unused -> {
                     if (callback != null) {
                         callback.onSuccess(null);
@@ -244,6 +247,7 @@ public final class FirestoreHelper {
         payload.put("amount", payment.getAmount());
         payload.put("description", payment.getDescription());
         payload.put("checkoutUrl", payment.getCheckoutUrl());
+        payload.put("qrCode", payment.getQrCode());
         payload.put("bankBin", payment.getBankBin());
         payload.put("accountNumber", payment.getAccountNumber());
         payload.put("accountName", payment.getAccountName());
@@ -265,6 +269,89 @@ public final class FirestoreHelper {
                     if (callback != null) {
                         callback.onError(e);
                     }
+                });
+    }
+
+    /**
+     * Seeds default reviews to Firestore once if the reviews collection is completely empty.
+     */
+    public static void seedReviewsIfEmpty(FirestoreCallback<Boolean> callback) {
+        FirebaseFirestore db = getDb();
+        CollectionReference col = db.collection(Constants.COLLECTION_REVIEWS);
+        col.limit(1).get()
+                .addOnSuccessListener(snapshot -> {
+                    if (!snapshot.isEmpty()) {
+                        if (callback != null) {
+                            callback.onSuccess(false);
+                        }
+                        return;
+                    }
+                    WriteBatch batch = db.batch();
+                    for (ReviewEntity review : ReviewRepository.createDefaultReviews()) {
+                        batch.set(col.document(review.getId()), review);
+                    }
+                    batch.commit()
+                            .addOnSuccessListener(unused -> {
+                                if (callback != null) {
+                                    callback.onSuccess(true);
+                                }
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e(TAG, "Failed to batch seed reviews", e);
+                                if (callback != null) {
+                                    callback.onError(e);
+                                }
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Failed to check remote reviews collection", e);
+                    if (callback != null) {
+                        callback.onError(e);
+                    }
+                });
+    }
+
+    /**
+     * Stores one compact tracking summary document under users/{username}/tracking/profile
+     * and removes any legacy trackingProfile field on users/{username} or top-level tracking_profiles docs.
+     */
+    public static void saveTrackingProfile(
+            @NonNull String username,
+            @NonNull Map<String, Object> summary
+    ) {
+        String cleanUser = username.trim();
+        if (cleanUser.isEmpty() || "guest".equals(cleanUser)) {
+            return;
+        }
+        FirebaseFirestore db = getDb();
+        db.collection(Constants.COLLECTION_USERS)
+                .document(cleanUser)
+                .collection(Constants.COLLECTION_TRACKING)
+                .document(Constants.DOC_TRACKING_PROFILE)
+                .set(summary)
+                .addOnSuccessListener(unused -> cleanupLegacyTrackingData(db, cleanUser))
+                .addOnFailureListener(e -> Log.e(TAG, "Failed to sync tracking profile", e));
+    }
+
+    private static void cleanupLegacyTrackingData(FirebaseFirestore db, String username) {
+        // Remove old trackingProfile field from users/{username} if it was written earlier
+        db.collection(Constants.COLLECTION_USERS)
+                .document(username)
+                .set(Collections.singletonMap("trackingProfile", FieldValue.delete()), SetOptions.merge());
+
+        // Delete all docs in legacy top-level tracking_profiles so the collection disappears
+        db.collection("tracking_profiles")
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    if (snapshot == null || snapshot.isEmpty()) {
+                        return;
+                    }
+                    WriteBatch batch = db.batch();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        batch.delete(doc.getReference());
+                    }
+                    batch.commit()
+                            .addOnFailureListener(e -> Log.e(TAG, "Failed to delete legacy tracking_profiles", e));
                 });
     }
 }

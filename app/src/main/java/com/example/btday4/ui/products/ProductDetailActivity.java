@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,6 +22,7 @@ import com.example.btday4.databinding.ActivityProductDetailBinding;
 import com.example.btday4.databinding.ItemRatingBarBinding;
 import com.example.btday4.databinding.ItemSpecRowBinding;
 import com.example.btday4.model.RatingSummary;
+import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.checkout.CheckoutActivity;
 import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.util.Constants;
@@ -50,6 +52,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     private ReviewEntity currentUserReview;
     private int selectedStarFilter = 0;
     private boolean openReviewComposerOnLoad = false;
+    private long productViewStartElapsedMs = 0L;
 
     private final ActivityResultLauncher<Intent> writeReviewLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -140,6 +143,7 @@ public class ProductDetailActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        productViewStartElapsedMs = SystemClock.elapsedRealtime();
         refreshCartBadge();
         if (product != null) {
             ProductRepository.findById(this, product.getId(), latest -> {
@@ -148,6 +152,19 @@ public class ProductDetailActivity extends AppCompatActivity {
                     bindStockState(latest);
                 }
             });
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (product != null && productViewStartElapsedMs > 0L) {
+            long dwellMs = Math.max(0L, SystemClock.elapsedRealtime() - productViewStartElapsedMs);
+            BehaviorTracker tracker = BehaviorTracker.getInstance();
+            if (tracker != null) {
+                tracker.trackProductView(product, dwellMs);
+            }
+            productViewStartElapsedMs = 0L;
         }
     }
 
@@ -377,6 +394,17 @@ public class ProductDetailActivity extends AppCompatActivity {
             }
             binding.btnAddToCart.setEnabled(true);
             refreshCartBadge();
+            if (added > 0) {
+                BehaviorTracker tracker = BehaviorTracker.getInstance();
+                if (tracker != null) {
+                    tracker.trackAction(
+                            "ProductDetailActivity",
+                            BehaviorTracker.EVENT_ADD_TO_CART,
+                            product.getId(),
+                            product.getName() + "|qty=" + added
+                    );
+                }
+            }
             String message = added > 0
                     ? "Đã thêm " + added + " × " + product.getName() + " vào giỏ"
                     : "Giỏ hàng đã có tối đa " + CartRepository.maxPurchasable(product) + " sản phẩm còn trong kho";
@@ -389,6 +417,15 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void launchQuickCheckout() {
         if (product == null) {
             return;
+        }
+        BehaviorTracker tracker = BehaviorTracker.getInstance();
+        if (tracker != null) {
+            tracker.trackAction(
+                    "ProductDetailActivity",
+                    BehaviorTracker.EVENT_BUY_NOW,
+                    product.getId(),
+                    product.getName() + "|qty=" + quantity
+            );
         }
         Intent intent = new Intent(this, CheckoutActivity.class);
         intent.putExtra(Constants.EXTRA_PRODUCT_ID, product.getId());

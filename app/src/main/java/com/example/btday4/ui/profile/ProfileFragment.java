@@ -95,13 +95,17 @@ public class ProfileFragment extends Fragment {
                 this::performLogout
         ));
 
-        refreshProfileData();
+        if (!isHidden()) {
+            refreshProfileData();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        refreshProfileData();
+        if (!isHidden()) {
+            refreshProfileData();
+        }
     }
 
     @Override

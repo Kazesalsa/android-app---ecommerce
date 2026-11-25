@@ -16,6 +16,7 @@ import com.example.btday4.R;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.databinding.FragmentCartBinding;
 import com.example.btday4.model.CartItem;
+import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.checkout.CheckoutActivity;
 import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.ui.products.ProductDetailActivity;
@@ -68,6 +69,15 @@ public class CartFragment extends Fragment {
 
             @Override
             public void onQuantityChanged(CartItem item, int newQuantity) {
+                BehaviorTracker tracker = BehaviorTracker.getInstance();
+                if (tracker != null) {
+                    tracker.trackAction(
+                            "MainActivity:Cart",
+                            BehaviorTracker.EVENT_UPDATE_CART,
+                            item.getProduct().getId(),
+                            "qty=" + newQuantity
+                    );
+                }
                 CartRepository.updateQuantity(
                         requireContext(),
                         item.getProduct().getId(),
@@ -94,6 +104,15 @@ public class CartFragment extends Fragment {
 
             @Override
             public void onRemoveItem(CartItem item) {
+                BehaviorTracker tracker = BehaviorTracker.getInstance();
+                if (tracker != null) {
+                    tracker.trackAction(
+                            "MainActivity:Cart",
+                            BehaviorTracker.EVENT_REMOVE_CART,
+                            item.getProduct().getId(),
+                            item.getProduct().getName()
+                    );
+                }
                 CartRepository.removeItem(requireContext(), item.getProduct().getId(), CartFragment.this::refreshCart);
             }
         });
@@ -126,18 +145,31 @@ public class CartFragment extends Fragment {
             if (selectedIds.isEmpty()) {
                 return;
             }
+            BehaviorTracker tracker = BehaviorTracker.getInstance();
+            if (tracker != null) {
+                tracker.trackAction(
+                        "MainActivity:Cart",
+                        BehaviorTracker.EVENT_CHECKOUT_START,
+                        String.join(",", selectedIds),
+                        "items=" + selectedIds.size()
+                );
+            }
             Intent intent = new Intent(requireContext(), CheckoutActivity.class);
             intent.putStringArrayListExtra(Constants.EXTRA_SELECTED_PRODUCT_IDS, selectedIds);
             checkoutLauncher.launch(intent);
         });
 
-        refreshCart();
+        if (!isHidden()) {
+            refreshCart();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        refreshCart();
+        if (!isHidden()) {
+            refreshCart();
+        }
     }
 
     @Override

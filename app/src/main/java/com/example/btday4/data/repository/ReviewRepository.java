@@ -1,19 +1,26 @@
 package com.example.btday4.data.repository;
 
 import android.content.Context;
-import com.example.btday4.data.local.AppDatabase;
-import com.example.btday4.data.local.ReviewDao;
+import com.example.btday4.data.local.Product;
 import com.example.btday4.data.local.ReviewEntity;
 import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.model.UserReviewWithProduct;
+import com.example.btday4.util.Constants;
 import com.example.btday4.util.ValidationUtils;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * Manages product reviews persisted in Room and synchronized to Firestore.
+ * Manages product reviews persisted 100% in Cloud Firestore.
  */
 public final class ReviewRepository {
 
@@ -29,10 +36,22 @@ public final class ReviewRepository {
             callback.accept(new ArrayList<>());
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            List<ReviewEntity> reviews = db.reviewDao().getByProductId(productId);
-            AppDatabase.postToMain(() -> callback.accept(reviews));
-        });
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_REVIEWS)
+                .whereEqualTo("productId", productId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    List<ReviewEntity> reviews = new ArrayList<>();
+                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
+                        ReviewEntity r = doc.toObject(ReviewEntity.class);
+                        if (r != null) {
+                            reviews.add(r);
+                        }
+                    }
+                    reviews.sort((a, b) -> Long.compare(b.getCreatedAt(), a.getCreatedAt()));
+                    callback.accept(reviews);
+                })
+                .addOnFailureListener(e -> callback.accept(new ArrayList<>()));
     }
 
     public static void getUserReviews(
@@ -44,10 +63,45 @@ public final class ReviewRepository {
             callback.accept(new ArrayList<>());
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            List<UserReviewWithProduct> list = db.reviewDao().getUserReviewsWithProduct(username);
-            AppDatabase.postToMain(() -> callback.accept(list));
-        });
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Task<QuerySnapshot> reviewsTask = db.collection(Constants.COLLECTION_REVIEWS)
+                .whereEqualTo("username", username)
+                .get();
+        Task<QuerySnapshot> productsTask = db.collection(Constants.COLLECTION_PRODUCTS).get();
+
+        Tasks.whenAllSuccess(reviewsTask, productsTask)
+                .addOnSuccessListener(results -> {
+                    QuerySnapshot reviewSnap = (QuerySnapshot) results.get(0);
+                    QuerySnapshot productSnap = (QuerySnapshot) results.get(1);
+
+                    Map<String, Product> productMap = new HashMap<>();
+                    for (DocumentSnapshot doc : productSnap.getDocuments()) {
+                        Product p = doc.toObject(Product.class);
+                        if (p != null) {
+                            if (p.getId().isEmpty()) {
+                                p.setId(doc.getId());
+                            }
+                            productMap.put(p.getId(), p);
+                        }
+                    }
+
+                    List<UserReviewWithProduct> list = new ArrayList<>();
+                    for (DocumentSnapshot doc : reviewSnap.getDocuments()) {
+                        ReviewEntity r = doc.toObject(ReviewEntity.class);
+                        if (r == null) {
+                            continue;
+                        }
+                        UserReviewWithProduct item = new UserReviewWithProduct();
+                        item.review = r;
+                        Product p = productMap.get(r.getProductId());
+                        item.productName = p != null ? p.getName() : r.getProductId();
+                        item.productImageUrl = p != null ? p.getImageUrl() : "";
+                        list.add(item);
+                    }
+                    list.sort((a, b) -> Long.compare(b.review.getCreatedAt(), a.review.getCreatedAt()));
+                    callback.accept(list);
+                })
+                .addOnFailureListener(e -> callback.accept(new ArrayList<>()));
     }
 
     public static void countUserReviews(Context context, String username, Consumer<Integer> callback) {
@@ -55,10 +109,12 @@ public final class ReviewRepository {
             callback.accept(0);
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            int count = db.reviewDao().countByUsername(username);
-            AppDatabase.postToMain(() -> callback.accept(count));
-        });
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_REVIEWS)
+                .whereEqualTo("username", username)
+                .get()
+                .addOnSuccessListener(snapshot -> callback.accept(snapshot.size()))
+                .addOnFailureListener(e -> callback.accept(0));
     }
 
     /**
@@ -79,29 +135,44 @@ public final class ReviewRepository {
             }
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            ReviewDao dao = db.reviewDao();
-            ReviewEntity existing = dao.findByProductAndUser(productId, username);
-            String reviewId = existing != null ? existing.getId() : "rev_" + UUID.randomUUID().toString();
-            String safeAuthor = ValidationUtils.isNotBlank(authorName) ? authorName.trim() : username;
-            String safeComment = comment == null ? "" : comment.trim();
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_REVIEWS)
+                .whereEqualTo("productId", productId)
+                .whereEqualTo("username", username)
+                .get()
+                .addOnCompleteListener(task -> {
+                    String reviewId = "rev_" + UUID.randomUUID().toString();
+                    if (task.isSuccessful() && task.getResult() != null && !task.getResult().isEmpty()) {
+                        reviewId = task.getResult().getDocuments().get(0).getId();
+                    }
+                    String safeAuthor = ValidationUtils.isNotBlank(authorName) ? authorName.trim() : username;
+                    String safeComment = comment == null ? "" : comment.trim();
 
-            ReviewEntity entity = new ReviewEntity(
-                    reviewId,
-                    productId,
-                    username,
-                    safeAuthor,
-                    Math.max(1, Math.min(5, rating)),
-                    safeComment,
-                    System.currentTimeMillis()
-            );
-            dao.upsert(entity);
-            FirestoreHelper.saveReview(entity, null);
+                    ReviewEntity entity = new ReviewEntity(
+                            reviewId,
+                            productId,
+                            username,
+                            safeAuthor,
+                            Math.max(1, Math.min(5, rating)),
+                            safeComment,
+                            System.currentTimeMillis()
+                    );
+                    FirestoreHelper.saveReview(entity, new FirestoreHelper.FirestoreCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void result) {
+                            if (onDone != null) {
+                                onDone.run();
+                            }
+                        }
 
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
-            }
-        });
+                        @Override
+                        public void onError(Exception e) {
+                            if (onDone != null) {
+                                onDone.run();
+                            }
+                        }
+                    });
+                });
     }
 
     public static void deleteReview(Context context, String reviewId, Runnable onDone) {
@@ -111,11 +182,19 @@ public final class ReviewRepository {
             }
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            db.reviewDao().deleteById(reviewId);
-            FirestoreHelper.deleteReview(reviewId, null);
-            if (onDone != null) {
-                AppDatabase.postToMain(onDone);
+        FirestoreHelper.deleteReview(reviewId, new FirestoreHelper.FirestoreCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                if (onDone != null) {
+                    onDone.run();
+                }
+            }
+
+            @Override
+            public void onError(Exception e) {
+                if (onDone != null) {
+                    onDone.run();
+                }
             }
         });
     }

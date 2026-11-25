@@ -1,21 +1,24 @@
 package com.example.btday4.data.repository;
 
 import android.content.Context;
-import com.example.btday4.data.local.AppDatabase;
 import com.example.btday4.data.local.Product;
-import com.example.btday4.data.local.ProductDao;
+import com.example.btday4.data.local.ReviewEntity;
 import com.example.btday4.model.ProductWithRating;
-import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.Constants;
 import com.example.btday4.util.ValidationUtils;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Room-backed product repository providing catalog queries with live rating stats
- * and safe remote synchronization without cascading deletes.
+ * Cloud Firestore-backed product repository providing catalog queries with live rating stats.
  */
 public final class ProductRepository {
 
@@ -25,10 +28,48 @@ public final class ProductRepository {
     }
 
     public static void getAllWithRating(Context context, Consumer<List<ProductWithRating>> callback) {
-        AppDatabase.runAsync(context, db -> {
-            List<ProductWithRating> products = db.productDao().getAllWithRating();
-            AppDatabase.postToMain(() -> callback.accept(products));
-        });
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        Task<QuerySnapshot> productsTask = db.collection(Constants.COLLECTION_PRODUCTS).get();
+        Task<QuerySnapshot> reviewsTask = db.collection(Constants.COLLECTION_REVIEWS).get();
+
+        Tasks.whenAllSuccess(productsTask, reviewsTask)
+                .addOnSuccessListener(results -> {
+                    QuerySnapshot productSnap = (QuerySnapshot) results.get(0);
+                    QuerySnapshot reviewSnap = (QuerySnapshot) results.get(1);
+                    List<Product> products = new ArrayList<>();
+                    for (DocumentSnapshot doc : productSnap.getDocuments()) {
+                        Product p = doc.toObject(Product.class);
+                        if (p != null) {
+                            if (p.getId().isEmpty()) {
+                                p.setId(doc.getId());
+                            }
+                            products.add(p);
+                        }
+                    }
+                    callback.accept(combineWithRatings(products, extractReviews(reviewSnap)));
+                })
+                .addOnFailureListener(e -> callback.accept(new ArrayList<>()));
+    }
+
+    public static List<ProductWithRating> withoutRatings(List<Product> products) {
+        return combineWithRatings(products == null ? new ArrayList<>() : products, new ArrayList<>());
+    }
+
+    public static void combineWithLiveRatings(
+            List<Product> products,
+            Consumer<List<ProductWithRating>> callback
+    ) {
+        if (products == null || products.isEmpty()) {
+            callback.accept(new ArrayList<>());
+            return;
+        }
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_REVIEWS)
+                .get()
+                .addOnSuccessListener(reviewSnap ->
+                        callback.accept(combineWithRatings(products, extractReviews(reviewSnap))))
+                .addOnFailureListener(e ->
+                        callback.accept(combineWithRatings(products, new ArrayList<>())));
     }
 
     public static void findById(Context context, String id, Consumer<Product> callback) {
@@ -36,77 +77,55 @@ public final class ProductRepository {
             callback.accept(null);
             return;
         }
-        AppDatabase.runAsync(context, db -> {
-            Product product = db.productDao().findById(id);
-            AppDatabase.postToMain(() -> callback.accept(product));
-        });
-    }
-
-    /**
-     * Merges remote Firestore products into Room without replacing rows (avoiding ON DELETE CASCADE)
-     * and prevents legacy unscaled remote seed documents from reverting the 100x reduced prices.
-     */
-    public static void syncFromRemote(
-            Context context,
-            List<Product> remoteProducts,
-            Consumer<List<ProductWithRating>> onSynced
-    ) {
-        if (remoteProducts == null || remoteProducts.isEmpty()) {
-            return;
-        }
-        Set<String> defaultIds = new HashSet<>();
-        for (Product p : createDefaultProducts()) {
-            defaultIds.add(p.getId());
-        }
-        AppDatabase.runAsync(context, db -> {
-            ProductDao dao = db.productDao();
-            for (Product remote : remoteProducts) {
-                if (remote == null || !ValidationUtils.isNotBlank(remote.getId())) {
-                    continue;
-                }
-                Product existing = dao.findById(remote.getId());
-                if (existing == null) {
-                    if (remote.getStock() <= 0) {
-                        remote.setStock(15);
+        FirebaseFirestore.getInstance()
+                .collection(Constants.COLLECTION_PRODUCTS)
+                .document(id.trim())
+                .get()
+                .addOnSuccessListener(doc -> {
+                    Product p = doc.exists() ? doc.toObject(Product.class) : null;
+                    if (p != null && p.getId().isEmpty()) {
+                        p.setId(doc.getId());
                     }
-                    dao.insertSingle(remote);
-                } else {
-                    boolean ignoreLegacyRemotePrice = defaultIds.contains(existing.getId())
-                            && FormatUtils.parseVnd(remote.getPrice()) >= LEGACY_UNSCALED_PRICE_THRESHOLD;
-                    String resolvedPrice = ignoreLegacyRemotePrice
-                            ? existing.getPrice()
-                            : pickNonBlank(remote.getPrice(), existing.getPrice());
-                    String resolvedOriginalPrice = ignoreLegacyRemotePrice
-                            ? existing.getOriginalPrice()
-                            : pickNonBlank(remote.getOriginalPrice(), existing.getOriginalPrice());
-
-                    Product merged = new Product(
-                            existing.getId(),
-                            pickNonBlank(remote.getName(), existing.getName()),
-                            resolvedPrice,
-                            resolvedOriginalPrice,
-                            pickNonBlank(remote.getShortInfo(), existing.getShortInfo()),
-                            pickNonBlank(remote.getCategory(), existing.getCategory()),
-                            pickNonBlank(remote.getImageUrl(), existing.getImageUrl()),
-                            pickNonBlank(remote.getBrand(), existing.getBrand()),
-                            pickNonBlank(remote.getDescription(), existing.getDescription()),
-                            pickNonBlank(remote.getSpecs(), existing.getSpecs()),
-                            pickNonBlank(remote.getWarranty(), existing.getWarranty()),
-                            // Local stock is authoritative: orders reserve/restock it transactionally.
-                            existing.getStock()
-                    );
-                    dao.updateSingle(merged);
-                }
-            }
-            List<ProductWithRating> refreshed = dao.getAllWithRating();
-            if (onSynced != null) {
-                AppDatabase.postToMain(() -> onSynced.accept(refreshed));
-            }
-        });
+                    callback.accept(p);
+                })
+                .addOnFailureListener(e -> callback.accept(null));
     }
 
-    private static String pickNonBlank(String primary, String fallback) {
-        return ValidationUtils.isNotBlank(primary) ? primary : fallback;
+    private static List<ReviewEntity> extractReviews(QuerySnapshot snapshot) {
+        List<ReviewEntity> reviews = new ArrayList<>();
+        if (snapshot == null) {
+            return reviews;
+        }
+        for (DocumentSnapshot doc : snapshot.getDocuments()) {
+            ReviewEntity r = doc.toObject(ReviewEntity.class);
+            if (r != null) {
+                reviews.add(r);
+            }
+        }
+        return reviews;
+    }
+
+    private static List<ProductWithRating> combineWithRatings(
+            List<Product> products,
+            List<ReviewEntity> reviews
+    ) {
+        Map<String, int[]> stats = new HashMap<>(); // [sum, count]
+        for (ReviewEntity r : reviews) {
+            if (r == null || r.getProductId().isEmpty()) {
+                continue;
+            }
+            int[] pair = stats.computeIfAbsent(r.getProductId(), k -> new int[2]);
+            pair[0] += r.getRating();
+            pair[1] += 1;
+        }
+        List<ProductWithRating> list = new ArrayList<>(products.size());
+        for (Product p : products) {
+            int[] pair = stats.get(p.getId());
+            int count = pair == null ? 0 : pair[1];
+            double avg = count == 0 ? 0.0 : (double) pair[0] / count;
+            list.add(new ProductWithRating(p, avg, count));
+        }
+        return list;
     }
 
     public static List<Product> createDefaultProducts() {

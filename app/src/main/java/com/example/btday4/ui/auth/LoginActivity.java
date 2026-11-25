@@ -170,6 +170,13 @@ public class LoginActivity extends AppCompatActivity {
                         .setAction(R.string.btn_login, v -> setRegisterMode(false))
                         .show();
                 break;
+            case NETWORK_ERROR:
+                Snackbar.make(
+                        binding.getRoot(),
+                        "Không thể kết nối Firebase (kiểm tra mạng hoặc Firestore Rules)",
+                        Snackbar.LENGTH_LONG
+                ).show();
+                break;
         }
     }
 

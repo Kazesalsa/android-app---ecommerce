@@ -38,9 +38,12 @@ public final class Constants {
     // ==========================================
     public static final String COLLECTION_PRODUCTS = "products";
     public static final String COLLECTION_USERS = "users";
+    public static final String COLLECTION_CART = "cart";
     public static final String COLLECTION_REVIEWS = "reviews";
     public static final String COLLECTION_ORDERS = "orders";
     public static final String COLLECTION_PAYMENTS = "payments";
+    public static final String COLLECTION_TRACKING = "tracking";
+    public static final String DOC_TRACKING_PROFILE = "profile";
 
     // ==========================================
     // SHARED PREFERENCES KEYS
