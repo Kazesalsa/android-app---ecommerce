@@ -37,7 +37,8 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Shopping cart screen with per-item selection, free-shipping threshold cue, live voucher picker
+ * Shopping cart screen with per-item selection, free-shipping threshold cue,
+ * live voucher picker
  * integration, Undo-on-remove Snackbar, and checkout of selected items.
  */
 public class CartFragment extends Fragment {
@@ -56,8 +57,7 @@ public class CartFragment extends Fragment {
 
     private final ActivityResultLauncher<Intent> checkoutLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
-            result -> refreshCart()
-    );
+            result -> refreshCart());
 
     private final ActivityResultLauncher<Intent> voucherPickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -72,20 +72,17 @@ public class CartFragment extends Fragment {
                     VoucherRepository.setSelectedCartVoucherCode(
                             requireContext(),
                             userSession.getUsername(),
-                            selectedVoucherCode
-                    );
+                            selectedVoucherCode);
                     loadVouchersAndRefreshSummary();
                 }
-            }
-    );
+            });
 
     @Nullable
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
+            @Nullable Bundle savedInstanceState) {
         binding = FragmentCartBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -96,8 +93,7 @@ public class CartFragment extends Fragment {
         userSession = new UserSession(requireContext());
         selectedVoucherCode = VoucherRepository.getSelectedCartVoucherCode(
                 requireContext(),
-                userSession.getUsername()
-        );
+                userSession.getUsername());
 
         adapter = new CartAdapter(new CartAdapter.CartActionListener() {
             @Override
@@ -119,15 +115,13 @@ public class CartFragment extends Fragment {
                             "MainActivity:Cart",
                             BehaviorTracker.EVENT_UPDATE_CART,
                             item.getProduct().getId(),
-                            "qty=" + newQuantity
-                    );
+                            "qty=" + newQuantity);
                 }
                 CartRepository.updateQuantity(
                         requireContext(),
                         item.getProduct().getId(),
                         newQuantity,
-                        CartFragment.this::refreshCart
-                );
+                        CartFragment.this::refreshCart);
             }
 
             @Override
@@ -189,8 +183,7 @@ public class CartFragment extends Fragment {
                         "MainActivity:Cart",
                         BehaviorTracker.EVENT_CHECKOUT_START,
                         String.join(",", selectedIds),
-                        "items=" + selectedIds.size()
-                );
+                        "items=" + selectedIds.size());
             }
             Intent intent = new Intent(requireContext(), CheckoutActivity.class);
             intent.putStringArrayListExtra(Constants.EXTRA_SELECTED_PRODUCT_IDS, selectedIds);
@@ -249,8 +242,7 @@ public class CartFragment extends Fragment {
                     "MainActivity:Cart",
                     BehaviorTracker.EVENT_REMOVE_CART,
                     productId,
-                    productName
-            );
+                    productName);
         }
 
         CartRepository.removeItem(requireContext(), productId, () -> {
@@ -270,8 +262,7 @@ public class CartFragment extends Fragment {
                             return;
                         }
                         CartRepository.addItem(requireContext(), productId, removedQty, added -> refreshCart());
-                    }
-            );
+                    });
         });
     }
 
@@ -285,8 +276,7 @@ public class CartFragment extends Fragment {
         if (!userExplicitlyClearedVoucher) {
             String stored = VoucherRepository.getSelectedCartVoucherCode(
                     requireContext(),
-                    userSession.getUsername()
-            );
+                    userSession.getUsername());
             if (!stored.isEmpty()) {
                 selectedVoucherCode = stored;
             }
@@ -359,7 +349,10 @@ public class CartFragment extends Fragment {
         return null;
     }
 
-    /** Recomputes total, voucher discount, checkout button, select-all state and shipping progress. */
+    /**
+     * Recomputes total, voucher discount, checkout button, select-all state and
+     * shipping progress.
+     */
     private void updateSelectionSummary() {
         if (binding == null || cartItems.isEmpty()) {
             return;
@@ -388,32 +381,25 @@ public class CartFragment extends Fragment {
             if (discount > 0L) {
                 appliedVoucherCode = activeVoucher.getCode();
                 binding.tvCartVoucherStatus.setText(
-                        activeVoucher.getCode() + " · -" + FormatUtils.formatVnd(discount)
-                );
+                        activeVoucher.getCode() + " · -" + FormatUtils.formatVnd(discount));
                 binding.tvCartVoucherStatus.setTextColor(
-                        ContextCompat.getColor(requireContext(), R.color.primary)
-                );
+                        ContextCompat.getColor(requireContext(), R.color.primary));
             } else if (activeVoucher.amountNeededToUnlock(subtotal) > 0L) {
                 binding.tvCartVoucherStatus.setText(
                         "Mua thêm " + FormatUtils.formatVnd(activeVoucher.amountNeededToUnlock(subtotal))
-                                + " dùng " + activeVoucher.getCode()
-                );
+                                + " dùng " + activeVoucher.getCode());
                 binding.tvCartVoucherStatus.setTextColor(
-                        ContextCompat.getColor(requireContext(), R.color.teal_trust)
-                );
+                        ContextCompat.getColor(requireContext(), R.color.teal_trust));
             } else {
                 binding.tvCartVoucherStatus.setText("Chọn hoặc nhập mã");
                 binding.tvCartVoucherStatus.setTextColor(
-                        ContextCompat.getColor(requireContext(), R.color.text_muted)
-                );
+                        ContextCompat.getColor(requireContext(), R.color.text_muted));
             }
         } else {
             binding.tvCartVoucherStatus.setText(
-                    userExplicitlyClearedVoucher ? "Không dùng mã" : "Chọn hoặc nhập mã"
-            );
+                    userExplicitlyClearedVoucher ? "Không dùng mã" : "Chọn hoặc nhập mã");
             binding.tvCartVoucherStatus.setTextColor(
-                    ContextCompat.getColor(requireContext(), R.color.text_muted)
-            );
+                    ContextCompat.getColor(requireContext(), R.color.text_muted));
         }
 
         long displayedTotal = subtotal;
@@ -445,8 +431,7 @@ public class CartFragment extends Fragment {
         } else {
             int pct = (int) Math.min(100L, (subtotal * 100L) / Constants.FREE_SHIPPING_THRESHOLD);
             binding.tvShippingProgressText.setText(
-                    "Mua thêm " + FormatUtils.formatVnd(remaining) + " để miễn phí vận chuyển"
-            );
+                    "Mua thêm " + FormatUtils.formatVnd(remaining) + " để miễn phí vận chuyển");
             binding.progressFreeShipping.setVisibility(View.VISIBLE);
             binding.progressFreeShipping.setProgress(pct);
         }

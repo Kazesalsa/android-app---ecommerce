@@ -29,24 +29,6 @@ public final class UiUtils {
     private UiUtils() {
     }
 
-    public static void applySystemBarInsets(View rootView) {
-        if (rootView == null) {
-            return;
-        }
-        final int baseLeft = rootView.getPaddingLeft();
-        final int baseTop = rootView.getPaddingTop();
-        final int baseRight = rootView.getPaddingRight();
-        final int baseBottom = rootView.getPaddingBottom();
-
-        ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, windowInsets) -> {
-            Insets sys = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
-            int bottom = Math.max(sys.bottom, ime.bottom);
-            v.setPadding(baseLeft + sys.left, baseTop + sys.top, baseRight + sys.right, baseBottom + bottom);
-            return WindowInsetsCompat.CONSUMED;
-        });
-    }
-
     public static void applyEdgeToEdgeBars(
             View rootView,
             @Nullable View topHeader,

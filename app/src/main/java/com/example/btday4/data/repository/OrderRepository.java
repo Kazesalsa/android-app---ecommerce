@@ -7,6 +7,7 @@ import com.example.btday4.data.local.Product;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.OrderWithItems;
 import com.example.btday4.model.PaymentMethod;
+import com.example.btday4.model.Voucher;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.ValidationUtils;
@@ -14,6 +15,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +56,15 @@ public final class OrderRepository {
         final String userMessage;
 
         InsufficientStockException(String userMessage) {
+            super(userMessage);
+            this.userMessage = userMessage;
+        }
+    }
+
+    private static final class VoucherInvalidException extends RuntimeException {
+        final String userMessage;
+
+        VoucherInvalidException(String userMessage) {
             super(userMessage);
             this.userMessage = userMessage;
         }
@@ -125,11 +136,6 @@ public final class OrderRepository {
 
         long shippingFee = FormatUtils.computeShippingFee(subtotal);
         String cleanVoucherCode = voucherCode == null ? "" : voucherCode.trim().toUpperCase(Locale.US);
-        long maxAllowedDiscount = Math.max(0L, subtotal + shippingFee - Constants.MIN_PAYABLE_TOTAL);
-        long safeDiscount = cleanVoucherCode.isEmpty()
-                ? 0L
-                : Math.max(0L, Math.min(voucherDiscount, maxAllowedDiscount));
-        long total = Math.max(Constants.MIN_PAYABLE_TOTAL, subtotal + shippingFee - safeDiscount);
         PaymentMethod method = paymentMethod == null ? PaymentMethod.COD : paymentMethod;
         OrderStatus initialStatus = method == PaymentMethod.VIETQR
                 ? OrderStatus.PENDING_PAYMENT
@@ -145,16 +151,61 @@ public final class OrderRepository {
                 method.getCode(),
                 subtotal,
                 shippingFee,
-                total,
-                safeDiscount > 0L ? cleanVoucherCode : "",
-                safeDiscount,
+                subtotal + shippingFee,
+                "",
+                0L,
                 initialStatus.getCode(),
                 now
         );
 
+        if (cleanVoucherCode.isEmpty()) {
+            runPlaceOrderTransaction(
+                    context,
+                    order,
+                    persistedItems,
+                    "",
+                    "",
+                    removeFromCartAfterOrder,
+                    callback
+            );
+            return;
+        }
+
+        VoucherRepository.findByCode(cleanVoucherCode, matched -> {
+            if (matched == null) {
+                callback.onError("Mã giảm giá \"" + cleanVoucherCode + "\" không còn tồn tại trên hệ thống");
+                return;
+            }
+            runPlaceOrderTransaction(
+                    context,
+                    order,
+                    persistedItems,
+                    matched.getCode(),
+                    matched.getDocId(),
+                    removeFromCartAfterOrder,
+                    callback
+            );
+        });
+    }
+
+    private static void runPlaceOrderTransaction(
+            Context context,
+            OrderEntity order,
+            List<OrderItemEntity> persistedItems,
+            String voucherCode,
+            String voucherDocId,
+            boolean removeFromCartAfterOrder,
+            PlaceOrderCallback callback
+    ) {
+        long now = order.getCreatedAt();
+        long subtotal = order.getSubtotalAmount();
+        long shippingFee = order.getShippingFee();
+        String cleanVoucherCode = voucherCode == null ? "" : voucherCode.trim().toUpperCase(Locale.US);
+        String cleanVoucherDocId = voucherDocId == null ? "" : voucherDocId.trim();
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.runTransaction(transaction -> {
-            // 1. Read all referenced products first (required by Firestore transactions).
+            // 1. Read all referenced products and optional voucher docs first (required by Firestore transactions).
             Map<String, Product> loadedProducts = new HashMap<>();
             Map<String, DocumentReference> productRefs = new HashMap<>();
             for (OrderItemEntity item : persistedItems) {
@@ -165,6 +216,44 @@ public final class OrderRepository {
                 productRefs.put(item.getProductId(), ref);
                 DocumentSnapshot snap = transaction.get(ref);
                 loadedProducts.put(item.getProductId(), snap.exists() ? snap.toObject(Product.class) : null);
+            }
+
+            DocumentReference voucherRef = null;
+            DocumentReference userVoucherRef = null;
+            Voucher liveVoucher = null;
+            long verifiedDiscount = 0L;
+
+            if (!cleanVoucherCode.isEmpty() && !cleanVoucherDocId.isEmpty()) {
+                voucherRef = db.collection(Constants.COLLECTION_VOUCHERS).document(cleanVoucherDocId);
+                userVoucherRef = db.collection(Constants.COLLECTION_USERS)
+                        .document(order.getUsername())
+                        .collection(Constants.COLLECTION_USER_VOUCHERS)
+                        .document(cleanVoucherCode);
+
+                DocumentSnapshot voucherSnap = transaction.get(voucherRef);
+                DocumentSnapshot userVoucherSnap = transaction.get(userVoucherRef);
+
+                liveVoucher = VoucherRepository.parseVoucher(voucherSnap);
+                if (liveVoucher == null) {
+                    throw new VoucherInvalidException("Mã giảm giá \"" + cleanVoucherCode + "\" không còn tồn tại");
+                }
+                if (!liveVoucher.isActive()) {
+                    throw new VoucherInvalidException("Mã giảm giá \"" + cleanVoucherCode + "\" hiện đang tạm ngưng");
+                }
+                if (liveVoucher.isExpired(now)) {
+                    throw new VoucherInvalidException("Mã giảm giá \"" + cleanVoucherCode + "\" đã hết hạn");
+                }
+                if (!liveVoucher.hasRemainingUses()) {
+                    throw new VoucherInvalidException("Mã giảm giá \"" + cleanVoucherCode + "\" đã hết lượt sử dụng");
+                }
+                if (userVoucherSnap != null && userVoucherSnap.exists()
+                        && Boolean.TRUE.equals(userVoucherSnap.getBoolean("used"))) {
+                    throw new VoucherInvalidException("Bạn đã sử dụng mã \"" + cleanVoucherCode + "\" trước đó");
+                }
+                verifiedDiscount = liveVoucher.computeDiscount(subtotal, shippingFee);
+                if (verifiedDiscount <= 0L) {
+                    throw new VoucherInvalidException("Đơn hàng chưa đủ điều kiện áp dụng mã \"" + cleanVoucherCode + "\"");
+                }
             }
 
             // 2. Verify stock availability for every item.
@@ -180,13 +269,36 @@ public final class OrderRepository {
                 remainingStock.put(item.getProductId(), currentStock - item.getQuantity());
             }
 
-            // 3. Decrement stock, persist order with embedded items, and clear ordered cart lines atomically.
+            // 3. Decrement stock, redeem voucher atomically, persist order, and clear ordered cart lines.
             for (Map.Entry<String, Integer> entry : remainingStock.entrySet()) {
                 transaction.update(productRefs.get(entry.getKey()), "stock", entry.getValue());
             }
 
+            if (liveVoucher != null && voucherRef != null && userVoucherRef != null && verifiedDiscount > 0L) {
+                order.setVoucherCode(liveVoucher.getCode());
+                order.setVoucherDiscount(verifiedDiscount);
+                order.setTotalAmount(Math.max(Constants.MIN_PAYABLE_TOTAL, subtotal + shippingFee - verifiedDiscount));
+
+                Map<String, Object> userVoucherPayload = new HashMap<>();
+                userVoucherPayload.put("code", liveVoucher.getCode());
+                userVoucherPayload.put("docId", cleanVoucherDocId);
+                userVoucherPayload.put("claimed", true);
+                userVoucherPayload.put("used", true);
+                userVoucherPayload.put("usedOrderId", order.getId());
+                userVoucherPayload.put("updatedAt", now);
+                transaction.set(userVoucherRef, userVoucherPayload, SetOptions.merge());
+
+                if (liveVoucher.getUsageLimit() > 0) {
+                    transaction.update(voucherRef, "usedCount", liveVoucher.getUsedCount() + 1);
+                }
+            }
+
+            Map<String, Object> orderPayload = buildOrderPayload(order, persistedItems);
+            if (!cleanVoucherDocId.isEmpty() && order.getVoucherDiscount() > 0L) {
+                orderPayload.put("voucherDocId", cleanVoucherDocId);
+            }
             DocumentReference orderRef = db.collection(Constants.COLLECTION_ORDERS).document(order.getId());
-            transaction.set(orderRef, buildOrderPayload(order, persistedItems));
+            transaction.set(orderRef, orderPayload);
 
             if (removeFromCartAfterOrder) {
                 for (String productId : productRefs.keySet()) {
@@ -200,7 +312,10 @@ public final class OrderRepository {
             return order;
         }).addOnSuccessListener(created -> {
             if (context != null && !created.getVoucherCode().isEmpty()) {
-                VoucherRepository.markVoucherUsed(context, created.getUsername(), created.getVoucherCode());
+                if (created.getVoucherCode().equalsIgnoreCase(
+                        VoucherRepository.getSelectedCartVoucherCode(context, created.getUsername()))) {
+                    VoucherRepository.setSelectedCartVoucherCode(context, created.getUsername(), "");
+                }
             }
             callback.onSuccess(created);
         }).addOnFailureListener(e -> {
@@ -209,6 +324,10 @@ public final class OrderRepository {
                 callback.onError(((InsufficientStockException) cause).userMessage);
             } else if (e instanceof InsufficientStockException) {
                 callback.onError(((InsufficientStockException) e).userMessage);
+            } else if (cause instanceof VoucherInvalidException) {
+                callback.onError(((VoucherInvalidException) cause).userMessage);
+            } else if (e instanceof VoucherInvalidException) {
+                callback.onError(((VoucherInvalidException) e).userMessage);
             } else {
                 callback.onError("Không thể đặt hàng: " + e.getMessage());
             }
@@ -285,9 +404,49 @@ public final class OrderRepository {
                 }
             }
 
+            String appliedCode = orderWithItems.order.getVoucherCode();
+            String appliedDocId = nonEmpty(orderDoc.getString("voucherDocId"), appliedCode);
+            DocumentReference userVoucherRef = null;
+            DocumentReference voucherRef = null;
+            boolean shouldRestoreUserVoucher = false;
+            int restoredUsedCount = -1;
+
+            if (ValidationUtils.isNotBlank(appliedCode)) {
+                String cleanCode = appliedCode.trim().toUpperCase(Locale.US);
+                if (ValidationUtils.isNotBlank(orderWithItems.order.getUsername())) {
+                    userVoucherRef = db.collection(Constants.COLLECTION_USERS)
+                            .document(orderWithItems.order.getUsername().trim())
+                            .collection(Constants.COLLECTION_USER_VOUCHERS)
+                            .document(cleanCode);
+                    DocumentSnapshot userVoucherDoc = transaction.get(userVoucherRef);
+                    if (userVoucherDoc.exists() && Boolean.TRUE.equals(userVoucherDoc.getBoolean("used"))) {
+                        shouldRestoreUserVoucher = true;
+                    }
+                }
+                if (ValidationUtils.isNotBlank(appliedDocId)) {
+                    voucherRef = db.collection(Constants.COLLECTION_VOUCHERS).document(appliedDocId.trim());
+                    DocumentSnapshot voucherDoc = transaction.get(voucherRef);
+                    if (voucherDoc.exists()) {
+                        Long usedVal = voucherDoc.getLong("usedCount");
+                        if (usedVal != null && usedVal > 0L) {
+                            restoredUsedCount = (int) (usedVal - 1L);
+                        }
+                    }
+                }
+            }
+
             transaction.update(orderRef, "status", OrderStatus.CANCELLED.getCode());
             for (Map.Entry<DocumentReference, Integer> entry : newStocks.entrySet()) {
                 transaction.update(entry.getKey(), "stock", entry.getValue());
+            }
+            if (shouldRestoreUserVoucher && userVoucherRef != null) {
+                Map<String, Object> restorePayload = new HashMap<>();
+                restorePayload.put("used", false);
+                restorePayload.put("updatedAt", System.currentTimeMillis());
+                transaction.set(userVoucherRef, restorePayload, SetOptions.merge());
+            }
+            if (voucherRef != null && restoredUsedCount >= 0) {
+                transaction.update(voucherRef, "usedCount", restoredUsedCount);
             }
             return true;
         });
@@ -335,19 +494,6 @@ public final class OrderRepository {
                 .get()
                 .addOnSuccessListener(doc -> callback.accept(parseOrderDocument(doc)))
                 .addOnFailureListener(e -> callback.accept(null));
-    }
-
-    public static void countOrdersForUser(Context context, String username, Consumer<Integer> callback) {
-        if (!ValidationUtils.isNotBlank(username)) {
-            callback.accept(0);
-            return;
-        }
-        FirebaseFirestore.getInstance()
-                .collection(Constants.COLLECTION_ORDERS)
-                .whereEqualTo("username", username)
-                .get()
-                .addOnSuccessListener(snapshot -> callback.accept(snapshot.size()))
-                .addOnFailureListener(e -> callback.accept(0));
     }
 
     private static Map<String, Object> buildOrderPayload(OrderEntity order, List<OrderItemEntity> items) {

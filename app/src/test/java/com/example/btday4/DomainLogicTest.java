@@ -219,4 +219,40 @@ public class DomainLogicTest {
         notif.setRead(true);
         assertTrue(notif.isRead());
     }
+
+    @Test
+    public void voucherFirestoreParsingHandlesManualConsoleDocumentsAndLimits() {
+        long now = 1_700_000_000_000L;
+        java.util.Map<String, Object> raw = new java.util.HashMap<>();
+        raw.put("title", "Sale hè 25%");
+        raw.put("discountType", "PERCENT");
+        raw.put("discountValue", 25L);
+        raw.put("maxDiscount", 30_000L);
+        raw.put("minOrderAmount", 50_000L);
+        raw.put("usageLimit", 10);
+        raw.put("usedCount", 9);
+
+        // Omitted code, badgeLabel, active, expiryMillis -> safe defaults
+        Voucher parsed = VoucherRepository.parseVoucherMap("SUMMER25", raw);
+        assertNotNull(parsed);
+        assertEquals("SUMMER25", parsed.getCode());
+        assertEquals("SUMMER25", parsed.getDocId());
+        assertEquals("-25%", parsed.getBadgeLabel());
+        assertTrue(parsed.isActive());
+        assertFalse(parsed.isExpired(now));
+        assertTrue(parsed.hasRemainingUses());
+        assertEquals(1, parsed.getRemainingUses());
+        assertEquals(30_000L, parsed.computeDiscount(200_000L, 0L));
+        assertTrue(parsed.isApplicable(200_000L, 0L, now));
+
+        // Exhausting usageLimit makes voucher ineligible
+        parsed.setUsedCount(10);
+        assertFalse(parsed.hasRemainingUses());
+        assertFalse(parsed.isApplicable(200_000L, 0L, now));
+
+        // Pausing via active=false makes voucher ineligible
+        parsed.setUsedCount(0);
+        parsed.setActive(false);
+        assertFalse(parsed.isApplicable(200_000L, 0L, now));
+    }
 }

@@ -1,75 +1,36 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
- * Room and Firestore entity tracking a PayOS VietQR payment transaction linked to an Order.
- * Mirrors the ThanhToan table design in Payment_PayOS_Module.
+ * Firestore entity tracking a PayOS VietQR payment transaction linked to an
+ * Order.
  */
-@Entity(
-        tableName = "payments",
-        foreignKeys = @ForeignKey(
-                entity = OrderEntity.class,
-                parentColumns = "id",
-                childColumns = "order_id",
-                onDelete = ForeignKey.CASCADE
-        ),
-        indices = {@Index(value = "order_id")}
-)
+@IgnoreExtraProperties
 public class PaymentEntity {
 
-    @PrimaryKey
-    @ColumnInfo(name = "order_code")
     private long orderCode;
 
     @NonNull
-    @ColumnInfo(name = "order_id")
     private String orderId;
 
-    @ColumnInfo(name = "payment_link_id")
     private String paymentLinkId;
-
-    @ColumnInfo(name = "amount")
     private long amount;
-
-    @ColumnInfo(name = "description")
     private String description;
-
-    @ColumnInfo(name = "checkout_url")
     private String checkoutUrl;
-
-    @ColumnInfo(name = "qr_code")
     private String qrCode;
-
-    @ColumnInfo(name = "bank_bin")
     private String bankBin;
-
-    @ColumnInfo(name = "account_number")
     private String accountNumber;
-
-    @ColumnInfo(name = "account_name")
     private String accountName;
 
     @NonNull
-    @ColumnInfo(name = "status")
     private String status;
 
-    @ColumnInfo(name = "expired_at")
     private long expiredAtSeconds;
-
-    @ColumnInfo(name = "created_at")
     private long createdAtMillis;
-
-    @ColumnInfo(name = "paid_at")
     private long paidAtMillis;
 
-    @Ignore
     public PaymentEntity() {
         this.orderId = "";
         this.status = "PENDING";
@@ -89,8 +50,7 @@ public class PaymentEntity {
             @NonNull String status,
             long expiredAtSeconds,
             long createdAtMillis,
-            long paidAtMillis
-    ) {
+            long paidAtMillis) {
         this.orderCode = orderCode;
         this.orderId = orderId;
         this.paymentLinkId = paymentLinkId;

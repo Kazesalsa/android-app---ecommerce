@@ -15,7 +15,6 @@ import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityLoginBinding;
 import com.example.btday4.model.AppNotification;
 import com.example.btday4.ui.main.MainActivity;
-import com.example.btday4.util.Constants;
 import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;

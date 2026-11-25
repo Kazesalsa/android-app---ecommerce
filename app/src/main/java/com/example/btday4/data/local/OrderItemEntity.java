@@ -1,53 +1,29 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
- * Room entity storing an immutable snapshot of a purchased product line item inside an order.
+ * Firestore entity storing a snapshot of a purchased product line item inside an order.
  */
-@Entity(
-        tableName = "order_items",
-        foreignKeys = @ForeignKey(
-                entity = OrderEntity.class,
-                parentColumns = "id",
-                childColumns = "order_id",
-                onDelete = ForeignKey.CASCADE
-        ),
-        indices = {@Index(value = "order_id")}
-)
+@IgnoreExtraProperties
 public class OrderItemEntity {
 
-    @PrimaryKey(autoGenerate = true)
     private long id;
 
     @NonNull
-    @ColumnInfo(name = "order_id")
     private String orderId;
 
     @NonNull
-    @ColumnInfo(name = "product_id")
     private String productId;
 
     @NonNull
-    @ColumnInfo(name = "product_name")
     private String productName;
 
-    @ColumnInfo(name = "product_image_url")
     private String productImageUrl;
-
-    @ColumnInfo(name = "unit_price")
     private long unitPrice;
-
-    @ColumnInfo(name = "quantity")
     private int quantity;
 
-    @Ignore
     public OrderItemEntity() {
         this.orderId = "";
         this.productId = "";

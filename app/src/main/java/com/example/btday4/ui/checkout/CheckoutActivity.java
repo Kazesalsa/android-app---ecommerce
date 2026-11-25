@@ -36,8 +36,10 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Full-bleed checkout flow with inline expandable shipping address editor, voucher redemption,
- * payment method selection (COD & PayOS VietQR), and transparent price breakdown.
+ * Full-bleed checkout flow with inline expandable shipping address editor,
+ * voucher redemption,
+ * payment method selection (COD & PayOS VietQR), and transparent price
+ * breakdown.
  */
 public class CheckoutActivity extends AppCompatActivity {
 
@@ -72,13 +74,11 @@ public class CheckoutActivity extends AppCompatActivity {
                         VoucherRepository.setSelectedCartVoucherCode(
                                 this,
                                 userSession.getUsername(),
-                                selectedVoucherCode
-                        );
+                                selectedVoucherCode);
                     }
                     loadVouchersAndRefreshPricing();
                 }
-            }
-    );
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,8 +89,7 @@ public class CheckoutActivity extends AppCompatActivity {
         UiUtils.applyEdgeToEdgeBars(
                 binding.checkoutRoot,
                 binding.toolbarCheckout,
-                binding.llCheckoutBottomBar
-        );
+                binding.llCheckoutBottomBar);
 
         userSession = new UserSession(this);
 
@@ -101,8 +100,7 @@ public class CheckoutActivity extends AppCompatActivity {
         } else {
             selectedVoucherCode = VoucherRepository.getSelectedCartVoucherCode(
                     this,
-                    userSession.getUsername()
-            );
+                    userSession.getUsername());
         }
 
         binding.toolbarCheckout.setNavigationOnClickListener(v -> finish());
@@ -342,11 +340,9 @@ public class CheckoutActivity extends AppCompatActivity {
 
         if (!appliedVoucherCode.isEmpty() && activeVoucher != null) {
             binding.tvCheckoutVoucherSubtitle.setText(
-                    "Đã áp dụng " + appliedVoucherCode + " · " + activeVoucher.getTitle()
-            );
+                    "Đã áp dụng " + appliedVoucherCode + " · " + activeVoucher.getTitle());
             binding.tvCheckoutVoucherSubtitle.setTextColor(
-                    ContextCompat.getColor(this, R.color.teal_trust)
-            );
+                    ContextCompat.getColor(this, R.color.teal_trust));
             binding.tvCheckoutVoucherBadge.setText("-" + FormatUtils.formatVnd(appliedDiscount));
             binding.tvCheckoutVoucherBadge.setBackgroundResource(R.drawable.bg_discount_tag);
             binding.tvCheckoutVoucherBadge.setTextColor(ContextCompat.getColor(this, R.color.primary));
@@ -361,11 +357,9 @@ public class CheckoutActivity extends AppCompatActivity {
             binding.tvCheckoutVoucherSubtitle.setText(
                     userExplicitlyClearedVoucher
                             ? "Không sử dụng mã ưu đãi cho đơn này"
-                            : "Chọn hoặc nhập mã ưu đãi cho đơn hàng"
-            );
+                            : "Chọn hoặc nhập mã ưu đãi cho đơn hàng");
             binding.tvCheckoutVoucherSubtitle.setTextColor(
-                    ContextCompat.getColor(this, R.color.text_secondary)
-            );
+                    ContextCompat.getColor(this, R.color.text_secondary));
             binding.tvCheckoutVoucherBadge.setText("Chọn mã");
             binding.tvCheckoutVoucherBadge.setBackgroundResource(R.drawable.bg_discount_tag);
             binding.tvCheckoutVoucherBadge.setTextColor(ContextCompat.getColor(this, R.color.primary));
@@ -404,11 +398,9 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.rbCod.setChecked(isCod);
         binding.rbQr.setChecked(!isCod);
         binding.optionCod.setBackgroundResource(
-                isCod ? R.drawable.bg_option_selected : R.drawable.bg_option_default
-        );
+                isCod ? R.drawable.bg_option_selected : R.drawable.bg_option_default);
         binding.optionQr.setBackgroundResource(
-                isCod ? R.drawable.bg_option_default : R.drawable.bg_option_selected
-        );
+                isCod ? R.drawable.bg_option_default : R.drawable.bg_option_selected);
         binding.btnPlaceOrder.setText(isCod ? R.string.btn_place_order : R.string.btn_place_order_qr);
     }
 
@@ -473,8 +465,7 @@ public class CheckoutActivity extends AppCompatActivity {
                                             + "|total=" + createdOrder.getTotalAmount()
                                             + "|items=" + checkoutItems.size()
                                             + "|products=" + purchasedIds
-                                            + voucherMeta
-                            );
+                                            + voucherMeta);
                         }
                         String orderNotifTitle = selectedPaymentMethod == PaymentMethod.VIETQR
                                 ? "Đơn hàng chờ thanh toán QR"
@@ -486,8 +477,7 @@ public class CheckoutActivity extends AppCompatActivity {
                                 com.example.btday4.model.AppNotification.TYPE_ORDER,
                                 orderNotifTitle,
                                 orderNotifBody,
-                                createdOrder.getId()
-                        );
+                                createdOrder.getId());
                         setResult(RESULT_OK);
                         Intent nextIntent = selectedPaymentMethod == PaymentMethod.VIETQR
                                 ? new Intent(CheckoutActivity.this, QrPaymentActivity.class)
@@ -508,10 +498,8 @@ public class CheckoutActivity extends AppCompatActivity {
                                 binding.getRoot(),
                                 com.example.btday4.model.AppNotification.TYPE_ALERT,
                                 "Không thể đặt hàng",
-                                message
-                        );
+                                message);
                     }
-                }
-        );
+                });
     }
 }

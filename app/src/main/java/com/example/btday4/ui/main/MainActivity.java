@@ -13,7 +13,6 @@ import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.NotificationRepository;
 import com.example.btday4.data.repository.UserSession;
-import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.ActivityMainBinding;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.auth.LoginActivity;
@@ -121,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
 
         FirestoreHelper.seedProductsIfEmpty(null);
         FirestoreHelper.seedReviewsIfEmpty(null);
-        VoucherRepository.seedVouchersIfEmpty();
     }
 
     @Override

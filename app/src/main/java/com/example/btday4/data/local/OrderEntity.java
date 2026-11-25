@@ -1,71 +1,45 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
- * Room and Firestore entity representing a submitted customer order with shipping and payment snapshot.
+ * Firestore entity representing a submitted customer order with shipping, voucher, and payment snapshot.
  */
-@Entity(
-        tableName = "orders",
-        indices = {@Index(value = "username")}
-)
+@IgnoreExtraProperties
 public class OrderEntity {
 
-    @PrimaryKey
     @NonNull
     private String id;
 
     @NonNull
-    @ColumnInfo(name = "username")
     private String username;
 
     @NonNull
-    @ColumnInfo(name = "recipient_name")
     private String recipientName;
 
     @NonNull
-    @ColumnInfo(name = "recipient_phone")
     private String recipientPhone;
 
     @NonNull
-    @ColumnInfo(name = "shipping_address")
     private String shippingAddress;
 
-    @ColumnInfo(name = "note")
     private String note;
 
     @NonNull
-    @ColumnInfo(name = "payment_method")
     private String paymentMethod;
 
-    @ColumnInfo(name = "subtotal_amount")
     private long subtotalAmount;
-
-    @ColumnInfo(name = "shipping_fee")
     private long shippingFee;
-
-    @ColumnInfo(name = "total_amount")
     private long totalAmount;
-
-    @ColumnInfo(name = "voucher_code")
     private String voucherCode;
-
-    @ColumnInfo(name = "voucher_discount")
     private long voucherDiscount;
 
     @NonNull
-    @ColumnInfo(name = "status")
     private String status;
 
-    @ColumnInfo(name = "created_at")
     private long createdAt;
 
-    @Ignore
     public OrderEntity() {
         this.id = "";
         this.username = "";
@@ -109,7 +83,6 @@ public class OrderEntity {
         );
     }
 
-    @Ignore
     public OrderEntity(
             @NonNull String id,
             @NonNull String username,

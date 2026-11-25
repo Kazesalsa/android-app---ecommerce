@@ -36,6 +36,7 @@ public final class InAppNotifier {
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
     private static final long DEFAULT_DURATION_MS = 2_800L;
     private static final long ACTION_DURATION_MS = 3_800L;
+    private static Runnable activeDismissTask;
 
     private InAppNotifier() {
     }
@@ -64,20 +65,6 @@ public final class InAppNotifier {
         Context context = contextView.getContext();
         recordNotification(context, type, title, message.toString(), targetId);
         showBannerOnActivity(findActivity(context), type, title, message, actionLabel, action);
-    }
-
-    public static void showOnActivity(
-            @Nullable Activity activity,
-            @NonNull String type,
-            @NonNull String title,
-            @NonNull CharSequence message,
-            @Nullable String targetId
-    ) {
-        if (activity == null || message.length() == 0) {
-            return;
-        }
-        recordNotification(activity, type, title, message.toString(), targetId);
-        showBannerOnActivity(activity, type, title, message, null, null);
     }
 
     public static void showBannerOnly(
@@ -139,9 +126,14 @@ public final class InAppNotifier {
         }
         ViewGroup container = (ViewGroup) decorContent;
 
-        // Remove any existing banner immediately so rapid taps never stack clutter.
+        // Cancel any pending dismiss timer and remove existing banner immediately so rapid taps never leak or stack.
+        if (activeDismissTask != null) {
+            MAIN_HANDLER.removeCallbacks(activeDismissTask);
+            activeDismissTask = null;
+        }
         View previous = container.findViewWithTag(TAG_ACTIVE_BANNER);
         if (previous != null) {
+            previous.animate().cancel();
             container.removeView(previous);
         }
 
@@ -215,10 +207,15 @@ public final class InAppNotifier {
                 .start();
 
         long stayMs = (action != null) ? ACTION_DURATION_MS : DEFAULT_DURATION_MS;
+        activeDismissTask = dismissTask;
         MAIN_HANDLER.postDelayed(dismissTask, stayMs);
     }
 
     private static void dismissBanner(ViewGroup container, View banner) {
+        if (activeDismissTask != null) {
+            MAIN_HANDLER.removeCallbacks(activeDismissTask);
+            activeDismissTask = null;
+        }
         if (banner.getParent() == null) {
             return;
         }

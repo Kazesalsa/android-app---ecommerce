@@ -1,57 +1,30 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.ForeignKey;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
- * Room and Firestore entity storing customer ratings and reviews per product.
+ * Firestore entity storing customer ratings and reviews per product.
  */
-@Entity(
-        tableName = "reviews",
-        foreignKeys = @ForeignKey(
-                entity = Product.class,
-                parentColumns = "id",
-                childColumns = "product_id",
-                onDelete = ForeignKey.CASCADE
-        ),
-        indices = {
-                @Index(value = "product_id"),
-                @Index(value = "username")
-        }
-)
+@IgnoreExtraProperties
 public class ReviewEntity {
 
-    @PrimaryKey
     @NonNull
     private String id;
 
     @NonNull
-    @ColumnInfo(name = "product_id")
     private String productId;
 
     @NonNull
-    @ColumnInfo(name = "username")
     private String username;
 
     @NonNull
-    @ColumnInfo(name = "author_name")
     private String authorName;
 
-    @ColumnInfo(name = "rating")
     private int rating;
-
-    @ColumnInfo(name = "comment")
     private String comment;
-
-    @ColumnInfo(name = "created_at")
     private long createdAt;
 
-    @Ignore
     public ReviewEntity() {
         this.id = "";
         this.productId = "";

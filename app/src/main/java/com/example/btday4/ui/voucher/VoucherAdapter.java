@@ -91,6 +91,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.ViewHold
             Voucher v = row.voucher;
             long now = System.currentTimeMillis();
             boolean expired = v.isExpired(now);
+            boolean outOfStock = !v.hasRemainingUses();
 
             binding.llVoucherStub.setBackgroundResource(
                     v.isFreeShipType() ? R.drawable.bg_voucher_stub_teal : R.drawable.bg_voucher_stub_primary
@@ -108,7 +109,7 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.ViewHold
             binding.cardVoucherRoot.setStrokeWidth(Math.round((isSelected ? 1.5f : 1f)
                     * context.getResources().getDisplayMetrics().density));
 
-            float contentAlpha = (row.used || expired) ? 0.55f : 1.0f;
+            float contentAlpha = (row.used || expired || outOfStock) ? 0.55f : 1.0f;
             binding.llVoucherStub.setAlpha(contentAlpha);
             binding.tvVoucherTitle.setAlpha(contentAlpha);
 
@@ -122,6 +123,12 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.ViewHold
                 binding.tvVoucherMeta.setText("Đã hết hạn");
                 binding.tvVoucherMeta.setTextColor(ContextCompat.getColor(context, R.color.text_muted));
                 styleDisabledButton(context, "Hết hạn");
+                return;
+            }
+            if (outOfStock) {
+                binding.tvVoucherMeta.setText("Đã hết lượt sử dụng");
+                binding.tvVoucherMeta.setTextColor(ContextCompat.getColor(context, R.color.text_muted));
+                styleDisabledButton(context, "Hết lượt");
                 return;
             }
 
@@ -156,7 +163,13 @@ public class VoucherAdapter extends RecyclerView.Adapter<VoucherAdapter.ViewHold
                     binding.btnVoucherAction.setOnClickListener(view -> listener.onSelectOrUseVoucher(v));
                 }
             } else {
-                binding.tvVoucherMeta.setText("HSD: " + FormatUtils.formatDate(v.getExpiryMillis()));
+                String expiryText = v.getExpiryMillis() > 0L
+                        ? "HSD: " + FormatUtils.formatDate(v.getExpiryMillis())
+                        : "Không giới hạn thời gian";
+                String quotaText = v.getUsageLimit() > 0
+                        ? " · Còn " + v.getRemainingUses() + "/" + v.getUsageLimit()
+                        : "";
+                binding.tvVoucherMeta.setText(expiryText + quotaText);
                 binding.tvVoucherMeta.setTextColor(ContextCompat.getColor(context, R.color.text_muted));
                 binding.btnVoucherAction.setEnabled(true);
                 if (!row.claimed) {

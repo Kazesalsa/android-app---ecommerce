@@ -18,7 +18,6 @@ public final class Constants {
     // ==========================================
     // INTENT EXTRA KEYS (Biến đại diện cho putExtra)
     // ==========================================
-    public static final String EXTRA_PRODUCT = "product";
     public static final String EXTRA_PRODUCT_ID = "product_id";
     public static final String EXTRA_PRODUCT_NAME = "product_name";
     public static final String EXTRA_PRODUCT_IMAGE_URL = "product_image_url";

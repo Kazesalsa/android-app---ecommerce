@@ -2,8 +2,6 @@ package com.example.btday4.data.remote;
 
 import android.util.Log;
 import androidx.annotation.NonNull;
-import com.example.btday4.data.local.OrderEntity;
-import com.example.btday4.data.local.OrderItemEntity;
 import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.local.Product;
 import com.example.btday4.data.local.ReviewEntity;
@@ -110,7 +108,10 @@ public final class FirestoreHelper {
                         List<Product> list = new ArrayList<>();
                         for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
                             Product p = doc.toObject(Product.class);
-                            if (p != null && !p.getId().isEmpty()) {
+                            if (p != null) {
+                                if (p.getId().isEmpty()) {
+                                    p.setId(doc.getId());
+                                }
                                 list.add(p);
                             }
                         }
@@ -172,44 +173,6 @@ public final class FirestoreHelper {
                 });
     }
 
-    public static void saveOrder(
-            @NonNull OrderEntity order,
-            @NonNull List<OrderItemEntity> items,
-            FirestoreCallback<Void> callback
-    ) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("id", order.getId());
-        payload.put("username", order.getUsername());
-        payload.put("recipientName", order.getRecipientName());
-        payload.put("recipientPhone", order.getRecipientPhone());
-        payload.put("shippingAddress", order.getShippingAddress());
-        payload.put("note", order.getNote());
-        payload.put("paymentMethod", order.getPaymentMethod());
-        payload.put("subtotalAmount", order.getSubtotalAmount());
-        payload.put("shippingFee", order.getShippingFee());
-        payload.put("totalAmount", order.getTotalAmount());
-        payload.put("voucherCode", order.getVoucherCode());
-        payload.put("voucherDiscount", order.getVoucherDiscount());
-        payload.put("status", order.getStatus());
-        payload.put("createdAt", order.getCreatedAt());
-        payload.put("items", items);
-
-        getDb().collection(Constants.COLLECTION_ORDERS)
-                .document(order.getId())
-                .set(payload)
-                .addOnSuccessListener(unused -> {
-                    if (callback != null) {
-                        callback.onSuccess(null);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to sync order", e);
-                    if (callback != null) {
-                        callback.onError(e);
-                    }
-                });
-    }
-
     public static void updateOrderStatus(
             @NonNull String orderId,
             @NonNull String status,
@@ -229,16 +192,6 @@ public final class FirestoreHelper {
                         callback.onError(e);
                     }
                 });
-    }
-
-    /**
-     * Best-effort mirror of a local stock change using an atomic server-side increment.
-     */
-    public static void adjustProductStock(@NonNull String productId, int delta) {
-        getDb().collection(Constants.COLLECTION_PRODUCTS)
-                .document(productId)
-                .update("stock", FieldValue.increment(delta))
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to sync product stock", e));
     }
 
     public static void savePayment(@NonNull PaymentEntity payment, FirestoreCallback<Void> callback) {

@@ -30,7 +30,7 @@ public abstract class TrackingDatabase extends RoomDatabase {
                                     TrackingDatabase.class,
                                     DB_NAME
                             )
-                            .fallbackToDestructiveMigration()
+                            .fallbackToDestructiveMigration(true)
                             .build();
                 }
             }

@@ -8,8 +8,25 @@ import java.util.Locale;
 
 /**
  * Pure formatting helpers for VND prices, discounts, timestamps, and user initials.
+ * Uses ThreadLocal formatters to avoid repeated allocations during RecyclerView binding.
  */
 public final class FormatUtils {
+
+    private static final ThreadLocal<DecimalFormat> VND_FORMATTER = ThreadLocal.withInitial(() -> {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.');
+        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
+        formatter.setGroupingUsed(true);
+        return formatter;
+    });
+
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMATTER = ThreadLocal.withInitial(
+            () -> new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    );
+
+    private static final ThreadLocal<SimpleDateFormat> DATE_TIME_FORMATTER = ThreadLocal.withInitial(
+            () -> new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    );
 
     private FormatUtils() {
     }
@@ -18,29 +35,26 @@ public final class FormatUtils {
         if (priceText == null || priceText.isEmpty()) {
             return 0L;
         }
-        StringBuilder digits = new StringBuilder();
+        long value = 0L;
+        boolean hasDigit = false;
         for (int i = 0; i < priceText.length(); i++) {
             char c = priceText.charAt(i);
-            if (Character.isDigit(c)) {
-                digits.append(c);
+            if (c >= '0' && c <= '9') {
+                hasDigit = true;
+                int digit = c - '0';
+                if (value > (Long.MAX_VALUE - digit) / 10L) {
+                    return 0L;
+                }
+                value = value * 10L + digit;
             }
         }
-        if (digits.length() == 0) {
-            return 0L;
-        }
-        try {
-            return Long.parseLong(digits.toString());
-        } catch (NumberFormatException e) {
-            return 0L;
-        }
+        return hasDigit ? value : 0L;
     }
 
     public static String formatVnd(long amount) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.');
-        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-        formatter.setGroupingUsed(true);
-        return formatter.format(Math.max(0L, amount)) + " ₫";
+        DecimalFormat formatter = VND_FORMATTER.get();
+        return (formatter != null ? formatter.format(Math.max(0L, amount)) : String.valueOf(Math.max(0L, amount)))
+                + " ₫";
     }
 
     public static String computeLineTotal(String unitPrice, int quantity) {
@@ -67,11 +81,13 @@ public final class FormatUtils {
     }
 
     public static String formatDate(long epochMillis) {
-        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(epochMillis));
+        SimpleDateFormat fmt = DATE_FORMATTER.get();
+        return fmt != null ? fmt.format(new Date(epochMillis)) : "";
     }
 
     public static String formatDateTime(long epochMillis) {
-        return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(epochMillis));
+        SimpleDateFormat fmt = DATE_TIME_FORMATTER.get();
+        return fmt != null ? fmt.format(new Date(epochMillis)) : "";
     }
 
     public static String formatRating(double rating) {

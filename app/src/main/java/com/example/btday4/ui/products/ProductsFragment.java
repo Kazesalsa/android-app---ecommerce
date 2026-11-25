@@ -51,8 +51,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Flagship TechStore feed featuring user avatar header, quick voucher wallet access,
- * AI-ranked spotlight hero, horizontal claimable voucher strip, 4-tab sort bar, and 2-column grid.
+ * Flagship TechStore feed featuring user avatar header, quick voucher wallet
+ * access,
+ * AI-ranked spotlight hero, horizontal claimable voucher strip, 4-tab sort bar,
+ * and 2-column grid.
  */
 public class ProductsFragment extends Fragment {
 
@@ -67,6 +69,7 @@ public class ProductsFragment extends Fragment {
     private UserSession userSession;
     private ProductAdapter adapter;
     private ListenerRegistration productsListener;
+    private ListenerRegistration homeVouchersListener;
 
     private final List<ProductWithRating> allProducts = new ArrayList<>();
     private final List<String> categories = new ArrayList<>();
@@ -85,8 +88,7 @@ public class ProductsFragment extends Fragment {
     public View onCreateView(
             @NonNull LayoutInflater inflater,
             @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState
-    ) {
+            @Nullable Bundle savedInstanceState) {
         binding = FragmentProductsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -111,8 +113,8 @@ public class ProductsFragment extends Fragment {
             }
         });
 
-        View.OnClickListener openVouchers = v ->
-                startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
+        View.OnClickListener openVouchers = v -> startActivity(
+                new Intent(requireContext(), VoucherWalletActivity.class));
         binding.btnHeaderVouchers.setOnClickListener(openVouchers);
         binding.btnOpenVoucherWallet.setOnClickListener(openVouchers);
 
@@ -164,7 +166,7 @@ public class ProductsFragment extends Fragment {
 
         binding.btnResetFilter.setOnClickListener(v -> resetFilters());
 
-        refreshHomeVouchers();
+        startListeningHomeVouchers();
 
         productsListener = FirestoreHelper.listenProducts(new FirestoreHelper.FirestoreCallback<List<Product>>() {
             @Override
@@ -229,6 +231,10 @@ public class ProductsFragment extends Fragment {
             productsListener.remove();
             productsListener = null;
         }
+        if (homeVouchersListener != null) {
+            homeVouchersListener.remove();
+            homeVouchersListener = null;
+        }
         binding = null;
     }
 
@@ -261,78 +267,102 @@ public class ProductsFragment extends Fragment {
         });
     }
 
+    private void startListeningHomeVouchers() {
+        if (homeVouchersListener != null) {
+            homeVouchersListener.remove();
+            homeVouchersListener = null;
+        }
+        if (!isAdded() || binding == null || userSession == null) {
+            return;
+        }
+        homeVouchersListener = VoucherRepository.listenVouchersForUser(
+                userSession.getUsername(),
+                this::renderHomeVouchers);
+    }
+
     private void refreshHomeVouchers() {
         if (!isAdded() || binding == null || userSession == null) {
             return;
         }
-        VoucherRepository.getVouchersForUser(requireContext(), userSession.getUsername(), list -> {
-            if (!isAdded() || binding == null) {
-                return;
-            }
-            binding.llHomeVouchers.removeAllViews();
-            LayoutInflater inflater = LayoutInflater.from(requireContext());
-            long now = System.currentTimeMillis();
-            int shown = 0;
-            for (VoucherItem row : list) {
-                if (row.used || row.voucher.isExpired(now)) {
-                    continue;
-                }
-                Voucher v = row.voucher;
-                ItemHomeVoucherBinding itemBinding = ItemHomeVoucherBinding.inflate(
-                        inflater,
-                        binding.llHomeVouchers,
-                        false
-                );
-                itemBinding.llMiniStub.setBackgroundResource(
-                        v.isFreeShipType()
-                                ? R.drawable.bg_voucher_stub_teal
-                                : R.drawable.bg_voucher_stub_primary
-                );
-                itemBinding.tvMiniBadge.setText(v.getBadgeLabel());
-                itemBinding.tvMiniTitle.setText(v.getTitle());
-                itemBinding.tvMiniCondition.setText("Đơn từ " + FormatUtils.formatVnd(v.getMinOrderAmount()));
+        VoucherRepository.getVouchersForUser(requireContext(), userSession.getUsername(), this::renderHomeVouchers);
+    }
 
-                if (row.claimed) {
-                    itemBinding.btnMiniClaim.setText("Đã lưu");
-                    itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_tag);
-                    itemBinding.btnMiniClaim.setTextColor(
-                            ContextCompat.getColor(requireContext(), R.color.primary)
-                    );
+    private void renderHomeVouchers(List<VoucherItem> list) {
+        if (!isAdded() || binding == null) {
+            return;
+        }
+        binding.llHomeVouchers.removeAllViews();
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        long now = System.currentTimeMillis();
+        int shown = 0;
+        for (VoucherItem row : list) {
+            if (row.used || !row.voucher.isActive() || row.voucher.isExpired(now) || !row.voucher.hasRemainingUses()) {
+                continue;
+            }
+            Voucher v = row.voucher;
+            ItemHomeVoucherBinding itemBinding = ItemHomeVoucherBinding.inflate(
+                    inflater,
+                    binding.llHomeVouchers,
+                    false);
+            itemBinding.llMiniStub.setBackgroundResource(
+                    v.isFreeShipType()
+                            ? R.drawable.bg_voucher_stub_teal
+                            : R.drawable.bg_voucher_stub_primary);
+            itemBinding.tvMiniBadge.setText(v.getBadgeLabel());
+            itemBinding.tvMiniTitle.setText(v.getTitle());
+            itemBinding.tvMiniCondition.setText("Đơn từ " + FormatUtils.formatVnd(v.getMinOrderAmount()));
+
+            if (row.claimed) {
+                itemBinding.btnMiniClaim.setText("Đã lưu");
+                itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_tag);
+                itemBinding.btnMiniClaim.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.primary));
+            } else {
+                itemBinding.btnMiniClaim.setText("Lưu");
+                itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_solid);
+                itemBinding.btnMiniClaim.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.white));
+            }
+
+            itemBinding.getRoot().setOnClickListener(click -> {
+                if (!row.claimed) {
+                    VoucherRepository.claimByCode(
+                            requireContext(),
+                            userSession.getUsername(),
+                            v.getCode(),
+                            outcome -> {
+                                if (!isAdded() || binding == null) {
+                                    return;
+                                }
+                                if (outcome.result == VoucherRepository.ClaimResult.CLAIMED
+                                        || outcome.result == VoucherRepository.ClaimResult.ALREADY_CLAIMED) {
+                                    showHomeNotification(
+                                            AppNotification.TYPE_VOUCHER,
+                                            "Đã lưu mã ưu đãi",
+                                            "Đã lưu mã " + v.getCode() + " vào kho voucher",
+                                            null,
+                                            null);
+                                } else {
+                                    showHomeNotification(
+                                            AppNotification.TYPE_ALERT,
+                                            "Không thể lưu mã",
+                                            "Mã " + v.getCode() + " hiện không khả dụng trên hệ thống",
+                                            null,
+                                            null);
+                                }
+                            });
                 } else {
-                    itemBinding.btnMiniClaim.setText("Lưu");
-                    itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_solid);
-                    itemBinding.btnMiniClaim.setTextColor(
-                            ContextCompat.getColor(requireContext(), R.color.white)
-                    );
+                    startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
                 }
+            });
 
-                itemBinding.getRoot().setOnClickListener(click -> {
-                    if (!row.claimed) {
-                        VoucherRepository.claimByCode(
-                                requireContext(),
-                                userSession.getUsername(),
-                                v.getCode()
-                        );
-                        refreshHomeVouchers();
-                        showHomeNotification(
-                                AppNotification.TYPE_VOUCHER,
-                                "Đã lưu mã ưu đãi",
-                                "Đã lưu mã " + v.getCode() + " vào kho voucher",
-                                null,
-                                null
-                        );
-                    } else {
-                        startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
-                    }
-                });
-
-                binding.llHomeVouchers.addView(itemBinding.getRoot());
-                shown++;
-                if (shown >= 5) {
-                    break;
-                }
+            binding.llHomeVouchers.addView(itemBinding.getRoot());
+            shown++;
+            if (shown >= 5) {
+                break;
             }
-        });
+        }
+        binding.sectionHomeVouchers.setVisibility(shown > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void quickAddToCart(Product product) {
@@ -355,8 +385,7 @@ public class ProductsFragment extends Fragment {
                             "MainActivity:Products",
                             BehaviorTracker.EVENT_ADD_TO_CART,
                             product.getId(),
-                            product.getName() + "|qty=" + added
-                    );
+                            product.getName() + "|qty=" + added);
                 }
                 showHomeNotification(
                         AppNotification.TYPE_CART,
@@ -367,16 +396,14 @@ public class ProductsFragment extends Fragment {
                             if (getActivity() instanceof MainActivity) {
                                 ((MainActivity) getActivity()).openCartTab();
                             }
-                        }
-                );
+                        });
             } else {
                 showHomeNotification(
                         AppNotification.TYPE_ALERT,
                         "Giới hạn tồn kho",
                         "Đã đạt số lượng tồn kho tối đa trong giỏ",
                         null,
-                        null
-                );
+                        null);
             }
         });
     }
@@ -386,8 +413,7 @@ public class ProductsFragment extends Fragment {
             String title,
             String message,
             @Nullable String actionLabel,
-            @Nullable Runnable action
-    ) {
+            @Nullable Runnable action) {
         if (!isAdded() || binding == null) {
             return;
         }
@@ -442,8 +468,7 @@ public class ProductsFragment extends Fragment {
                     recommendationScores.putAll(scores);
                     bindSpotlightProduct();
                     applyFilterAndSort();
-                }
-        );
+                });
     }
 
     private void bindSpotlightProduct() {
@@ -540,7 +565,8 @@ public class ProductsFragment extends Fragment {
         UiUtils.styleUnderlineTab(binding.tvSortDefault, binding.indSortDefault, currentSort == SortOption.DEFAULT);
         UiUtils.styleUnderlineTab(binding.tvSortRating, binding.indSortRating, currentSort == SortOption.RATING_DESC);
         UiUtils.styleUnderlineTab(binding.tvSortPriceAsc, binding.indSortPriceAsc, currentSort == SortOption.PRICE_ASC);
-        UiUtils.styleUnderlineTab(binding.tvSortPriceDesc, binding.indSortPriceDesc, currentSort == SortOption.PRICE_DESC);
+        UiUtils.styleUnderlineTab(binding.tvSortPriceDesc, binding.indSortPriceDesc,
+                currentSort == SortOption.PRICE_DESC);
     }
 
     private void resetFilters() {
@@ -592,15 +618,13 @@ public class ProductsFragment extends Fragment {
         if (currentSort == SortOption.DEFAULT && !recommendationScores.isEmpty()) {
             filtered.sort((a, b) -> Double.compare(
                     recommendationScores.getOrDefault(b.product.getId(), 0.0),
-                    recommendationScores.getOrDefault(a.product.getId(), 0.0)
-            ));
+                    recommendationScores.getOrDefault(a.product.getId(), 0.0)));
         } else if (currentSort == SortOption.PRICE_ASC) {
             filtered.sort(Comparator.comparingLong(i -> FormatUtils.parseVnd(i.product.getPrice())));
         } else if (currentSort == SortOption.PRICE_DESC) {
             filtered.sort((a, b) -> Long.compare(
                     FormatUtils.parseVnd(b.product.getPrice()),
-                    FormatUtils.parseVnd(a.product.getPrice())
-            ));
+                    FormatUtils.parseVnd(a.product.getPrice())));
         } else if (currentSort == SortOption.RATING_DESC) {
             filtered.sort((a, b) -> {
                 int cmp = Double.compare(b.avgRating, a.avgRating);
@@ -611,8 +635,7 @@ public class ProductsFragment extends Fragment {
         lastFilteredCount = filtered.size();
         adapter.submitList(filtered);
         binding.llEmptyProducts.setVisibility(
-                filtered.isEmpty() && !allProducts.isEmpty() ? View.VISIBLE : View.GONE
-        );
+                filtered.isEmpty() && !allProducts.isEmpty() ? View.VISIBLE : View.GONE);
     }
 
     private void scheduleSearchTracking(String query) {
@@ -658,8 +681,7 @@ public class ProductsFragment extends Fragment {
                     binding.imgHeaderAvatar,
                     binding.tvHeaderAvatarInitials,
                     userSession.getAvatarUrl(),
-                    name
-            );
+                    name);
         }
     }
 

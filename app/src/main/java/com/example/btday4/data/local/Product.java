@@ -1,57 +1,31 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
+import com.google.firebase.firestore.IgnoreExtraProperties;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Room and Firestore entity representing a store product with full details and specs.
+ * Firestore entity representing a store product with full details and specs.
  */
-@Entity(tableName = "products")
+@IgnoreExtraProperties
 public class Product {
 
-    @PrimaryKey
     @NonNull
     private String id;
 
-    @ColumnInfo(name = "name")
     private String name;
-
-    @ColumnInfo(name = "price")
     private String price;
-
-    @ColumnInfo(name = "original_price")
     private String originalPrice;
-
-    @ColumnInfo(name = "short_info")
     private String shortInfo;
-
-    @ColumnInfo(name = "category")
     private String category;
-
-    @ColumnInfo(name = "image_url")
     private String imageUrl;
-
-    @ColumnInfo(name = "brand")
     private String brand;
-
-    @ColumnInfo(name = "description")
     private String description;
-
-    @ColumnInfo(name = "specs")
     private String specs;
-
-    @ColumnInfo(name = "warranty")
     private String warranty;
-
-    @ColumnInfo(name = "stock", defaultValue = "15")
     private int stock;
 
-    @Ignore
     public Product() {
         this.id = "";
         this.stock = 15;

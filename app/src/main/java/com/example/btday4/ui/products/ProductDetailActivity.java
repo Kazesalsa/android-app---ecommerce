@@ -19,12 +19,15 @@ import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.data.repository.UserSession;
+import com.example.btday4.data.repository.VoucherRepository;
+import com.example.btday4.data.repository.VoucherRepository.VoucherItem;
 import com.example.btday4.databinding.ActivityProductDetailBinding;
 import com.example.btday4.databinding.ItemRatingBarBinding;
 import com.example.btday4.databinding.ItemSpecPillBinding;
 import com.example.btday4.databinding.ItemSpecRowBinding;
 import com.example.btday4.model.AppNotification;
 import com.example.btday4.model.RatingSummary;
+import com.example.btday4.model.Voucher;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.checkout.CheckoutActivity;
 import com.example.btday4.ui.main.MainActivity;
@@ -36,6 +39,7 @@ import com.example.btday4.util.ProductImageLoader;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -54,6 +58,8 @@ public class ProductDetailActivity extends AppCompatActivity {
     private Product product;
     private int quantity = 1;
     private final List<ReviewEntity> allReviews = new ArrayList<>();
+    private final List<VoucherItem> storeVouchers = new ArrayList<>();
+    private ListenerRegistration voucherCueListener;
     private ReviewEntity currentUserReview;
     private int selectedStarFilter = 0;
     private boolean openReviewComposerOnLoad = false;
@@ -155,6 +161,27 @@ public class ProductDetailActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (voucherCueListener != null) {
+            voucherCueListener.remove();
+        }
+        voucherCueListener = VoucherRepository.listenVouchersForUser(
+                userSession.getUsername(),
+                items -> {
+                    if (isFinishing() || isDestroyed() || binding == null) {
+                        return;
+                    }
+                    storeVouchers.clear();
+                    if (items != null) {
+                        storeVouchers.addAll(items);
+                    }
+                    bindFeaturedVoucherCue();
+                }
+        );
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         productViewStartElapsedMs = SystemClock.elapsedRealtime();
@@ -164,6 +191,7 @@ public class ProductDetailActivity extends AppCompatActivity {
                 if (latest != null && !isFinishing() && !isDestroyed()) {
                     product = latest;
                     bindStockState(latest);
+                    bindFeaturedVoucherCue();
                 }
             });
         }
@@ -182,8 +210,59 @@ public class ProductDetailActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (voucherCueListener != null) {
+            voucherCueListener.remove();
+            voucherCueListener = null;
+        }
+    }
+
+    private void bindFeaturedVoucherCue() {
+        if (binding == null) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        long unitPrice = product == null ? 0L : FormatUtils.parseVnd(product.getPrice());
+        long baseShip = FormatUtils.computeShippingFee(unitPrice);
+
+        VoucherItem bestMatching = null;
+        long bestDiscount = 0L;
+        VoucherItem firstAvailable = null;
+
+        for (VoucherItem row : storeVouchers) {
+            Voucher v = row.voucher;
+            if (row.used || !v.isActive() || v.isExpired(now) || !v.hasRemainingUses()) {
+                continue;
+            }
+            if (firstAvailable == null) {
+                firstAvailable = row;
+            }
+            if (unitPrice > 0L) {
+                long discount = v.computeDiscount(unitPrice, baseShip);
+                if (discount > bestDiscount) {
+                    bestDiscount = discount;
+                    bestMatching = row;
+                }
+            }
+        }
+
+        VoucherItem featured = bestMatching != null ? bestMatching : firstAvailable;
+        if (featured == null) {
+            binding.rowDetailVoucherCue.setVisibility(View.GONE);
+            return;
+        }
+
+        Voucher v = featured.voucher;
+        binding.rowDetailVoucherCue.setVisibility(View.VISIBLE);
+        binding.tvDetailVoucherCueText.setText(v.getCode() + " · " + v.getTitle());
+        binding.tvDetailVoucherCueAction.setText(featured.claimed ? "Xem mã ›" : "Nhận mã ›");
+    }
+
     private void bindProduct(Product item) {
         ProductImageLoader.load(binding.imgDetailProduct, item.getImageUrl());
+        bindFeaturedVoucherCue();
 
         binding.tvDetailBrand.setText(
                 ValidationUtils.isNotBlank(item.getBrand())

@@ -7,8 +7,6 @@
     <color name="primary_pressed">#BE123C</color>
     <color name="primary_soft">#FFF1F2</color>
     <color name="primary_border_soft">#FECDD3</color>
-    <color name="price_strip_start">#FFF5F6</color>
-    <color name="primary_container">#FFF1F2</color>
 
     <!-- Deep Slate Obsidian Chrome -->
     <color name="ink_dark">#0F172A</color>
@@ -20,7 +18,6 @@
     <color name="teal_trust_border">#99F6E4</color>
 
     <color name="accent">#E11D48</color>
-    <color name="accent_soft">#FFF1F2</color>
 
     <!-- Crisp Titanium-Gray Feed Canvas + Pure White Surfaces + Studio Image Stage -->
     <color name="bg_screen">#F3F4F8</color>
@@ -48,17 +45,10 @@
     <color name="star_amber">#F59E0B</color>
     <color name="star_empty">#CBD5E1</color>
 
-    <color name="voucher_gold">#B45309</color>
-    <color name="voucher_gold_bg">#FEF3C7</color>
-
-    <color name="success_green">#0F766E</color>
-    <color name="success_bg">#F0FDFA</color>
-
     <color name="warning_amber">#B45309</color>
     <color name="warning_bg">#FFFBEB</color>
 
     <color name="danger_red">#DC2626</color>
-    <color name="danger_bg">#FEF2F2</color>
 
     <color name="badge_bg">#E11D48</color>
 </resources>

@@ -22,13 +22,14 @@ import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
+import com.google.firebase.firestore.ListenerRegistration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * Full-screen Voucher Wallet & Checkout/Cart Voucher Picker supporting promo code entry,
- * segmented filtering, and instant ticket claiming/selection with custom top notifications.
+ * Full-screen Voucher Wallet & Checkout/Cart Voucher Picker synchronized live with Cloud Firestore
+ * (`vouchers` and `users/{username}/user_vouchers`).
  */
 public class VoucherWalletActivity extends AppCompatActivity {
 
@@ -41,6 +42,7 @@ public class VoucherWalletActivity extends AppCompatActivity {
     private ActivityVoucherWalletBinding binding;
     private UserSession userSession;
     private VoucherAdapter adapter;
+    private ListenerRegistration vouchersListener;
 
     private boolean pickerMode = false;
     private long orderSubtotal = 0L;
@@ -83,17 +85,26 @@ public class VoucherWalletActivity extends AppCompatActivity {
                         VoucherRepository.claimByCode(
                                 VoucherWalletActivity.this,
                                 userSession.getUsername(),
-                                voucher.getCode()
-                        );
-                        loadVouchers();
-                        InAppNotifier.show(
-                                binding.getRoot(),
-                                AppNotification.TYPE_VOUCHER,
-                                "Đã lưu mã ưu đãi",
-                                "Đã lưu mã " + voucher.getCode() + " vào kho voucher",
                                 voucher.getCode(),
-                                null,
-                                null
+                                outcome -> {
+                                    if (isFinishing() || isDestroyed()) {
+                                        return;
+                                    }
+                                    if (outcome.result == ClaimResult.CLAIMED
+                                            || outcome.result == ClaimResult.ALREADY_CLAIMED) {
+                                        InAppNotifier.show(
+                                                binding.getRoot(),
+                                                AppNotification.TYPE_VOUCHER,
+                                                "Đã lưu mã ưu đãi",
+                                                "Đã lưu mã " + voucher.getCode() + " vào kho voucher",
+                                                voucher.getCode(),
+                                                null,
+                                                null
+                                        );
+                                    } else {
+                                        showClaimError(voucher.getCode(), outcome.result);
+                                    }
+                                }
                         );
                     }
 
@@ -102,22 +113,32 @@ public class VoucherWalletActivity extends AppCompatActivity {
                         VoucherRepository.claimByCode(
                                 VoucherWalletActivity.this,
                                 userSession.getUsername(),
-                                voucher.getCode()
+                                voucher.getCode(),
+                                outcome -> {
+                                    if (isFinishing() || isDestroyed()) {
+                                        return;
+                                    }
+                                    if (outcome.result != ClaimResult.CLAIMED
+                                            && outcome.result != ClaimResult.ALREADY_CLAIMED) {
+                                        showClaimError(voucher.getCode(), outcome.result);
+                                        return;
+                                    }
+                                    if (pickerMode) {
+                                        returnSelectedCode(voucher.getCode());
+                                    } else {
+                                        VoucherRepository.setSelectedCartVoucherCode(
+                                                VoucherWalletActivity.this,
+                                                userSession.getUsername(),
+                                                voucher.getCode()
+                                        );
+                                        Intent intent = new Intent(VoucherWalletActivity.this, MainActivity.class);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                        intent.putExtra(Constants.EXTRA_OPEN_PRODUCTS, true);
+                                        startActivity(intent);
+                                        finish();
+                                    }
+                                }
                         );
-                        if (pickerMode) {
-                            returnSelectedCode(voucher.getCode());
-                        } else {
-                            VoucherRepository.setSelectedCartVoucherCode(
-                                    VoucherWalletActivity.this,
-                                    userSession.getUsername(),
-                                    voucher.getCode()
-                            );
-                            Intent intent = new Intent(VoucherWalletActivity.this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                            intent.putExtra(Constants.EXTRA_OPEN_PRODUCTS, true);
-                            startActivity(intent);
-                            finish();
-                        }
                     }
                 }
         );
@@ -139,8 +160,40 @@ public class VoucherWalletActivity extends AppCompatActivity {
         });
 
         binding.btnClearSelectedVoucher.setOnClickListener(v -> returnSelectedCode(""));
+    }
 
-        loadVouchers();
+    @Override
+    protected void onStart() {
+        super.onStart();
+        startListeningVouchers();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        stopListeningVouchers();
+    }
+
+    private void startListeningVouchers() {
+        stopListeningVouchers();
+        vouchersListener = VoucherRepository.listenVouchersForUser(
+                userSession.getUsername(),
+                items -> {
+                    if (isFinishing() || isDestroyed()) {
+                        return;
+                    }
+                    allItems.clear();
+                    allItems.addAll(items);
+                    applyFilter();
+                }
+        );
+    }
+
+    private void stopListeningVouchers() {
+        if (vouchersListener != null) {
+            vouchersListener.remove();
+            vouchersListener = null;
+        }
     }
 
     private void handlePromoCodeSubmit() {
@@ -152,72 +205,93 @@ public class VoucherWalletActivity extends AppCompatActivity {
                     binding.getRoot(),
                     AppNotification.TYPE_ALERT,
                     "Chưa nhập mã",
-                    "Vui lòng nhập mã voucher (VD: TECHNEW15 hoặc VIP20)"
-            );
-            return;
-        }
-        ClaimResult result = VoucherRepository.claimByCode(this, userSession.getUsername(), raw);
-        Voucher matched = VoucherRepository.findByCode(raw);
-        if (result == ClaimResult.NOT_FOUND || matched == null) {
-            InAppNotifier.show(
-                    binding.getRoot(),
-                    AppNotification.TYPE_ALERT,
-                    "Mã không hợp lệ",
-                    "Mã \"" + raw + "\" không tồn tại"
-            );
-            return;
-        }
-        if (result == ClaimResult.ALREADY_USED) {
-            InAppNotifier.show(
-                    binding.getRoot(),
-                    AppNotification.TYPE_ALERT,
-                    "Mã đã sử dụng",
-                    "Mã \"" + raw + "\" đã được sử dụng trước đó"
-            );
-            return;
-        }
-        if (result == ClaimResult.EXPIRED) {
-            InAppNotifier.show(
-                    binding.getRoot(),
-                    AppNotification.TYPE_ALERT,
-                    "Mã hết hạn",
-                    "Mã \"" + raw + "\" đã hết hạn"
+                    "Vui lòng nhập mã voucher từ hệ thống"
             );
             return;
         }
 
-        binding.etPromoCode.setText("");
-        loadVouchers();
-
-        if (pickerMode) {
-            long ship = FormatUtils.computeShippingFee(orderSubtotal);
-            if (matched.computeDiscount(orderSubtotal, ship) > 0L) {
-                returnSelectedCode(matched.getCode());
+        binding.btnApplyPromoCode.setEnabled(false);
+        VoucherRepository.claimByCode(this, userSession.getUsername(), raw, outcome -> {
+            if (isFinishing() || isDestroyed()) {
                 return;
             }
-            InAppNotifier.show(
-                    binding.getRoot(),
-                    AppNotification.TYPE_VOUCHER,
-                    "Đã lưu mã " + matched.getCode(),
-                    "Đơn hàng hiện tại chưa đủ điều kiện áp dụng mã này.",
-                    matched.getCode(),
-                    null,
-                    null
-            );
-        } else {
-            String msg = result == ClaimResult.CLAIMED
-                    ? "Đã mở khóa & lưu mã " + matched.getCode() + " vào kho voucher"
-                    : "Mã " + matched.getCode() + " đã có sẵn trong kho";
-            InAppNotifier.show(
-                    binding.getRoot(),
-                    AppNotification.TYPE_VOUCHER,
-                    "Kho Voucher",
-                    msg,
-                    matched.getCode(),
-                    null,
-                    null
-            );
+            binding.btnApplyPromoCode.setEnabled(true);
+
+            Voucher matched = outcome.voucher;
+            if (outcome.result != ClaimResult.CLAIMED && outcome.result != ClaimResult.ALREADY_CLAIMED) {
+                showClaimError(raw, outcome.result);
+                return;
+            }
+            if (matched == null) {
+                showClaimError(raw, ClaimResult.NOT_FOUND);
+                return;
+            }
+
+            binding.etPromoCode.setText("");
+
+            if (pickerMode) {
+                long ship = FormatUtils.computeShippingFee(orderSubtotal);
+                if (matched.computeDiscount(orderSubtotal, ship) > 0L) {
+                    returnSelectedCode(matched.getCode());
+                    return;
+                }
+                InAppNotifier.show(
+                        binding.getRoot(),
+                        AppNotification.TYPE_VOUCHER,
+                        "Đã lưu mã " + matched.getCode(),
+                        "Đơn hàng hiện tại chưa đủ điều kiện áp dụng mã này.",
+                        matched.getCode(),
+                        null,
+                        null
+                );
+            } else {
+                String msg = outcome.result == ClaimResult.CLAIMED
+                        ? "Đã mở khóa & lưu mã " + matched.getCode() + " vào kho voucher"
+                        : "Mã " + matched.getCode() + " đã có sẵn trong kho";
+                InAppNotifier.show(
+                        binding.getRoot(),
+                        AppNotification.TYPE_VOUCHER,
+                        "Kho Voucher",
+                        msg,
+                        matched.getCode(),
+                        null,
+                        null
+                );
+            }
+        });
+    }
+
+    private void showClaimError(String code, ClaimResult result) {
+        String title;
+        String message;
+        switch (result) {
+            case ALREADY_USED:
+                title = "Mã đã sử dụng";
+                message = "Mã \"" + code + "\" đã được sử dụng trước đó";
+                break;
+            case EXPIRED:
+                title = "Mã hết hạn";
+                message = "Mã \"" + code + "\" đã hết hạn";
+                break;
+            case INACTIVE:
+                title = "Mã tạm ngưng";
+                message = "Mã \"" + code + "\" hiện không còn hiệu lực";
+                break;
+            case OUT_OF_STOCK:
+                title = "Hết lượt sử dụng";
+                message = "Mã \"" + code + "\" đã đạt giới hạn lượt dùng";
+                break;
+            case ERROR:
+                title = "Không thể kết nối";
+                message = "Không thể kiểm tra mã trên Firebase, vui lòng thử lại";
+                break;
+            case NOT_FOUND:
+            default:
+                title = "Mã không hợp lệ";
+                message = "Mã \"" + code + "\" không tồn tại trên hệ thống";
+                break;
         }
+        InAppNotifier.show(binding.getRoot(), AppNotification.TYPE_ALERT, title, message);
     }
 
     private void returnSelectedCode(String code) {
@@ -245,17 +319,6 @@ public class VoucherWalletActivity extends AppCompatActivity {
                 this,
                 active ? R.font.be_vietnam_pro_bold : R.font.be_vietnam_pro_medium
         ));
-    }
-
-    private void loadVouchers() {
-        VoucherRepository.getVouchersForUser(this, userSession.getUsername(), items -> {
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
-            allItems.clear();
-            allItems.addAll(items);
-            applyFilter();
-        });
     }
 
     private void applyFilter() {

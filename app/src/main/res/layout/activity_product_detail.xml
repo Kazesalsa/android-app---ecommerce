@@ -221,7 +221,7 @@
                         tools:visibility="visible" />
                 </LinearLayout>
 
-                <!-- Voucher Cue Strip (Opens Voucher Wallet) -->
+                <!-- Voucher Cue Strip (Shows 1 Live Store Voucher from Firebase) -->
                 <LinearLayout
                     android:id="@+id/rowDetailVoucherCue"
                     android:layout_width="match_parent"
@@ -234,7 +234,8 @@
                     android:minHeight="44dp"
                     android:orientation="horizontal"
                     android:paddingHorizontal="12dp"
-                    android:paddingVertical="8dp">
+                    android:paddingVertical="8dp"
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="18dp"
@@ -244,16 +245,20 @@
                         app:tint="@color/primary" />
 
                     <TextView
+                        android:id="@+id/tvDetailVoucherCueText"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
+                        android:layout_marginEnd="8dp"
                         android:layout_weight="1"
+                        android:ellipsize="end"
                         android:fontFamily="@font/be_vietnam_pro_semibold"
-                        android:text="Voucher giảm đến 50.000 ₫ &amp; Freeship"
+                        android:maxLines="1"
                         android:textColor="@color/primary"
                         android:textSize="12.5sp" />
 
                     <TextView
+                        android:id="@+id/tvDetailVoucherCueAction"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/be_vietnam_pro_bold"

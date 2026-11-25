@@ -32,14 +32,12 @@
     <string name="empty_notifications">Chưa có thông báo mới</string>
 
     <!-- Products -->
-    <string name="products_title">Cửa hàng</string>
     <string name="search_hint">Tìm iPhone, MacBook, phụ kiện...</string>
     <string name="empty_products">Không tìm thấy sản phẩm phù hợp</string>
     <string name="category_all">Tất cả</string>
     <string name="clear_filter">Đặt lại bộ lọc</string>
 
     <!-- Product Detail & Reviews -->
-    <string name="product_detail_title">Chi tiết sản phẩm</string>
     <string name="section_description">Tổng quan sản phẩm</string>
     <string name="section_specs">Thông số kỹ thuật</string>
     <string name="section_reviews">Đánh giá thực tế</string>
@@ -56,7 +54,6 @@
     <string name="voucher_wallet_title">Kho Voucher ưu đãi</string>
     <string name="voucher_picker_title">Chọn mã giảm giá</string>
     <string name="qr_payment_title">Thanh toán VietQR</string>
-    <string name="btn_checkout">Tiến hành thanh toán</string>
     <string name="btn_place_order">Đặt hàng</string>
     <string name="btn_place_order_qr">Đặt hàng &amp; Tạo QR</string>
     <string name="btn_pay_qr_now">Thanh toán mã QR ngay</string>
@@ -70,7 +67,6 @@
     <string name="btn_cancel_order">Hủy đơn hàng</string>
 
     <!-- Profile -->
-    <string name="profile_title">Tài khoản</string>
     <string name="edit_profile_title">Chỉnh sửa hồ sơ</string>
     <string name="change_password_title">Đổi mật khẩu</string>
     <string name="my_reviews_title">Đánh giá của tôi</string>
@@ -78,6 +74,5 @@
     <string name="profile_login_info_title">Tiện ích &amp; Bảo mật</string>
     <string name="btn_logout">Đăng xuất tài khoản</string>
     <string name="btn_cancel">Hủy</string>
-    <string name="btn_confirm">Xác nhận</string>
     <string name="btn_save">Lưu thay đổi</string>
 </resources>
