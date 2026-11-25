@@ -14,6 +14,7 @@ import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityMyReviewsBinding;
 import com.example.btday4.databinding.ItemMyReviewBinding;
 import com.example.btday4.model.UserReviewWithProduct;
+import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.ui.products.ProductDetailActivity;
 import com.example.btday4.ui.products.ReviewAdapter;
 import com.example.btday4.util.Constants;
@@ -24,23 +25,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Full-screen user review history screen replacing the previous BottomSheet popup.
+ * Full-screen user review history screen with product navigation and store CTA fallback.
  */
 public class MyReviewsActivity extends AppCompatActivity {
 
     private ActivityMyReviewsBinding binding;
     private UserSession userSession;
     private MyReviewsAdapter adapter;
+    private boolean hasLoadedOnce = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMyReviewsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.myReviewsRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(binding.myReviewsRoot, binding.toolbarMyReviews, null);
 
         userSession = new UserSession(this);
         binding.toolbarMyReviews.setNavigationOnClickListener(v -> finish());
+
+        binding.btnMyReviewsExplore.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            intent.putExtra(Constants.EXTRA_OPEN_PRODUCTS, true);
+            startActivity(intent);
+            finish();
+        });
 
         adapter = new MyReviewsAdapter(productId -> {
             Intent intent = new Intent(this, ProductDetailActivity.class);
@@ -60,10 +71,16 @@ public class MyReviewsActivity extends AppCompatActivity {
     }
 
     private void loadReviews() {
+        if (!hasLoadedOnce) {
+            binding.progressMyReviews.setVisibility(View.VISIBLE);
+            binding.llMyReviewsEmpty.setVisibility(View.GONE);
+        }
         ReviewRepository.getUserReviews(this, userSession.getUsername(), reviews -> {
             if (isFinishing() || isDestroyed()) {
                 return;
             }
+            hasLoadedOnce = true;
+            binding.progressMyReviews.setVisibility(View.GONE);
             adapter.submitList(reviews);
             binding.llMyReviewsEmpty.setVisibility(
                     reviews == null || reviews.isEmpty() ? View.VISIBLE : View.GONE

@@ -10,8 +10,9 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarOrders"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/bg_card"
+        android:minHeight="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@color/text_primary"
         app:title="@string/orders_title"
@@ -23,13 +24,12 @@
         android:layout_height="1dp"
         android:background="@color/divider_hairline" />
 
-    <!-- Shopee-like inline status filter tabs (zero popups) -->
+    <!-- Inline status filter tabs -->
     <HorizontalScrollView
         android:id="@+id/scrollOrderTabs"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="48dp"
         android:background="@color/bg_card"
-        android:elevation="0.5dp"
         android:fillViewport="true"
         android:scrollbars="none">
 
@@ -39,6 +39,11 @@
             android:layout_height="match_parent"
             android:orientation="horizontal" />
     </HorizontalScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_hairline" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -50,7 +55,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
+            android:paddingTop="4dp"
             android:paddingBottom="24dp" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/progressOrders"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorColor="@color/primary"
+            app:trackColor="@color/primary_soft" />
 
         <LinearLayout
             android:id="@+id/llOrdersEmpty"
@@ -62,19 +78,27 @@
             android:padding="32dp"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_receipt"
-                app:tint="@color/text_muted" />
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_circle_avatar"
+                android:backgroundTint="@color/primary_soft">
+
+                <ImageView
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_receipt"
+                    app:tint="@color/primary" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvOrdersEmptyTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/nunito_bold"
+                android:fontFamily="@font/be_vietnam_pro_bold"
                 android:text="@string/empty_orders"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp" />
@@ -84,10 +108,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:fontFamily="@font/be_vietnam_pro_regular"
                 android:gravity="center"
+                android:lineSpacingMultiplier="1.35"
                 android:text="Lịch sử mua sắm và trạng thái giao hàng của bạn sẽ xuất hiện tại đây."
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp" />
+                android:textSize="13.5sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOrdersExploreStore"
+                style="@style/Widget.BtDay4.PrimaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginTop="20dp"
+                android:minHeight="46dp"
+                android:paddingHorizontal="24dp"
+                android:text="Khám phá cửa hàng" />
         </LinearLayout>
     </FrameLayout>
 

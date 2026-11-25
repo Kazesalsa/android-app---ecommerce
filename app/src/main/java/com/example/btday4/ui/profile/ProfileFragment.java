@@ -2,6 +2,7 @@ package com.example.btday4.ui.profile;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,17 +17,25 @@ import com.example.btday4.R;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.data.repository.UserSession;
+import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.FragmentProfileBinding;
+import com.example.btday4.model.AppNotification;
+import com.example.btday4.model.OrderStatus;
+import com.example.btday4.model.OrderWithItems;
 import com.example.btday4.ui.auth.LoginActivity;
 import com.example.btday4.ui.orders.OrderHistoryActivity;
-import com.example.btday4.util.FormatUtils;
+import com.example.btday4.ui.voucher.VoucherWalletActivity;
+import com.example.btday4.util.AvatarImageLoader;
+import com.example.btday4.util.Constants;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
-import com.google.android.material.snackbar.Snackbar;
+import java.util.List;
+import java.util.concurrent.Executors;
 
 /**
- * Full-bleed Account Hub displaying populated profile fields cleanly (hiding empty fields),
- * Orders, My Reviews, Edit Profile, Change Password, and logout with a confirmation popup.
+ * Account Hub displaying circular user avatar with instant gallery photo picker, membership tier,
+ * 3-column stats (Orders / Vouchers / Reviews), 3-status order shortcuts, and personal details.
  */
 public class ProfileFragment extends Fragment {
 
@@ -38,9 +47,7 @@ public class ProfileFragment extends Fragment {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     refreshProfileData();
-                    if (isAdded() && binding != null) {
-                        Snackbar.make(binding.getRoot(), "Đã lưu thông tin cá nhân", Snackbar.LENGTH_SHORT).show();
-                    }
+                    showProfileNotification("Đã lưu thông tin hồ sơ");
                 }
             }
     );
@@ -48,10 +55,15 @@ public class ProfileFragment extends Fragment {
     private final ActivityResultLauncher<Intent> changePasswordLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK && isAdded() && binding != null) {
-                    Snackbar.make(binding.getRoot(), "Đã cập nhật mật khẩu", Snackbar.LENGTH_SHORT).show();
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    showProfileNotification("Đã cập nhật mật khẩu thành công");
                 }
             }
+    );
+
+    private final ActivityResultLauncher<String> quickAvatarPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            this::handlePickedAvatarUri
     );
 
     @Nullable
@@ -71,15 +83,30 @@ public class ProfileFragment extends Fragment {
 
         userSession = new UserSession(requireContext());
 
-        binding.btnEditProfileHeader.setOnClickListener(v ->
-                editProfileLauncher.launch(new Intent(requireContext(), EditProfileActivity.class))
-        );
-        binding.rowMyOrders.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), OrderHistoryActivity.class))
-        );
-        binding.btnViewAllOrders.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), OrderHistoryActivity.class))
-        );
+        View.OnClickListener openEditor = v ->
+                editProfileLauncher.launch(new Intent(requireContext(), EditProfileActivity.class));
+
+        binding.flProfileAvatar.setOnClickListener(v -> quickAvatarPickerLauncher.launch("image/*"));
+        binding.btnEditProfileHeader.setOnClickListener(openEditor);
+        binding.btnEditPersonalCard.setOnClickListener(openEditor);
+
+        binding.rowProfileFullName.setOnClickListener(openEditor);
+        binding.rowProfileEmail.setOnClickListener(openEditor);
+        binding.rowProfilePhone.setOnClickListener(openEditor);
+        binding.rowProfileDemographics.setOnClickListener(openEditor);
+        binding.rowProfileAddress.setOnClickListener(openEditor);
+
+        binding.rowMyOrders.setOnClickListener(v -> openOrdersWithFilter(null));
+        binding.btnViewAllOrders.setOnClickListener(v -> openOrdersWithFilter(null));
+        binding.shortcutPendingPayment.setOnClickListener(v -> openOrdersWithFilter(OrderStatus.PENDING_PAYMENT));
+        binding.shortcutPaid.setOnClickListener(v -> openOrdersWithFilter(OrderStatus.PROCESSING));
+        binding.shortcutCancelled.setOnClickListener(v -> openOrdersWithFilter(OrderStatus.CANCELLED));
+
+        View.OnClickListener openVouchers = v ->
+                startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
+        binding.statVouchers.setOnClickListener(openVouchers);
+        binding.rowVoucherWallet.setOnClickListener(openVouchers);
+
         binding.rowMyReviews.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), MyReviewsActivity.class))
         );
@@ -89,8 +116,8 @@ public class ProfileFragment extends Fragment {
 
         binding.btnLogout.setOnClickListener(v -> UiUtils.showConfirmDialog(
                 requireContext(),
-                "Đăng xuất?",
-                "Bạn sẽ quay về màn hình đăng nhập.",
+                "Đăng xuất tài khoản?",
+                "Phiên làm việc hiện tại sẽ kết thúc và quay về màn hình đăng nhập.",
                 getString(R.string.btn_logout),
                 this::performLogout
         ));
@@ -122,18 +149,50 @@ public class ProfileFragment extends Fragment {
         binding = null;
     }
 
+    private void handlePickedAvatarUri(@Nullable Uri uri) {
+        if (uri == null || !isAdded()) {
+            return;
+        }
+        android.content.Context appCtx = requireContext().getApplicationContext();
+        Executors.newSingleThreadExecutor().execute(() -> {
+            String encoded = AvatarImageLoader.encodeUriToDataUri(appCtx, uri);
+            if (encoded == null || !isAdded()) {
+                return;
+            }
+            requireActivity().runOnUiThread(() -> {
+                if (!isAdded() || binding == null) {
+                    return;
+                }
+                userSession.updateAvatarUrl(encoded, () -> {
+                    if (isAdded() && binding != null) {
+                        refreshProfileData();
+                        showProfileNotification("Đã cập nhật ảnh đại diện");
+                    }
+                });
+            });
+        });
+    }
+
     public void refreshProfileData() {
         if (!isAdded() || binding == null || userSession == null) {
             return;
         }
-        binding.tvProfileRememberMe.setText(userSession.isRemembered() ? "Đã bật" : "Không bật");
+        binding.tvProfileRememberMe.setText(userSession.isRemembered() ? "Ghi nhớ: Bật" : "Ghi nhớ: Tắt");
 
         String username = userSession.getUsername();
-        OrderRepository.countOrdersForUser(requireContext(), username, count -> {
+        String cachedName = userSession.getDisplayName();
+        String cachedAvatar = userSession.getAvatarUrl();
+        AvatarImageLoader.load(binding.imgProfileAvatar, binding.tvAvatarInitials, cachedAvatar, cachedName);
+        binding.tvProfileName.setText(cachedName);
+
+        OrderRepository.getOrdersForUser(requireContext(), username, this::bindOrderStatsAndTier);
+
+        VoucherRepository.countAvailableForUser(requireContext(), username, count -> {
             if (isAdded() && binding != null) {
-                binding.tvOrdersCount.setText(String.valueOf(count));
+                binding.tvVouchersCount.setText(String.valueOf(count));
             }
         });
+
         ReviewRepository.countUserReviews(requireContext(), username, count -> {
             if (isAdded() && binding != null) {
                 binding.tvReviewsCount.setText(String.valueOf(count));
@@ -144,18 +203,23 @@ public class ProfileFragment extends Fragment {
             if (!isAdded() || binding == null) {
                 return;
             }
-            String resolvedUsername = user != null ? user.getUsername() : userSession.getUsername();
+            String resolvedUsername = user != null && ValidationUtils.isNotBlank(user.getUsername())
+                    ? user.getUsername()
+                    : userSession.getUsername();
             String displayName = user != null && ValidationUtils.isNotBlank(user.getDisplayName())
                     ? user.getDisplayName()
                     : userSession.getDisplayName();
-            String email = user != null ? user.getEmail() : "";
-            String phone = user != null ? user.getPhone() : "";
-            String gender = user != null ? user.getGender() : "";
-            String birthDate = user != null ? user.getBirthDate() : "";
-            String address = user != null ? user.getAddress() : "";
-            String loginTime = user != null ? user.getLoginTime() : "";
+            String email = user != null ? safe(user.getEmail()) : "";
+            String phone = user != null ? safe(user.getPhone()) : "";
+            String gender = user != null ? safe(user.getGender()) : "";
+            String birthDate = user != null ? safe(user.getBirthDate()) : "";
+            String address = user != null ? safe(user.getAddress()) : "";
+            String loginTime = user != null ? safe(user.getLoginTime()) : "";
+            String avatarUrl = user != null && ValidationUtils.isNotBlank(user.getAvatarUrl())
+                    ? user.getAvatarUrl()
+                    : userSession.getAvatarUrl();
 
-            binding.tvAvatarInitials.setText(FormatUtils.extractInitials(displayName));
+            AvatarImageLoader.load(binding.imgProfileAvatar, binding.tvAvatarInitials, avatarUrl, displayName);
             binding.tvProfileName.setText(displayName);
             if (ValidationUtils.isNotBlank(resolvedUsername)) {
                 binding.tvProfileUsername.setVisibility(View.VISIBLE);
@@ -164,51 +228,99 @@ public class ProfileFragment extends Fragment {
                 binding.tvProfileUsername.setVisibility(View.GONE);
             }
 
-            bindPersonalInfoCard(email, phone, gender, birthDate, address);
+            bindCompletePersonalInfo(displayName, email, phone, gender, birthDate, address);
 
             binding.tvProfileLoginTime.setText(
-                    ValidationUtils.isNotBlank(loginTime) ? loginTime : "Vừa đăng nhập"
+                    "Đăng nhập: " + (ValidationUtils.isNotBlank(loginTime) ? loginTime : "Phiên hiện tại")
             );
         });
     }
 
-    /**
-     * Renders only populated personal fields with clean single dividers between visible rows,
-     * hiding the entire card when no optional profile fields are set.
-     */
-    private void bindPersonalInfoCard(
+    private void bindOrderStatsAndTier(List<OrderWithItems> orders) {
+        if (!isAdded() || binding == null) {
+            return;
+        }
+        int totalOrders = orders == null ? 0 : orders.size();
+        binding.tvOrdersCount.setText(String.valueOf(totalOrders));
+
+        int pendingPay = 0;
+        int activeCount = 0;
+        long totalSpend = 0L;
+
+        if (orders != null) {
+            for (OrderWithItems item : orders) {
+                OrderStatus st = OrderStatus.fromCode(item.order.getStatus());
+                if (st == OrderStatus.PENDING_PAYMENT) {
+                    pendingPay++;
+                } else if (st == OrderStatus.PROCESSING || st == OrderStatus.PAID || st == OrderStatus.DELIVERED) {
+                    activeCount++;
+                }
+                if (st != OrderStatus.CANCELLED) {
+                    totalSpend += item.order.getTotalAmount();
+                }
+            }
+        }
+
+        bindMiniBadge(binding.tvBadgePendingPay, pendingPay);
+        bindMiniBadge(binding.tvBadgePaid, activeCount);
+
+        String tier;
+        if (totalSpend >= 500_000L || totalOrders >= 5) {
+            tier = "★ Thành viên Kim Cương";
+        } else if (totalSpend >= 150_000L || totalOrders >= 2) {
+            tier = "★ Thành viên Vàng";
+        } else if (totalOrders >= 1) {
+            tier = "Thành viên Thân thiết";
+        } else {
+            tier = "Thành viên Mới";
+        }
+        binding.tvMemberTier.setText(tier);
+    }
+
+    private void bindMiniBadge(TextView badge, int count) {
+        if (count > 0) {
+            badge.setVisibility(View.VISIBLE);
+            badge.setText(count > 99 ? "99+" : String.valueOf(count));
+        } else {
+            badge.setVisibility(View.GONE);
+        }
+    }
+
+    private void bindCompletePersonalInfo(
+            String displayName,
             String email,
             String phone,
             String gender,
             String birthDate,
             String address
     ) {
-        boolean anyVisible = false;
-        anyVisible = bindOptionalField(binding.rowProfileEmail, null, binding.tvProfileEmail, email, anyVisible);
-        anyVisible = bindOptionalField(binding.rowProfilePhone, binding.dividerProfilePhone, binding.tvProfilePhone, phone, anyVisible);
-        anyVisible = bindOptionalField(binding.rowProfileGender, binding.dividerProfileGender, binding.tvProfileGender, gender, anyVisible);
-        anyVisible = bindOptionalField(binding.rowProfileBirthDate, binding.dividerProfileBirthDate, binding.tvProfileBirthDate, birthDate, anyVisible);
-        anyVisible = bindOptionalField(binding.rowProfileAddress, binding.dividerProfileAddress, binding.tvProfileAddress, address, anyVisible);
-
-        binding.cardPersonalInfo.setVisibility(anyVisible ? View.VISIBLE : View.GONE);
+        bindCleanValue(binding.tvProfileFullNameDetail, displayName);
+        bindCleanValue(binding.tvProfileEmail, email);
+        bindCleanValue(binding.tvProfilePhone, phone);
+        bindCleanValue(binding.tvProfileGender, gender);
+        bindCleanValue(binding.tvProfileBirthDate, birthDate);
+        bindCleanValue(binding.tvProfileAddress, address);
     }
 
-    private boolean bindOptionalField(
-            View rowContainer,
-            @Nullable View dividerAbove,
-            TextView valueView,
-            String rawValue,
-            boolean hasVisibleAbove
-    ) {
-        boolean hasValue = ValidationUtils.isNotBlank(rawValue);
-        rowContainer.setVisibility(hasValue ? View.VISIBLE : View.GONE);
-        if (dividerAbove != null) {
-            dividerAbove.setVisibility(hasValue && hasVisibleAbove ? View.VISIBLE : View.GONE);
+    private void bindCleanValue(TextView view, String value) {
+        boolean filled = ValidationUtils.isNotBlank(value);
+        view.setText(filled ? value.trim() : "");
+        view.setVisibility(filled ? View.VISIBLE : View.GONE);
+    }
+
+    private void openOrdersWithFilter(@Nullable OrderStatus filter) {
+        Intent intent = new Intent(requireContext(), OrderHistoryActivity.class);
+        if (filter != null) {
+            intent.putExtra(Constants.EXTRA_ORDER_STATUS_FILTER, filter.getCode());
         }
-        if (hasValue) {
-            valueView.setText(rawValue.trim());
+        startActivity(intent);
+    }
+
+    private void showProfileNotification(String message) {
+        if (!isAdded() || binding == null) {
+            return;
         }
-        return hasVisibleAbove || hasValue;
+        InAppNotifier.show(binding.getRoot(), AppNotification.TYPE_ACCOUNT, "Tài khoản", message);
     }
 
     private void performLogout() {
@@ -217,5 +329,9 @@ public class ProfileFragment extends Fragment {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         requireActivity().finish();
+    }
+
+    private static String safe(String v) {
+        return v == null ? "" : v.trim();
     }
 }

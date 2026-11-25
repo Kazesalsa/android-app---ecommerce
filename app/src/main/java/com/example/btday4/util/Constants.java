@@ -26,12 +26,17 @@ public final class Constants {
     public static final String EXTRA_SELECTED_PRODUCT_IDS = "selected_product_ids";
     public static final String EXTRA_OPEN_CART = "open_cart";
     public static final String EXTRA_OPEN_PRODUCTS = "open_products";
+    public static final String EXTRA_OPEN_NOTIFICATIONS = "open_notifications";
     public static final String EXTRA_OPEN_REVIEW = "open_review";
     public static final String EXTRA_ORDER_ID = "order_id";
     public static final String EXTRA_IS_NEW_ORDER = "is_new_order";
     public static final String EXTRA_INITIAL_RATING = "initial_rating";
     public static final String EXTRA_INITIAL_COMMENT = "initial_comment";
     public static final String EXTRA_IS_EDIT_REVIEW = "is_edit_review";
+    public static final String EXTRA_VOUCHER_CODE = "voucher_code";
+    public static final String EXTRA_PICKER_MODE = "picker_mode";
+    public static final String EXTRA_ORDER_SUBTOTAL = "order_subtotal";
+    public static final String EXTRA_ORDER_STATUS_FILTER = "order_status_filter";
 
     // ==========================================
     // FIRESTORE COLLECTIONS
@@ -42,6 +47,8 @@ public final class Constants {
     public static final String COLLECTION_REVIEWS = "reviews";
     public static final String COLLECTION_ORDERS = "orders";
     public static final String COLLECTION_PAYMENTS = "payments";
+    public static final String COLLECTION_VOUCHERS = "vouchers";
+    public static final String COLLECTION_USER_VOUCHERS = "user_vouchers";
     public static final String COLLECTION_TRACKING = "tracking";
     public static final String DOC_TRACKING_PROFILE = "profile";
 
@@ -52,7 +59,9 @@ public final class Constants {
     public static final String KEY_IS_LOGGED_IN = "is_logged_in";
     public static final String KEY_USERNAME = "username";
     public static final String KEY_DISPLAY_NAME = "display_name";
+    public static final String KEY_AVATAR_URL = "avatar_url";
     public static final String KEY_REMEMBER_ME = "remember_me";
+    public static final String KEY_SELECTED_CART_VOUCHER = "selected_cart_voucher";
 
     // ==========================================
     // DEMO ACCOUNT (seeded with a hashed password)
@@ -66,6 +75,7 @@ public final class Constants {
     // ==========================================
     public static final long FREE_SHIPPING_THRESHOLD = 50_000L;
     public static final long STANDARD_SHIPPING_FEE = 300L;
+    public static final long MIN_PAYABLE_TOTAL = 2_000L;
     public static final int MAX_CART_QUANTITY = 99;
 
     public static final String PAYOS_API_BASE_URL = "https://api-merchant.payos.vn";

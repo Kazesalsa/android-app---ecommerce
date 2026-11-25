@@ -10,7 +10,7 @@ import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
 
 /**
- * Full-screen password update flow replacing the previous BottomSheet popup.
+ * Full-screen password update flow with edge-to-edge + IME-safe insets and clear loading state.
  */
 public class ChangePasswordActivity extends AppCompatActivity {
 
@@ -22,7 +22,12 @@ public class ChangePasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityChangePasswordBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.changePasswordRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(
+                binding.changePasswordRoot,
+                binding.toolbarChangePassword,
+                binding.llChangePassBottomBar
+        );
 
         userSession = new UserSession(this);
 
@@ -71,6 +76,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         }
 
         binding.btnSubmitPasswordChange.setEnabled(false);
+        binding.btnSubmitPasswordChange.setText("Đang cập nhật...");
         userSession.changePassword(current, next, success -> {
             if (isFinishing() || isDestroyed()) {
                 return;
@@ -80,6 +86,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 finish();
             } else {
                 binding.btnSubmitPasswordChange.setEnabled(true);
+                binding.btnSubmitPasswordChange.setText("Cập nhật mật khẩu");
                 binding.tilCurrentPassword.setError("Mật khẩu hiện tại không đúng");
             }
         });

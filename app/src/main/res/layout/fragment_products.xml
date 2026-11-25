@@ -1,155 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_screen"
     android:orientation="vertical">
 
-    <!-- Elevated Flagship Mall Header (Brand Strip + Coral-Framed Search Pill + Live Cart) -->
+    <!-- Streamlined Flagship Store Header (Avatar + Greeting + Voucher & Cart Shortcuts + Subtle Search) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_card"
-        android:elevation="2dp"
         android:orientation="vertical"
-        android:paddingTop="10dp"
+        android:paddingTop="8dp"
         android:paddingBottom="10dp">
 
-        <!-- Compact Brand & Greeting Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_discount_solid"
-                android:fontFamily="@font/nunito_extrabold"
-                android:paddingHorizontal="7dp"
-                android:paddingVertical="2dp"
-                android:text="MALL"
-                android:textColor="@color/white"
-                android:textSize="10sp" />
-
-            <TextView
-                android:id="@+id/tvWelcomeUser"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:fontFamily="@font/nunito_bold"
-                android:maxLines="1"
-                android:text="Xin chào"
-                android:textColor="@color/text_primary"
-                android:textSize="14sp" />
-
-            <TextView
-                android:id="@+id/tvProductCount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_pill_subtle"
-                android:fontFamily="@font/nunito_semibold"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
-                android:text="0 sản phẩm"
-                android:textColor="@color/text_secondary"
-                android:textSize="11.5sp" />
-        </LinearLayout>
-
-        <!-- Pinned Shopee / TikTok Shop Coral-Framed Search Pill + Quick Cart -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="9dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="16dp"
-            android:paddingEnd="10dp">
+            android:paddingEnd="8dp">
+
+            <!-- Mini User Avatar (Taps to Profile) -->
+            <FrameLayout
+                android:id="@+id/flHeaderAvatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_circle_button"
+                android:clickable="true"
+                android:contentDescription="@string/nav_profile"
+                android:focusable="true"
+                android:padding="1.5dp">
+
+                <TextView
+                    android:id="@+id/tvHeaderAvatarInitials"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/bg_circle_avatar"
+                    android:backgroundTint="@color/ink_dark"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="11.5sp"
+                    tools:text="TT" />
+
+                <ImageView
+                    android:id="@+id/imgHeaderAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:importantForAccessibility="no"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+            </FrameLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="44dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_search_pill_accent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="14dp"
-                android:paddingEnd="6dp">
+                android:orientation="vertical">
 
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_search"
-                    app:tint="@color/primary" />
-
-                <EditText
-                    android:id="@+id/etSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@null"
-                    android:hint="@string/search_hint"
-                    android:imeOptions="actionSearch"
-                    android:inputType="text"
+                <TextView
+                    android:id="@+id/tvWelcomeUser"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:maxLines="1"
                     android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_muted"
-                    android:textSize="14sp" />
-
-                <ImageButton
-                    android:id="@+id/btnClearSearch"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="Xóa tìm kiếm"
-                    android:padding="9dp"
-                    android:src="@drawable/ic_close"
-                    android:visibility="gone"
-                    app:tint="@color/text_muted" />
+                    android:textSize="15.5sp"
+                    tools:text="Xin chào, Tantai" />
             </LinearLayout>
 
-            <!-- Quick Cart Action with Live Badge -->
+            <!-- Quick Voucher Wallet Button (48dp touch target) -->
+            <FrameLayout
+                android:id="@+id/btnHeaderVouchers"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="@string/voucher_wallet_title"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_voucher"
+                    app:tint="@color/primary" />
+            </FrameLayout>
+
+            <!-- Quick Cart Action with Non-Clipping Pill Badge (48dp touch target) -->
             <FrameLayout
                 android:id="@+id/btnHomeCart"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:layout_marginStart="6dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:clickable="true"
                 android:contentDescription="@string/nav_cart"
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="23dp"
-                    android:layout_height="23dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
-                    android:src="@drawable/ic_nav_cart"
+                    android:src="@drawable/ic_nav_cart_outline"
                     app:tint="@color/text_primary" />
 
                 <TextView
                     android:id="@+id/tvHomeCartBadge"
-                    android:layout_width="18dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="18dp"
                     android:layout_gravity="top|end"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@drawable/bg_circle_avatar"
-                    android:fontFamily="@font/nunito_extrabold"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_badge_pill"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:gravity="center"
+                    android:minWidth="18dp"
+                    android:paddingHorizontal="4dp"
                     android:textColor="@color/white"
                     android:textSize="10sp"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    tools:text="2"
+                    tools:visibility="visible" />
             </FrameLayout>
         </LinearLayout>
+
+        <!-- Clean Subtle Search Pill -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="6dp"
+            android:background="@drawable/bg_search_pill"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="14dp"
+            android:paddingEnd="4dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_search"
+                app:tint="@color/text_muted" />
+
+            <EditText
+                android:id="@+id/etSearch"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:background="@null"
+                android:hint="@string/search_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_muted"
+                android:textSize="13.5sp" />
+
+            <ImageButton
+                android:id="@+id/btnClearSearch"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="Xóa tìm kiếm"
+                android:padding="10dp"
+                android:src="@drawable/ic_close"
+                android:visibility="gone"
+                app:tint="@color/text_muted" />
+        </LinearLayout>
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_hairline" />
 
     <!-- Scrollable Store Feed -->
     <androidx.core.widget.NestedScrollView
@@ -163,17 +196,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="20dp">
+            android:paddingBottom="24dp">
 
-            <!-- Category Strip -->
+            <!-- Category Filter Strip -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/bg_card"
                 android:clipToPadding="false"
                 android:paddingHorizontal="16dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="10dp"
+                android:paddingVertical="6dp"
                 android:scrollbars="none">
 
                 <com.google.android.material.chip.ChipGroup
@@ -186,19 +218,19 @@
                     app:singleSelection="true" />
             </HorizontalScrollView>
 
-            <!-- Elevated Flagship Spotlight Card (Hidden during search/filter) -->
+            <!-- Flagship Spotlight Hero Banner -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardSpotlight"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:clickable="true"
                 android:focusable="true"
                 android:visibility="gone"
                 app:cardBackgroundColor="@color/ink_dark"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="3dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="2dp"
                 app:strokeWidth="0dp">
 
                 <LinearLayout
@@ -217,14 +249,29 @@
                         android:paddingEnd="12dp">
 
                         <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_pill_subtle"
+                            android:backgroundTint="#29FFFFFF"
+                            android:fontFamily="@font/be_vietnam_pro_semibold"
+                            android:paddingHorizontal="8dp"
+                            android:paddingVertical="2dp"
+                            android:text="★ ĐỀ XUẤT CHO BẠN"
+                            android:textColor="#FCD34D"
+                            android:textSize="10sp" />
+
+                        <TextView
                             android:id="@+id/tvSpotlightName"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:layout_marginTop="8dp"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:letterSpacing="-0.02"
                             android:maxLines="2"
                             android:textColor="@color/white"
-                            android:textSize="17.5sp" />
+                            android:textSize="17sp"
+                            tools:text="iPhone 16 Pro Max 256GB" />
 
                         <TextView
                             android:id="@+id/tvSpotlightSubtitle"
@@ -235,7 +282,8 @@
                             android:ellipsize="end"
                             android:maxLines="1"
                             android:textColor="@color/white"
-                            android:textSize="12sp" />
+                            android:textSize="12sp"
+                            tools:text="Chip A18 Pro · 6.9&quot; ProMotion 120Hz" />
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -248,29 +296,30 @@
                                 android:id="@+id/tvSpotlightPrice"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:fontFamily="@font/nunito_extrabold"
+                                android:fontFamily="@font/be_vietnam_pro_bold"
                                 android:textColor="@color/white"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:text="344.900 ₫" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="10dp"
                                 android:background="@drawable/bg_discount_solid"
-                                android:fontFamily="@font/nunito_bold"
-                                android:paddingHorizontal="11dp"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:paddingHorizontal="10dp"
                                 android:paddingVertical="4dp"
-                                android:text="Mua ngay"
+                                android:text="Khám phá"
                                 android:textColor="@color/white"
                                 android:textSize="11.5sp" />
                         </LinearLayout>
                     </LinearLayout>
 
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="106dp"
-                        android:layout_height="106dp"
-                        app:cardBackgroundColor="@color/bg_card"
-                        app:cardCornerRadius="12dp"
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        app:cardBackgroundColor="@color/bg_image_stage"
+                        app:cardCornerRadius="14dp"
                         app:cardElevation="0dp"
                         app:strokeWidth="0dp">
 
@@ -285,87 +334,76 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Floating Mall Assurance Strip -->
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/rowTrustStrip"
+            <!-- Horizontal Perforated Voucher Ticket Strip -->
+            <LinearLayout
+                android:id="@+id/sectionHomeVouchers"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"
-                app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0.5dp"
-                app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                android:layout_marginTop="14dp"
+                android:orientation="vertical">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="10dp">
+                    android:paddingHorizontal="16dp">
 
                     <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
                         android:importantForAccessibility="no"
-                        android:src="@drawable/ic_shield_check"
-                        app:tint="@color/teal_trust" />
+                        android:src="@drawable/ic_voucher"
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="6dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/nunito_semibold"
-                        android:text="Chính hãng 100%"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11.5sp" />
-
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/ic_check_circle"
-                        app:tint="@color/teal_trust" />
+                        android:fontFamily="@font/be_vietnam_pro_bold"
+                        android:text="Mã giảm giá hôm nay"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" />
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:layout_weight="1.05"
-                        android:fontFamily="@font/nunito_semibold"
-                        android:text="Freeship từ 50K"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11.5sp" />
+                        android:id="@+id/btnOpenVoucherWallet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:gravity="center"
+                        android:paddingHorizontal="6dp"
+                        android:text="Kho mã ›"
+                        android:textColor="@color/primary"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:importantForAccessibility="no"
-                        android:src="@drawable/ic_check_circle"
-                        app:tint="@color/teal_trust" />
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="6dp"
+                    android:scrollbars="none">
 
-                    <TextView
+                    <LinearLayout
+                        android:id="@+id/llHomeVouchers"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:fontFamily="@font/nunito_semibold"
-                        android:text="Đổi trả 15 ngày"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="11.5sp" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+            </LinearLayout>
 
-            <!-- Shopee / Lazada / TikTok Shop 4-Tab Sort Bar (Inline, Zero Popup) -->
+            <!-- 48dp 4-Tab Sort Bar -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:layout_marginTop="12dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="14dp"
                 android:background="@color/bg_card"
-                android:elevation="0.5dp"
                 android:orientation="horizontal">
 
                 <LinearLayout
@@ -384,15 +422,15 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/nunito_bold"
+                        android:fontFamily="@font/be_vietnam_pro_bold"
                         android:gravity="center"
-                        android:text="Liên quan"
+                        android:text="Đề xuất"
                         android:textColor="@color/primary"
                         android:textSize="13sp" />
 
                     <View
                         android:id="@+id/indSortDefault"
-                        android:layout_width="34dp"
+                        android:layout_width="32dp"
                         android:layout_height="2.5dp"
                         android:background="@color/primary" />
                 </LinearLayout>
@@ -413,7 +451,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/nunito_semibold"
+                        android:fontFamily="@font/be_vietnam_pro_medium"
                         android:gravity="center"
                         android:text="Đánh giá"
                         android:textColor="@color/text_secondary"
@@ -421,7 +459,7 @@
 
                     <View
                         android:id="@+id/indSortRating"
-                        android:layout_width="34dp"
+                        android:layout_width="32dp"
                         android:layout_height="2.5dp"
                         android:background="@color/primary"
                         android:visibility="invisible" />
@@ -443,7 +481,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/nunito_semibold"
+                        android:fontFamily="@font/be_vietnam_pro_medium"
                         android:gravity="center"
                         android:text="Giá thấp"
                         android:textColor="@color/text_secondary"
@@ -451,7 +489,7 @@
 
                     <View
                         android:id="@+id/indSortPriceAsc"
-                        android:layout_width="34dp"
+                        android:layout_width="32dp"
                         android:layout_height="2.5dp"
                         android:background="@color/primary"
                         android:visibility="invisible" />
@@ -473,7 +511,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:fontFamily="@font/nunito_semibold"
+                        android:fontFamily="@font/be_vietnam_pro_medium"
                         android:gravity="center"
                         android:text="Giá cao"
                         android:textColor="@color/text_secondary"
@@ -481,23 +519,34 @@
 
                     <View
                         android:id="@+id/indSortPriceDesc"
-                        android:layout_width="34dp"
+                        android:layout_width="32dp"
                         android:layout_height="2.5dp"
                         android:background="@color/primary"
                         android:visibility="invisible" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- 2-Column Commerce Product Grid -->
+            <!-- Loading State While Fetching Initial Catalog -->
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:id="@+id/progressProducts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="40dp"
+                android:indeterminate="true"
+                app:indicatorColor="@color/primary"
+                app:trackColor="@color/primary_soft" />
+
+            <!-- 2-Column Commerce Product Grid (12dp outer / 10dp inner rhythm) -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvProducts"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
+                android:layout_marginTop="12dp"
                 android:nestedScrollingEnabled="false"
-                android:paddingHorizontal="10dp" />
+                android:paddingHorizontal="12dp" />
 
-            <!-- Empty State -->
+            <!-- Empty Search / Filter State -->
             <LinearLayout
                 android:id="@+id/llEmptyProducts"
                 android:layout_width="match_parent"
@@ -505,7 +554,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:paddingHorizontal="24dp"
-                android:paddingVertical="56dp"
+                android:paddingVertical="52dp"
                 android:visibility="gone">
 
                 <ImageView
@@ -519,7 +568,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:fontFamily="@font/nunito_bold"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:text="@string/empty_products"
                     android:textColor="@color/text_primary"
                     android:textSize="16sp" />
@@ -528,7 +577,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Thử tìm từ khóa khác hoặc đặt lại bộ lọc."
+                    android:gravity="center"
+                    android:text="Thử tìm từ khóa khác hoặc đặt lại bộ lọc danh mục."
                     android:textColor="@color/text_secondary"
                     android:textSize="13.5sp" />
 
@@ -536,12 +586,10 @@
                     android:id="@+id/btnResetFilter"
                     style="@style/Widget.BtDay4.TintedButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_marginTop="16dp"
-                    android:minHeight="44dp"
                     android:paddingHorizontal="20dp"
-                    android:text="@string/clear_filter"
-                    android:textSize="14sp" />
+                    android:text="@string/clear_filter" />
             </LinearLayout>
 
         </LinearLayout>

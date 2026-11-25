@@ -53,6 +53,7 @@ public class OrderAdapter extends ListAdapter<OrderWithItems, OrderAdapter.ViewH
                 ) {
                     return Objects.equals(oldItem.order.getStatus(), newItem.order.getStatus())
                             && oldItem.order.getTotalAmount() == newItem.order.getTotalAmount()
+                            && oldItem.order.getVoucherDiscount() == newItem.order.getVoucherDiscount()
                             && oldItem.totalQuantity() == newItem.totalQuantity();
                 }
             };
@@ -91,7 +92,9 @@ public class OrderAdapter extends ListAdapter<OrderWithItems, OrderAdapter.ViewH
             binding.tvOrderCode.setText(order.getId());
             binding.tvOrderDate.setText(FormatUtils.formatDateTime(order.getCreatedAt()));
             binding.tvOrderStatus.setText(orderStatus.getLabel());
-            if (orderStatus == OrderStatus.PAID || orderStatus == OrderStatus.DELIVERED) {
+            if (orderStatus == OrderStatus.PAID
+                    || orderStatus == OrderStatus.DELIVERED
+                    || orderStatus == OrderStatus.PROCESSING) {
                 binding.tvOrderStatus.setBackgroundResource(R.drawable.bg_freeship_tag);
                 binding.tvOrderStatus.setTextColor(ContextCompat.getColor(context, R.color.teal_trust));
             } else if (orderStatus == OrderStatus.CANCELLED) {
@@ -104,7 +107,12 @@ public class OrderAdapter extends ListAdapter<OrderWithItems, OrderAdapter.ViewH
             binding.tvOrderTotal.setText(FormatUtils.formatVnd(order.getTotalAmount()));
 
             PaymentMethod method = PaymentMethod.fromCode(order.getPaymentMethod());
-            binding.tvOrderItemCount.setText(row.totalQuantity() + " sản phẩm, " + method.getTitle());
+            String voucherSuffix = order.getVoucherDiscount() > 0L && !order.getVoucherCode().isEmpty()
+                    ? " · Mã " + order.getVoucherCode()
+                    : "";
+            binding.tvOrderItemCount.setText(
+                    row.totalQuantity() + " sản phẩm · " + method.getTitle() + voucherSuffix
+            );
 
             if (!items.isEmpty()) {
                 OrderItemEntity first = items.get(0);

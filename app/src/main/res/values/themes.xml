@@ -1,8 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Modern SEA Flagship Commerce Theme (TikTok Shop / Shopee Mall inspired). -->
+    <!-- Refined Flagship Tech Commerce Theme (Be Vietnam Pro + Obsidian Slate + Precision Crimson) -->
     <style name="Base.Theme.BtDay4" parent="Theme.Material3.Light.NoActionBar">
-        <item name="android:fontFamily">@font/nunito</item>
-        <item name="fontFamily">@font/nunito</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro</item>
+        <item name="fontFamily">@font/be_vietnam_pro</item>
 
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/white</item>
@@ -26,16 +26,17 @@
         <item name="colorError">@color/danger_red</item>
 
         <item name="android:colorBackground">@color/bg_screen</item>
-        <item name="android:statusBarColor">@color/bg_card</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/bg_card</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
 
     <style name="Theme.BtDay4" parent="Base.Theme.BtDay4" />
 
     <style name="Widget.BtDay4.BottomNavIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">@color/primary_soft</item>
-        <item name="android:width">54dp</item>
+        <item name="android:width">56dp</item>
         <item name="android:height">30dp</item>
     </style>
 
@@ -44,20 +45,20 @@
         <item name="android:textColor">@color/selector_chip_text</item>
         <item name="chipStrokeColor">@color/selector_chip_stroke</item>
         <item name="chipStrokeWidth">1dp</item>
-        <item name="chipCornerRadius">18dp</item>
+        <item name="chipCornerRadius">20dp</item>
         <item name="checkedIconVisible">false</item>
-        <item name="chipMinTouchTargetSize">40dp</item>
+        <item name="chipMinTouchTargetSize">48dp</item>
         <item name="chipMinHeight">34dp</item>
         <item name="android:textSize">13sp</item>
-        <item name="android:fontFamily">@font/nunito_semibold</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro_medium</item>
     </style>
 
     <style name="Widget.BtDay4.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxBackgroundColor">@color/bg_card</item>
-        <item name="boxCornerRadiusTopStart">10dp</item>
-        <item name="boxCornerRadiusTopEnd">10dp</item>
-        <item name="boxCornerRadiusBottomStart">10dp</item>
-        <item name="boxCornerRadiusBottomEnd">10dp</item>
+        <item name="boxCornerRadiusTopStart">12dp</item>
+        <item name="boxCornerRadiusTopEnd">12dp</item>
+        <item name="boxCornerRadiusBottomStart">12dp</item>
+        <item name="boxCornerRadiusBottomEnd">12dp</item>
         <item name="boxStrokeColor">@color/selector_input_stroke</item>
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">1.5dp</item>
@@ -69,10 +70,11 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">@font/nunito_bold</item>
-        <item name="backgroundTint">@color/primary</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="android:textSize">14.5sp</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro_bold</item>
+        <item name="android:textColor">@color/selector_primary_btn_text</item>
+        <item name="backgroundTint">@color/selector_primary_btn_bg</item>
+        <item name="cornerRadius">12dp</item>
         <item name="elevation">0dp</item>
     </style>
 
@@ -81,13 +83,13 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:fontFamily">@font/nunito_bold</item>
-        <item name="android:textColor">@color/primary</item>
-        <item name="backgroundTint">@color/primary_soft</item>
-        <item name="strokeColor">@color/primary</item>
+        <item name="android:textSize">14.5sp</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
+        <item name="android:textColor">@color/selector_tinted_btn_fg</item>
+        <item name="backgroundTint">@color/selector_tinted_btn_bg</item>
+        <item name="strokeColor">@color/selector_tinted_btn_fg</item>
         <item name="strokeWidth">1dp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">12dp</item>
         <item name="elevation">0dp</item>
     </style>
 
@@ -96,11 +98,11 @@
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textSize">14.5sp</item>
-        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">@font/be_vietnam_pro_semibold</item>
         <item name="android:textColor">@color/text_primary</item>
         <item name="strokeColor">@color/border_light</item>
         <item name="strokeWidth">1dp</item>
-        <item name="cornerRadius">10dp</item>
+        <item name="cornerRadius">12dp</item>
     </style>
 </resources>

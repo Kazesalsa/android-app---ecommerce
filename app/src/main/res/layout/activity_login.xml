@@ -12,15 +12,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Signature Flagship Dark Brand Header -->
+        <!-- Full-Bleed Obsidian Brand Header (Seamless Behind Status Bar) -->
         <LinearLayout
+            android:id="@+id/llLoginBrandHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/bg_profile_header_gradient"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="44dp"
-            android:paddingBottom="48dp">
+            android:paddingTop="28dp"
+            android:paddingBottom="44dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -29,13 +30,13 @@
                 android:orientation="horizontal">
 
                 <FrameLayout
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
                     android:background="@drawable/bg_discount_solid">
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="19dp"
+                        android:layout_height="19dp"
                         android:layout_gravity="center"
                         android:importantForAccessibility="no"
                         android:src="@drawable/ic_shopping_bag"
@@ -46,23 +47,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:fontFamily="@font/nunito_extrabold"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:letterSpacing="-0.02"
                     android:text="@string/app_name"
                     android:textColor="@color/white"
-                    android:textSize="17sp" />
+                    android:textSize="16.5sp" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/tvAuthTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:fontFamily="@font/nunito_extrabold"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/be_vietnam_pro_bold"
                 android:letterSpacing="-0.02"
                 android:text="@string/auth_title_login"
                 android:textColor="@color/white"
-                android:textSize="26sp" />
+                android:textSize="24sp" />
 
             <TextView
                 android:id="@+id/tvAuthSubtitle"
@@ -73,10 +74,10 @@
                 android:lineSpacingMultiplier="1.35"
                 android:text="@string/auth_subtitle_login"
                 android:textColor="@color/white"
-                android:textSize="14sp" />
+                android:textSize="13.5sp" />
         </LinearLayout>
 
-        <!-- Overlapping Elevated Auth Form Card -->
+        <!-- Elevated Auth Form Card with Segmented Mode Switcher -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,89 +85,53 @@
             android:layout_marginTop="-24dp"
             android:layout_marginBottom="28dp"
             app:cardBackgroundColor="@color/bg_card"
-            app:cardCornerRadius="16dp"
+            app:cardCornerRadius="18dp"
             app:cardElevation="3dp"
-            app:strokeColor="@color/divider_hairline"
-            app:strokeWidth="0.75dp">
+            app:strokeColor="@color/border_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:id="@+id/llAuthForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingHorizontal="20dp"
-                android:paddingBottom="20dp">
+                android:padding="20dp">
 
-                <!-- Inline Login / Register mode tabs (zero popups) -->
+                <!-- Segmented Pill Switcher -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:orientation="horizontal">
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_segmented_track"
+                    android:orientation="horizontal"
+                    android:padding="4dp">
 
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/tabModeLogin"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="?attr/selectableItemBackground"
+                        android:background="@drawable/bg_segmented_active"
                         android:clickable="true"
                         android:focusable="true"
+                        android:fontFamily="@font/be_vietnam_pro_semibold"
                         android:gravity="center"
-                        android:orientation="vertical">
+                        android:text="@string/btn_login"
+                        android:textColor="@color/text_primary"
+                        android:textSize="14sp" />
 
-                        <TextView
-                            android:id="@+id/tvTabLogin"
-                            android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_bold"
-                            android:gravity="center"
-                            android:text="@string/btn_login"
-                            android:textColor="@color/primary"
-                            android:textSize="15sp" />
-
-                        <View
-                            android:id="@+id/indTabLogin"
-                            android:layout_width="48dp"
-                            android:layout_height="2.5dp"
-                            android:background="@color/primary" />
-                    </LinearLayout>
-
-                    <LinearLayout
+                    <TextView
                         android:id="@+id/tabModeRegister"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:background="?attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
+                        android:fontFamily="@font/be_vietnam_pro_medium"
                         android:gravity="center"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvTabRegister"
-                            android:layout_width="wrap_content"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_semibold"
-                            android:gravity="center"
-                            android:text="@string/btn_register"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="15sp" />
-
-                        <View
-                            android:id="@+id/indTabRegister"
-                            android:layout_width="48dp"
-                            android:layout_height="2.5dp"
-                            android:background="@color/primary"
-                            android:visibility="invisible" />
-                    </LinearLayout>
+                        android:text="@string/btn_register"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
                 </LinearLayout>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/divider_hairline" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilDisplayName"
@@ -176,7 +141,7 @@
                     android:layout_marginTop="16dp"
                     android:hint="@string/hint_display_name"
                     android:visibility="gone"
-                    app:startIconDrawable="@drawable/ic_nav_profile"
+                    app:startIconDrawable="@drawable/ic_nav_profile_outline"
                     app:startIconTint="@color/text_muted">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -189,7 +154,7 @@
                         android:maxLines="1"
                         android:minHeight="52dp"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
+                        android:textSize="14.5sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -199,7 +164,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:hint="@string/hint_username"
-                    app:startIconDrawable="@drawable/ic_nav_profile"
+                    app:startIconDrawable="@drawable/ic_mail"
                     app:startIconTint="@color/text_muted">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -212,7 +177,7 @@
                         android:maxLines="1"
                         android:minHeight="52dp"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
+                        android:textSize="14.5sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -236,7 +201,7 @@
                         android:maxLines="1"
                         android:minHeight="52dp"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
+                        android:textSize="14.5sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -261,7 +226,7 @@
                         android:maxLines="1"
                         android:minHeight="52dp"
                         android:textColor="@color/text_primary"
-                        android:textSize="15sp" />
+                        android:textSize="14.5sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
@@ -284,14 +249,16 @@
                     <TextView
                         android:id="@+id/tvFillDemo"
                         android:layout_width="wrap_content"
-                        android:layout_height="44dp"
+                        android:layout_height="48dp"
                         android:background="?attr/selectableItemBackground"
-                        android:fontFamily="@font/nunito_bold"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/be_vietnam_pro_semibold"
                         android:gravity="center"
-                        android:paddingHorizontal="8dp"
+                        android:paddingHorizontal="10dp"
                         android:text="Tài khoản mẫu"
                         android:textColor="@color/primary"
-                        android:textSize="13.5sp" />
+                        android:textSize="13sp" />
                 </LinearLayout>
 
                 <com.google.android.material.button.MaterialButton
@@ -299,7 +266,7 @@
                     style="@style/Widget.BtDay4.PrimaryButton"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="14dp"
                     android:text="@string/btn_login" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

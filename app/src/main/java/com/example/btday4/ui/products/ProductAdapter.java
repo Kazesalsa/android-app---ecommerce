@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,11 +15,12 @@ import com.example.btday4.model.ProductWithRating;
 import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.ProductImageLoader;
 import com.example.btday4.util.ValidationUtils;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
- * RecyclerView ListAdapter rendering 2-column commerce feed tiles with coral pricing,
- * dynamic Freeship badge, and live ratings.
+ * RecyclerView ListAdapter rendering 2-column flagship tech tiles with studio image pedestals,
+ * semantic rating/new badges, live stock DiffUtil updates, and 1-tap quick add-to-cart.
  */
 public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapter.ViewHolder> {
 
@@ -26,11 +28,25 @@ public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapte
         void onProductClick(Product product);
     }
 
+    public interface OnQuickAddCartListener {
+        void onQuickAddCart(Product product);
+    }
+
     private final OnProductClickListener listener;
+    @Nullable
+    private final OnQuickAddCartListener quickAddListener;
 
     public ProductAdapter(OnProductClickListener listener) {
+        this(listener, null);
+    }
+
+    public ProductAdapter(
+            OnProductClickListener listener,
+            @Nullable OnQuickAddCartListener quickAddListener
+    ) {
         super(DIFF_CALLBACK);
         this.listener = listener;
+        this.quickAddListener = quickAddListener;
     }
 
     private static final DiffUtil.ItemCallback<ProductWithRating> DIFF_CALLBACK =
@@ -52,6 +68,7 @@ public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapte
                             && Objects.equals(oldItem.product.getPrice(), newItem.product.getPrice())
                             && Objects.equals(oldItem.product.getOriginalPrice(), newItem.product.getOriginalPrice())
                             && Objects.equals(oldItem.product.getImageUrl(), newItem.product.getImageUrl())
+                            && oldItem.product.getStock() == newItem.product.getStock()
                             && Double.compare(oldItem.avgRating, newItem.avgRating) == 0
                             && oldItem.reviewCount == newItem.reviewCount;
                 }
@@ -89,13 +106,23 @@ public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapte
             String brandLabel = ValidationUtils.isNotBlank(product.getBrand())
                     ? product.getBrand()
                     : product.getCategory();
-            binding.tvProductBrand.setText(brandLabel);
+            binding.tvProductBrand.setText(
+                    brandLabel == null ? "" : brandLabel.toUpperCase(Locale.getDefault())
+            );
             binding.tvProductName.setText(product.getName());
             binding.tvProductPrice.setText(product.getPrice());
 
-            long priceAmount = FormatUtils.parseVnd(product.getPrice());
-            boolean eligibleFreeShip = FormatUtils.computeShippingFee(priceAmount) == 0L;
-            binding.tvFreeshipTag.setVisibility(eligibleFreeShip ? View.VISIBLE : View.GONE);
+            int stock = product.getStock();
+            boolean soldOut = stock <= 0;
+            binding.tvSoldOutOverlay.setVisibility(soldOut ? View.VISIBLE : View.GONE);
+            binding.imgProduct.setAlpha(soldOut ? 0.55f : 1.0f);
+
+            if (stock >= 1 && stock <= 5) {
+                binding.tvLowStockTag.setVisibility(View.VISIBLE);
+                binding.tvLowStockTag.setText("Còn " + stock);
+            } else {
+                binding.tvLowStockTag.setVisibility(View.GONE);
+            }
 
             int discountPercent = FormatUtils.computeDiscountPercent(
                     product.getPrice(),
@@ -115,14 +142,22 @@ public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapte
             }
 
             if (item.reviewCount > 0) {
+                binding.imgRatingStar.setVisibility(View.VISIBLE);
                 binding.tvProductRating.setText(FormatUtils.formatRating(item.avgRating));
                 binding.tvProductReviewCount.setText("(" + item.reviewCount + ")");
             } else {
+                binding.imgRatingStar.setVisibility(View.GONE);
                 binding.tvProductRating.setText("Mới");
                 binding.tvProductReviewCount.setText("");
             }
 
-            binding.tvProductStockMini.setText(product.getStock() > 0 ? "Còn " + product.getStock() : "Hết hàng");
+            binding.btnQuickAddCart.setEnabled(!soldOut);
+            binding.btnQuickAddCart.setAlpha(soldOut ? 0.3f : 1.0f);
+            binding.btnQuickAddCart.setOnClickListener(v -> {
+                if (!soldOut && quickAddListener != null) {
+                    quickAddListener.onQuickAddCart(product);
+                }
+            });
 
             binding.getRoot().setOnClickListener(v -> {
                 if (listener != null) {

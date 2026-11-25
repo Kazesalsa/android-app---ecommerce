@@ -144,10 +144,12 @@ public class UserSession {
                 ? user.getDisplayName()
                 : deriveDisplayName(user.getUsername());
         user.setDisplayName(displayName);
+        String avatarUrl = user.getAvatarUrl() == null ? "" : user.getAvatarUrl().trim();
         prefs.edit()
                 .putBoolean(Constants.KEY_IS_LOGGED_IN, true)
                 .putString(Constants.KEY_USERNAME, user.getUsername())
                 .putString(Constants.KEY_DISPLAY_NAME, displayName)
+                .putString(Constants.KEY_AVATAR_URL, avatarUrl)
                 .putBoolean(Constants.KEY_REMEMBER_ME, rememberMe)
                 .commit();
         RecommendationEngine.clearCache();
@@ -161,6 +163,19 @@ public class UserSession {
             String gender,
             String birthDate,
             String address,
+            Runnable onDone
+    ) {
+        updateProfile(displayName, email, phone, gender, birthDate, address, getAvatarUrl(), onDone);
+    }
+
+    public void updateProfile(
+            String displayName,
+            String email,
+            String phone,
+            String gender,
+            String birthDate,
+            String address,
+            String avatarUrl,
             Runnable onDone
     ) {
         String username = getUsername();
@@ -177,8 +192,12 @@ public class UserSession {
         String cleanGender = gender == null ? "" : gender.trim();
         String cleanBirthDate = birthDate == null ? "" : birthDate.trim();
         String cleanAddress = address == null ? "" : address.trim();
+        String cleanAvatar = avatarUrl == null ? "" : avatarUrl.trim();
 
-        prefs.edit().putString(Constants.KEY_DISPLAY_NAME, finalName).apply();
+        prefs.edit()
+                .putString(Constants.KEY_DISPLAY_NAME, finalName)
+                .putString(Constants.KEY_AVATAR_URL, cleanAvatar)
+                .apply();
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("displayName", finalName);
@@ -187,9 +206,31 @@ public class UserSession {
         updates.put("gender", cleanGender);
         updates.put("birthDate", cleanBirthDate);
         updates.put("address", cleanAddress);
+        updates.put("avatarUrl", cleanAvatar);
 
         usersRef().document(username)
-                .update(updates)
+                .set(updates, com.google.firebase.firestore.SetOptions.merge())
+                .addOnCompleteListener(task -> {
+                    if (onDone != null) {
+                        onDone.run();
+                    }
+                });
+    }
+
+    public void updateAvatarUrl(String avatarUrl, Runnable onDone) {
+        String username = getUsername();
+        String cleanAvatar = avatarUrl == null ? "" : avatarUrl.trim();
+        prefs.edit().putString(Constants.KEY_AVATAR_URL, cleanAvatar).apply();
+        if (username.isEmpty()) {
+            if (onDone != null) {
+                onDone.run();
+            }
+            return;
+        }
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("avatarUrl", cleanAvatar);
+        usersRef().document(username)
+                .set(updates, com.google.firebase.firestore.SetOptions.merge())
                 .addOnCompleteListener(task -> {
                     if (onDone != null) {
                         onDone.run();
@@ -219,7 +260,7 @@ public class UserSession {
         updates.put("address", cleanAddress);
 
         usersRef().document(username)
-                .update(updates)
+                .set(updates, com.google.firebase.firestore.SetOptions.merge())
                 .addOnCompleteListener(task -> {
                     if (onDone != null) {
                         onDone.run();
@@ -257,6 +298,9 @@ public class UserSession {
                 .get()
                 .addOnSuccessListener(snapshot -> {
                     UserEntity user = snapshot.exists() ? snapshot.toObject(UserEntity.class) : null;
+                    if (user != null && user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                        prefs.edit().putString(Constants.KEY_AVATAR_URL, user.getAvatarUrl().trim()).apply();
+                    }
                     callback.accept(user);
                 })
                 .addOnFailureListener(e -> callback.accept(null));
@@ -271,6 +315,7 @@ public class UserSession {
             RecommendationEngine.syncTrackingSummaryToFirestore(appContext, username);
         }
         SharedPreferences.Editor editor = prefs.edit().putBoolean(Constants.KEY_IS_LOGGED_IN, false);
+        editor.remove(Constants.KEY_AVATAR_URL);
         if (!isRemembered()) {
             editor.remove(Constants.KEY_USERNAME);
             editor.remove(Constants.KEY_DISPLAY_NAME);
@@ -294,6 +339,10 @@ public class UserSession {
     public String getDisplayName() {
         String name = prefs.getString(Constants.KEY_DISPLAY_NAME, "");
         return name.isEmpty() ? getUsername() : name;
+    }
+
+    public String getAvatarUrl() {
+        return prefs.getString(Constants.KEY_AVATAR_URL, "");
     }
 
     private static com.google.firebase.firestore.CollectionReference usersRef() {

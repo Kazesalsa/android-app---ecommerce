@@ -52,6 +52,12 @@ public class OrderEntity {
     @ColumnInfo(name = "total_amount")
     private long totalAmount;
 
+    @ColumnInfo(name = "voucher_code")
+    private String voucherCode;
+
+    @ColumnInfo(name = "voucher_discount")
+    private long voucherDiscount;
+
     @NonNull
     @ColumnInfo(name = "status")
     private String status;
@@ -67,6 +73,7 @@ public class OrderEntity {
         this.recipientPhone = "";
         this.shippingAddress = "";
         this.paymentMethod = "";
+        this.voucherCode = "";
         this.status = "";
     }
 
@@ -84,6 +91,41 @@ public class OrderEntity {
             @NonNull String status,
             long createdAt
     ) {
+        this(
+                id,
+                username,
+                recipientName,
+                recipientPhone,
+                shippingAddress,
+                note,
+                paymentMethod,
+                subtotalAmount,
+                shippingFee,
+                totalAmount,
+                "",
+                0L,
+                status,
+                createdAt
+        );
+    }
+
+    @Ignore
+    public OrderEntity(
+            @NonNull String id,
+            @NonNull String username,
+            @NonNull String recipientName,
+            @NonNull String recipientPhone,
+            @NonNull String shippingAddress,
+            String note,
+            @NonNull String paymentMethod,
+            long subtotalAmount,
+            long shippingFee,
+            long totalAmount,
+            String voucherCode,
+            long voucherDiscount,
+            @NonNull String status,
+            long createdAt
+    ) {
         this.id = id;
         this.username = username;
         this.recipientName = recipientName;
@@ -94,6 +136,8 @@ public class OrderEntity {
         this.subtotalAmount = subtotalAmount;
         this.shippingFee = shippingFee;
         this.totalAmount = totalAmount;
+        this.voucherCode = voucherCode == null ? "" : voucherCode;
+        this.voucherDiscount = Math.max(0L, voucherDiscount);
         this.status = status;
         this.createdAt = createdAt;
     }
@@ -182,6 +226,22 @@ public class OrderEntity {
 
     public void setTotalAmount(long totalAmount) {
         this.totalAmount = totalAmount;
+    }
+
+    public String getVoucherCode() {
+        return voucherCode == null ? "" : voucherCode;
+    }
+
+    public void setVoucherCode(String voucherCode) {
+        this.voucherCode = voucherCode == null ? "" : voucherCode;
+    }
+
+    public long getVoucherDiscount() {
+        return voucherDiscount;
+    }
+
+    public void setVoucherDiscount(long voucherDiscount) {
+        this.voucherDiscount = Math.max(0L, voucherDiscount);
     }
 
     @NonNull

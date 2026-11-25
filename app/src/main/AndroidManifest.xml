@@ -73,6 +73,11 @@
             android:name=".ui.profile.MyReviewsActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.voucher.VoucherWalletActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

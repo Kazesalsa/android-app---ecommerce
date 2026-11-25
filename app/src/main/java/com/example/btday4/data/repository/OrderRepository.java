@@ -40,8 +40,9 @@ public final class OrderRepository {
      * Statuses a shopper may still cancel; cancelling from any of them returns items to stock.
      */
     public static final List<String> CANCELLABLE_STATUSES = Arrays.asList(
-            OrderStatus.PENDING_CONFIRMATION.getCode(),
-            OrderStatus.PENDING_PAYMENT.getCode()
+            OrderStatus.PROCESSING.getCode(),
+            OrderStatus.PENDING_PAYMENT.getCode(),
+            "PENDING_CONFIRMATION"
     );
 
     private static final Random RANDOM = new Random();
@@ -70,6 +71,36 @@ public final class OrderRepository {
             boolean removeFromCartAfterOrder,
             PlaceOrderCallback callback
     ) {
+        placeOrder(
+                context,
+                username,
+                recipientName,
+                recipientPhone,
+                shippingAddress,
+                note,
+                paymentMethod,
+                previewItems,
+                "",
+                0L,
+                removeFromCartAfterOrder,
+                callback
+        );
+    }
+
+    public static void placeOrder(
+            Context context,
+            String username,
+            String recipientName,
+            String recipientPhone,
+            String shippingAddress,
+            String note,
+            PaymentMethod paymentMethod,
+            List<OrderItemEntity> previewItems,
+            String voucherCode,
+            long voucherDiscount,
+            boolean removeFromCartAfterOrder,
+            PlaceOrderCallback callback
+    ) {
         if (!ValidationUtils.isNotBlank(username) || previewItems == null || previewItems.isEmpty()) {
             callback.onError("Không thể tạo đơn hàng, vui lòng thử lại");
             return;
@@ -93,11 +124,16 @@ public final class OrderRepository {
         }
 
         long shippingFee = FormatUtils.computeShippingFee(subtotal);
-        long total = subtotal + shippingFee;
+        String cleanVoucherCode = voucherCode == null ? "" : voucherCode.trim().toUpperCase(Locale.US);
+        long maxAllowedDiscount = Math.max(0L, subtotal + shippingFee - Constants.MIN_PAYABLE_TOTAL);
+        long safeDiscount = cleanVoucherCode.isEmpty()
+                ? 0L
+                : Math.max(0L, Math.min(voucherDiscount, maxAllowedDiscount));
+        long total = Math.max(Constants.MIN_PAYABLE_TOTAL, subtotal + shippingFee - safeDiscount);
         PaymentMethod method = paymentMethod == null ? PaymentMethod.COD : paymentMethod;
         OrderStatus initialStatus = method == PaymentMethod.VIETQR
                 ? OrderStatus.PENDING_PAYMENT
-                : OrderStatus.PENDING_CONFIRMATION;
+                : OrderStatus.PROCESSING;
 
         OrderEntity order = new OrderEntity(
                 orderId,
@@ -110,6 +146,8 @@ public final class OrderRepository {
                 subtotal,
                 shippingFee,
                 total,
+                safeDiscount > 0L ? cleanVoucherCode : "",
+                safeDiscount,
                 initialStatus.getCode(),
                 now
         );
@@ -160,17 +198,21 @@ public final class OrderRepository {
                 }
             }
             return order;
-        }).addOnSuccessListener(callback::onSuccess)
-                .addOnFailureListener(e -> {
-                    Throwable cause = e.getCause() != null ? e.getCause() : e;
-                    if (cause instanceof InsufficientStockException) {
-                        callback.onError(((InsufficientStockException) cause).userMessage);
-                    } else if (e instanceof InsufficientStockException) {
-                        callback.onError(((InsufficientStockException) e).userMessage);
-                    } else {
-                        callback.onError("Không thể đặt hàng: " + e.getMessage());
-                    }
-                });
+        }).addOnSuccessListener(created -> {
+            if (context != null && !created.getVoucherCode().isEmpty()) {
+                VoucherRepository.markVoucherUsed(context, created.getUsername(), created.getVoucherCode());
+            }
+            callback.onSuccess(created);
+        }).addOnFailureListener(e -> {
+            Throwable cause = e.getCause() != null ? e.getCause() : e;
+            if (cause instanceof InsufficientStockException) {
+                callback.onError(((InsufficientStockException) cause).userMessage);
+            } else if (e instanceof InsufficientStockException) {
+                callback.onError(((InsufficientStockException) e).userMessage);
+            } else {
+                callback.onError("Không thể đặt hàng: " + e.getMessage());
+            }
+        });
     }
 
     /**
@@ -181,9 +223,21 @@ public final class OrderRepository {
             callback.accept(false);
             return;
         }
-        runCancelAndRestockTransaction(orderId)
-                .addOnSuccessListener(cancelled -> callback.accept(Boolean.TRUE.equals(cancelled)))
-                .addOnFailureListener(e -> callback.accept(false));
+        getOrderDetail(context, orderId, existing ->
+                runCancelAndRestockTransaction(orderId)
+                        .addOnSuccessListener(cancelled -> {
+                            boolean ok = Boolean.TRUE.equals(cancelled);
+                            if (ok && existing != null && existing.order != null) {
+                                VoucherRepository.restoreVoucherIfCancelled(
+                                        context,
+                                        existing.order.getUsername(),
+                                        existing.order.getVoucherCode()
+                                );
+                            }
+                            callback.accept(ok);
+                        })
+                        .addOnFailureListener(e -> callback.accept(false))
+        );
     }
 
     /**
@@ -308,6 +362,8 @@ public final class OrderRepository {
         payload.put("subtotalAmount", order.getSubtotalAmount());
         payload.put("shippingFee", order.getShippingFee());
         payload.put("totalAmount", order.getTotalAmount());
+        payload.put("voucherCode", order.getVoucherCode());
+        payload.put("voucherDiscount", order.getVoucherDiscount());
         payload.put("status", order.getStatus());
         payload.put("createdAt", order.getCreatedAt());
 
@@ -343,7 +399,9 @@ public final class OrderRepository {
                 longVal(doc.get("subtotalAmount")),
                 longVal(doc.get("shippingFee")),
                 longVal(doc.get("totalAmount")),
-                nonEmpty(doc.getString("status"), OrderStatus.PENDING_CONFIRMATION.getCode()),
+                nonEmpty(doc.getString("voucherCode"), ""),
+                longVal(doc.get("voucherDiscount")),
+                nonEmpty(doc.getString("status"), OrderStatus.PROCESSING.getCode()),
                 longVal(doc.get("createdAt"))
         );
 

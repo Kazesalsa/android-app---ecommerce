@@ -188,6 +188,8 @@ public final class FirestoreHelper {
         payload.put("subtotalAmount", order.getSubtotalAmount());
         payload.put("shippingFee", order.getShippingFee());
         payload.put("totalAmount", order.getTotalAmount());
+        payload.put("voucherCode", order.getVoucherCode());
+        payload.put("voucherDiscount", order.getVoucherDiscount());
         payload.put("status", order.getStatus());
         payload.put("createdAt", order.getCreatedAt());
         payload.put("items", items);

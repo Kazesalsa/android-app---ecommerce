@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Shared compact line-item adapter reused cleanly by both CheckoutActivity and OrderDetailActivity.
- * When reviewClickListener is provided, each purchased item displays a direct "Đánh giá" action.
+ * Displays the "Đánh giá sản phẩm" action only when reviewClickListener is set and reviewAllowed is true.
  */
 public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.ViewHolder> {
 
@@ -26,9 +26,14 @@ public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.View
     private final List<OrderItemEntity> items = new ArrayList<>();
     @Nullable
     private final OnReviewItemClickListener reviewClickListener;
+    private boolean reviewAllowed = true;
 
     public OrderItemAdapter(@Nullable OnReviewItemClickListener reviewClickListener) {
         this.reviewClickListener = reviewClickListener;
+    }
+
+    public void setReviewAllowed(boolean allowed) {
+        this.reviewAllowed = allowed;
     }
 
     public void submitItems(List<OrderItemEntity> newItems) {
@@ -78,7 +83,7 @@ public class OrderItemAdapter extends RecyclerView.Adapter<OrderItemAdapter.View
             binding.tvOrderLineSubtotal.setText(FormatUtils.formatVnd(item.lineSubtotal()));
             binding.dividerOrderLine.setVisibility(isLast ? View.GONE : View.VISIBLE);
 
-            if (reviewClickListener != null) {
+            if (reviewClickListener != null && reviewAllowed) {
                 binding.btnOrderLineReview.setVisibility(View.VISIBLE);
                 binding.btnOrderLineReview.setOnClickListener(v -> reviewClickListener.onReviewItemClick(item));
             } else {

@@ -86,7 +86,15 @@ public class CartAdapter extends ListAdapter<CartItem, CartAdapter.ViewHolder> {
             int maxPurchasable = CartRepository.maxPurchasable(product);
             ProductImageLoader.load(binding.imgCartProduct, product.getImageUrl());
             binding.tvCartProductName.setText(product.getName());
-            binding.tvCartUnitPrice.setText("Đơn giá: " + product.getPrice());
+
+            // Only show unit price when quantity > 1 to avoid duplicating the subtotal line.
+            if (item.getQuantity() > 1) {
+                binding.tvCartUnitPrice.setVisibility(View.VISIBLE);
+                binding.tvCartUnitPrice.setText("Đơn giá: " + product.getPrice());
+            } else {
+                binding.tvCartUnitPrice.setVisibility(View.GONE);
+            }
+
             binding.tvCartSubtotal.setText(item.getSubtotalText());
             binding.tvCartQty.setText(String.valueOf(item.getQuantity()));
 

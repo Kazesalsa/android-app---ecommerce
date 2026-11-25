@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginEnd="8dp"
+    android:background="@drawable/bg_stepper_pill"
+    android:minWidth="112dp"
+    android:orientation="vertical"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp">
+
+    <TextView
+        android:id="@+id/tvSpecPillLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_muted"
+        android:textSize="11sp"
+        tools:text="Vi xử lý" />
+
+    <TextView
+        android:id="@+id/tvSpecPillValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:ellipsize="end"
+        android:fontFamily="@font/be_vietnam_pro_semibold"
+        android:maxLines="1"
+        android:maxWidth="160dp"
+        android:textColor="@color/text_primary"
+        android:textSize="12.5sp"
+        tools:text="Apple A18 Pro" />
+</LinearLayout>

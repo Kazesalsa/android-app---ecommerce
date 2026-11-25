@@ -2,51 +2,63 @@
 <resources>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- TikTok Shop / Shopee Mall Inspired Modern Commerce Palette (WCAG >= 4.5:1) -->
-    <color name="primary">#DC2645</color>
-    <color name="primary_pressed">#BE1E3A</color>
-    <color name="primary_soft">#FFF0F3</color>
-    <color name="primary_border_soft">#F4C2CC</color>
-    <color name="price_strip_start">#FFF3F5</color>
-    <color name="primary_container">#FFF0F3</color>
+    <!-- Flagship Tech Commerce Palette: Obsidian Slate + Precision Crimson + Emerald Trust -->
+    <color name="primary">#E11D48</color>
+    <color name="primary_pressed">#BE123C</color>
+    <color name="primary_soft">#FFF1F2</color>
+    <color name="primary_border_soft">#FECDD3</color>
+    <color name="price_strip_start">#FFF5F6</color>
+    <color name="primary_container">#FFF1F2</color>
 
-    <!-- Secondary Deep Ink & Trust Teal (Freeship / Chính hãng) -->
-    <color name="ink_dark">#161823</color>
-    <color name="ink_dark_end">#272B42</color>
+    <!-- Deep Slate Obsidian Chrome -->
+    <color name="ink_dark">#0F172A</color>
+    <color name="ink_dark_end">#1E293B</color>
 
-    <color name="teal_trust">#007A67</color>
-    <color name="teal_trust_bg">#E6F7F4</color>
-    <color name="teal_trust_border">#A7E6DB</color>
+    <!-- Emerald Trust (Verified / Freeship / Paid) -->
+    <color name="teal_trust">#0F766E</color>
+    <color name="teal_trust_bg">#F0FDFA</color>
+    <color name="teal_trust_border">#99F6E4</color>
 
-    <color name="accent">#DC2645</color>
-    <color name="accent_soft">#FFF0F3</color>
+    <color name="accent">#E11D48</color>
+    <color name="accent_soft">#FFF1F2</color>
 
-    <!-- Crisp Commerce Surfaces: Soft Gray Feed Canvas + Pure White Blocks -->
-    <color name="bg_screen">#EFEFF4</color>
+    <!-- Crisp Titanium-Gray Feed Canvas + Pure White Surfaces + Studio Image Stage -->
+    <color name="bg_screen">#F3F4F8</color>
     <color name="bg_card">#FFFFFF</color>
-    <color name="bg_image_stage">#FFFFFF</color>
-    <color name="bg_subtle">#F4F4F6</color>
-    <color name="bg_section_band">#EFEFF4</color>
-    <color name="border_light">#E2E4EA</color>
-    <color name="divider_hairline">#ECEEF2</color>
+    <color name="bg_image_stage">#F6F7FB</color>
+    <color name="bg_subtle">#EEF0F5</color>
+    <color name="bg_section_band">#F3F4F8</color>
+    <color name="zebra_row_bg">#F8FAFC</color>
+    <color name="border_light">#E2E8F0</color>
+    <color name="divider_hairline">#EDF1F7</color>
 
-    <!-- High-Contrast Ink Hierarchy -->
-    <color name="text_primary">#161823</color>
-    <color name="text_secondary">#525460</color>
-    <color name="text_muted">#6E7180</color>
+    <!-- WCAG AA High-Contrast Ink Hierarchy -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#64748B</color>
+
+    <!-- Disabled & Glass States -->
+    <color name="btn_disabled_bg">#E2E8F0</color>
+    <color name="btn_disabled_text">#94A3B8</color>
+    <color name="glass_white_fill">#24FFFFFF</color>
+    <color name="glass_white_stroke">#3DFFFFFF</color>
+    <color name="scrim_sold_out">#B30F172A</color>
 
     <!-- Semantic Accents -->
     <color name="star_amber">#F59E0B</color>
-    <color name="star_empty">#D4D5DC</color>
+    <color name="star_empty">#CBD5E1</color>
 
-    <color name="success_green">#007A67</color>
-    <color name="success_bg">#E6F7F4</color>
+    <color name="voucher_gold">#B45309</color>
+    <color name="voucher_gold_bg">#FEF3C7</color>
+
+    <color name="success_green">#0F766E</color>
+    <color name="success_bg">#F0FDFA</color>
 
     <color name="warning_amber">#B45309</color>
     <color name="warning_bg">#FFFBEB</color>
 
-    <color name="danger_red">#C81E1E</color>
+    <color name="danger_red">#DC2626</color>
     <color name="danger_bg">#FEF2F2</color>
 
-    <color name="badge_bg">#DC2645</color>
+    <color name="badge_bg">#E11D48</color>
 </resources>

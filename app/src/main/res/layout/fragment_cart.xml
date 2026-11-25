@@ -6,20 +6,22 @@
     android:background="@color/bg_screen"
     android:orientation="vertical">
 
-    <!-- Clean White Top Bar -->
+    <!-- Clean White Top Bar with Voucher Shortcut -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/bg_card"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:paddingStart="16dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="10dp"
+        android:paddingBottom="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/nunito_extrabold"
+            android:fontFamily="@font/be_vietnam_pro_bold"
             android:letterSpacing="-0.02"
             android:text="@string/cart_title"
             android:textColor="@color/text_primary"
@@ -27,15 +29,27 @@
 
         <TextView
             android:id="@+id/tvCartSummary"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:fontFamily="@font/be_vietnam_pro_medium"
             android:text="(0 sản phẩm)"
             android:textColor="@color/text_muted"
-            android:textSize="14sp" />
+            android:textSize="13.5sp" />
+
+        <ImageButton
+            android:id="@+id/btnCartOpenWallet"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/voucher_wallet_title"
+            android:padding="10dp"
+            android:src="@drawable/ic_voucher"
+            app:tint="@color/primary" />
     </LinearLayout>
 
-    <!-- Teal Freeship Threshold Strip (Authentic TikTok Shop / Shopee Cart cue) -->
+    <!-- Emerald Freeship Threshold Strip -->
     <LinearLayout
         android:id="@+id/llShippingProgress"
         android:layout_width="match_parent"
@@ -43,7 +57,7 @@
         android:background="@color/teal_trust_bg"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingVertical="10dp"
+        android:paddingVertical="9dp"
         android:visibility="gone">
 
         <LinearLayout
@@ -57,9 +71,9 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_freeship_tag"
                 android:backgroundTint="@color/white"
-                android:fontFamily="@font/nunito_extrabold"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="1dp"
+                android:fontFamily="@font/be_vietnam_pro_bold"
+                android:paddingHorizontal="7dp"
+                android:paddingVertical="2dp"
                 android:text="Freeship"
                 android:textColor="@color/teal_trust"
                 android:textSize="10.5sp" />
@@ -70,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
-                android:fontFamily="@font/nunito_semibold"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
                 android:textColor="@color/teal_trust"
                 android:textSize="12.5sp" />
         </LinearLayout>
@@ -118,10 +132,10 @@
             android:visibility="gone">
 
             <FrameLayout
-                android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
                 android:background="@drawable/bg_circle_avatar"
-                android:backgroundTint="@color/bg_card">
+                android:backgroundTint="@color/primary_soft">
 
                 <ImageView
                     android:layout_width="34dp"
@@ -129,14 +143,14 @@
                     android:layout_gravity="center"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_shopping_bag"
-                    app:tint="@color/text_muted" />
+                    app:tint="@color/primary" />
             </FrameLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:fontFamily="@font/nunito_extrabold"
+                android:fontFamily="@font/be_vietnam_pro_bold"
                 android:text="Giỏ hàng đang trống"
                 android:textColor="@color/text_primary"
                 android:textSize="17sp" />
@@ -145,9 +159,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
+                android:fontFamily="@font/be_vietnam_pro_regular"
                 android:gravity="center"
                 android:lineSpacingMultiplier="1.35"
-                android:text="Hãy chọn những thiết bị công nghệ ưng ý và thêm vào giỏ hàng của bạn."
+                android:text="Hãy chọn những thiết bị công nghệ ưng ý và săn thêm mã giảm giá hấp dẫn."
                 android:textColor="@color/text_secondary"
                 android:textSize="13.5sp" />
 
@@ -155,15 +170,15 @@
                 android:id="@+id/btnBrowseProducts"
                 style="@style/Widget.BtDay4.PrimaryButton"
                 android:layout_width="wrap_content"
-                android:layout_height="46dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="20dp"
-                android:minHeight="46dp"
-                android:paddingHorizontal="24dp"
-                android:text="Khám phá ngay" />
+                android:minHeight="48dp"
+                android:paddingHorizontal="26dp"
+                android:text="Khám phá cửa hàng" />
         </LinearLayout>
     </FrameLayout>
 
-    <!-- TikTok Shop / Shopee Elevated Bottom Checkout Bar -->
+    <!-- Sticky Voucher + Checkout Bar -->
     <LinearLayout
         android:id="@+id/llCartTotalBar"
         android:layout_width="match_parent"
@@ -178,28 +193,89 @@
             android:layout_height="1dp"
             android:background="@color/divider_hairline" />
 
+        <!-- Interactive Voucher Picker Strip -->
+        <LinearLayout
+            android:id="@+id/rowCartVoucher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:minHeight="44dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_voucher"
+                app:tint="@color/primary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:text="TechStore Voucher"
+                android:textColor="@color/text_primary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvCartVoucherStatus"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:gravity="end"
+                android:maxLines="1"
+                android:text="Chọn hoặc nhập mã"
+                android:textColor="@color/text_muted"
+                android:textSize="12.5sp" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="4dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_right"
+                app:tint="@color/text_muted" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_hairline" />
+
+        <!-- Select All + Total + Checkout CTA -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="6dp"
+            android:paddingTop="10dp"
             android:paddingEnd="16dp"
-            android:paddingVertical="12dp">
+            android:paddingBottom="10dp">
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/cbSelectAll"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/be_vietnam_pro_medium"
                 android:minHeight="48dp"
                 android:text="@string/category_all"
                 android:textColor="@color/text_primary"
-                android:textSize="13.5sp" />
+                android:textSize="13sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="6dp"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
                 android:gravity="end"
                 android:orientation="vertical"
@@ -208,29 +284,43 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/be_vietnam_pro_regular"
                     android:text="Tổng thanh toán"
                     android:textColor="@color/text_secondary"
-                    android:textSize="12.5sp" />
+                    android:textSize="11.5sp" />
 
                 <TextView
                     android:id="@+id/tvCartGrandTotal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="1dp"
-                    android:fontFamily="@font/nunito_extrabold"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:maxLines="1"
                     android:text="0 ₫"
                     android:textColor="@color/primary"
-                    android:textSize="19sp" />
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/tvCartSavedNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
+                    android:maxLines="1"
+                    android:textColor="@color/teal_trust"
+                    android:textSize="11sp"
+                    android:visibility="gone" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCheckout"
                 style="@style/Widget.BtDay4.PrimaryButton"
                 android:layout_width="wrap_content"
-                android:layout_height="46dp"
-                android:minHeight="46dp"
-                android:paddingHorizontal="24dp"
-                android:text="Thanh toán" />
+                android:layout_height="48dp"
+                android:minHeight="48dp"
+                android:paddingHorizontal="20dp"
+                android:text="Mua hàng (0)" />
         </LinearLayout>
     </LinearLayout>
 

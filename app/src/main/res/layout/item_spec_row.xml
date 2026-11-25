@@ -1,38 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rowSpecContainer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="10dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvSpecKey"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingVertical="12dp">
+        android:layout_weight="0.4"
+        android:textColor="@color/text_secondary"
+        android:textSize="13.5sp"
+        tools:text="Chip xử lý" />
 
-        <TextView
-            android:id="@+id/tvSpecKey"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.4"
-            android:textColor="@color/text_muted"
-            android:textSize="14sp" />
-
-        <TextView
-            android:id="@+id/tvSpecValue"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            android:layout_weight="0.6"
-            android:fontFamily="@font/nunito_semibold"
-            android:textColor="@color/text_primary"
-            android:textSize="14sp" />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tvSpecValue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="0.6"
+        android:fontFamily="@font/be_vietnam_pro_semibold"
+        android:textColor="@color/text_primary"
+        android:textSize="13.5sp"
+        tools:text="Apple A18 Pro" />
 
     <View
         android:id="@+id/dividerSpec"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_hairline" />
-
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone" />
 </LinearLayout>

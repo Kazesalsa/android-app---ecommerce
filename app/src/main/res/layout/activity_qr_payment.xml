@@ -10,14 +10,19 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarQrPayment"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/bg_card"
-        android:elevation="2dp"
+        android:minHeight="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@color/text_primary"
         app:title="@string/qr_payment_title"
         app:titleCentered="true"
         app:titleTextColor="@color/text_primary" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_hairline" />
 
     <!-- Loading State -->
     <LinearLayout
@@ -40,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:fontFamily="@font/nunito_bold"
+            android:fontFamily="@font/be_vietnam_pro_bold"
             android:text="Đang tạo mã VietQR qua PayOS..."
             android:textColor="@color/text_primary"
             android:textSize="15.5sp" />
@@ -49,13 +54,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:fontFamily="@font/be_vietnam_pro_regular"
             android:gravity="center"
             android:text="Vui lòng giữ kết nối mạng trong giây lát"
             android:textColor="@color/text_secondary"
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Error / Expired Inline State (Zero Popups) -->
+    <!-- Error / Expired Inline State -->
     <LinearLayout
         android:id="@+id/llQrError"
         android:layout_width="match_parent"
@@ -71,9 +77,9 @@
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/bg_card"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            app:strokeColor="@color/divider_hairline"
-            app:strokeWidth="0.75dp">
+            app:cardElevation="0.5dp"
+            app:strokeColor="@color/border_light"
+            app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -82,19 +88,27 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <ImageView
-                    android:layout_width="42dp"
-                    android:layout_height="42dp"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_qr_code"
-                    app:tint="@color/primary" />
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_circle_avatar"
+                    android:backgroundTint="@color/primary_soft">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:importantForAccessibility="no"
+                        android:src="@drawable/ic_qr_code"
+                        app:tint="@color/primary" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/tvQrErrorTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:fontFamily="@font/nunito_extrabold"
+                    android:layout_marginTop="14dp"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:gravity="center"
                     android:text="Không thể tạo mã QR"
                     android:textColor="@color/text_primary"
@@ -105,6 +119,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:fontFamily="@font/be_vietnam_pro_regular"
                     android:gravity="center"
                     android:lineSpacingMultiplier="1.35"
                     android:text="Vui lòng kiểm tra kết nối Wi-Fi hoặc thử lại."
@@ -154,7 +169,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="16dp"
-                android:paddingVertical="11dp">
+                android:paddingVertical="10dp">
 
                 <ImageView
                     android:layout_width="16dp"
@@ -169,7 +184,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
-                    android:fontFamily="@font/nunito_semibold"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
                     android:text="Đang tự động kiểm tra thanh toán..."
                     android:textColor="@color/teal_trust"
                     android:textSize="12.5sp" />
@@ -179,33 +194,32 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_discount_solid"
-                    android:fontFamily="@font/nunito_extrabold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
+                    android:paddingHorizontal="9dp"
+                    android:paddingVertical="3dp"
                     android:text="15:00"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Elevated Centerpiece VietQR Card -->
+            <!-- Centerpiece VietQR Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
-                android:layout_marginTop="12dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="14dp"
                 app:cardBackgroundColor="@color/bg_card"
                 app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="@color/divider_hairline"
-                app:strokeWidth="0.75dp">
+                app:cardElevation="0.5dp"
+                app:strokeColor="@color/border_light"
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_horizontal"
                     android:orientation="vertical"
-                    android:paddingHorizontal="18dp"
-                    android:paddingVertical="18dp">
+                    android:padding="18dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -217,7 +231,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_freeship_tag"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:paddingHorizontal="8dp"
                             android:paddingVertical="3dp"
                             android:text="VietQR · PayOS"
@@ -229,8 +243,10 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/nunito_semibold"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/be_vietnam_pro_medium"
                             android:gravity="end"
+                            android:maxLines="1"
                             android:text="DH-20261124-0000"
                             android:textColor="@color/text_secondary"
                             android:textSize="12.5sp" />
@@ -238,8 +254,8 @@
 
                     <!-- Framed High-Contrast QR Bitmap -->
                     <FrameLayout
-                        android:layout_width="244dp"
-                        android:layout_height="244dp"
+                        android:layout_width="236dp"
+                        android:layout_height="236dp"
                         android:layout_marginTop="16dp"
                         android:background="@drawable/bg_qr_frame"
                         android:padding="12dp">
@@ -256,6 +272,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="14dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:text="Số tiền cần thanh toán"
                         android:textColor="@color/text_secondary"
                         android:textSize="12.5sp" />
@@ -265,15 +282,29 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:fontFamily="@font/nunito_extrabold"
+                        android:fontFamily="@font/be_vietnam_pro_bold"
                         android:text="0 ₫"
                         android:textColor="@color/primary"
                         android:textSize="26sp" />
 
                     <TextView
+                        android:id="@+id/tvQrVoucherNote"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_freeship_tag"
+                        android:fontFamily="@font/be_vietnam_pro_semibold"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="3dp"
+                        android:textColor="@color/teal_trust"
+                        android:textSize="11.5sp"
+                        android:visibility="gone" />
+
+                    <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:gravity="center"
                         android:lineSpacingMultiplier="1.35"
                         android:text="Mở ứng dụng Ngân hàng hoặc Ví điện tử hỗ trợ VietQR và quét mã phía trên để thanh toán tự động."
@@ -282,229 +313,292 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Elevated Manual Transfer Details Card with Tactile Copy Pills -->
+            <!-- Collapsible Manual Transfer Details Card -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="14dp"
-                android:layout_marginTop="14dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0.5dp"
                 app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito_extrabold"
-                        android:text="Thông tin chuyển khoản thủ công"
-                        android:textColor="@color/text_primary"
-                        android:textSize="14.5sp" />
+                    android:orientation="vertical">
 
                     <LinearLayout
+                        android:id="@+id/rowToggleManualTransfer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="12dp"
+                        android:background="?attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:gravity="center_vertical"
-                        android:orientation="horizontal">
+                        android:minHeight="54dp"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="12dp">
 
-                        <TextView
-                            android:layout_width="104dp"
-                            android:layout_height="wrap_content"
-                            android:text="Ngân hàng"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/tvQrBankName"
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/nunito_bold"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13.5sp" />
-                    </LinearLayout>
+                            android:orientation="vertical">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="10dp"
-                        android:background="@color/divider_hairline" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_bold"
+                                android:text="Thông tin chuyển khoản thủ công"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="104dp"
-                            android:layout_height="wrap_content"
-                            android:text="Chủ tài khoản"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Sao chép STK &amp; nội dung nếu không quét được QR"
+                                android:textColor="@color/text_muted"
+                                android:textSize="12sp" />
+                        </LinearLayout>
 
                         <TextView
-                            android:id="@+id/tvQrAccountName"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_bold"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13.5sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="10dp"
-                        android:background="@color/divider_hairline" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="104dp"
-                            android:layout_height="wrap_content"
-                            android:text="Số tài khoản"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/tvQrAccountNumber"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_extrabold"
-                            android:textColor="@color/text_primary"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/btnCopyAccount"
+                            android:id="@+id/tvToggleManualLabel"
                             android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:background="@drawable/bg_copy_pill"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:fontFamily="@font/nunito_bold"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp"
-                            android:text="Sao chép"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:fontFamily="@font/be_vietnam_pro_semibold"
+                            android:text="Mở rộng"
                             android:textColor="@color/primary"
+                            android:textSize="12.5sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/llManualTransferDetails"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="16dp"
+                        android:paddingBottom="16dp"
+                        android:visibility="gone">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginBottom="12dp"
+                            android:background="@color/divider_hairline" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Ngân hàng"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvQrBankName"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13.5sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/divider_hairline" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Chủ tài khoản"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvQrAccountName"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13.5sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/divider_hairline" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Số tài khoản"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvQrAccountNumber"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro_bold"
+                                android:textColor="@color/text_primary"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/btnCopyAccount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_copy_pill"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:gravity="center"
+                                android:paddingHorizontal="12dp"
+                                android:text="Sao chép"
+                                android:textColor="@color/primary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/divider_hairline" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Số tiền"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvQrTransferAmount"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro_bold"
+                                android:textColor="@color/primary"
+                                android:textSize="14sp" />
+
+                            <TextView
+                                android:id="@+id/btnCopyAmount"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_copy_pill"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:gravity="center"
+                                android:paddingHorizontal="12dp"
+                                android:text="Sao chép"
+                                android:textColor="@color/primary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginVertical="10dp"
+                            android:background="@color/divider_hairline" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="100dp"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/be_vietnam_pro_regular"
+                                android:text="Nội dung CK"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="13sp" />
+
+                            <TextView
+                                android:id="@+id/tvQrDescription"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:fontFamily="@font/be_vietnam_pro_bold"
+                                android:textColor="@color/text_primary"
+                                android:textSize="13.5sp" />
+
+                            <TextView
+                                android:id="@+id/btnCopyDescription"
+                                android:layout_width="wrap_content"
+                                android:layout_height="36dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@drawable/bg_copy_pill"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:fontFamily="@font/be_vietnam_pro_semibold"
+                                android:gravity="center"
+                                android:paddingHorizontal="12dp"
+                                android:text="Sao chép"
+                                android:textColor="@color/primary"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:fontFamily="@font/be_vietnam_pro_regular"
+                            android:text="Giữ nguyên số tiền và nội dung chuyển khoản để PayOS tự động đối soát."
+                            android:textColor="@color/text_muted"
                             android:textSize="12sp" />
                     </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="10dp"
-                        android:background="@color/divider_hairline" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="104dp"
-                            android:layout_height="wrap_content"
-                            android:text="Số tiền"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/tvQrTransferAmount"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_extrabold"
-                            android:textColor="@color/primary"
-                            android:textSize="14sp" />
-
-                        <TextView
-                            android:id="@+id/btnCopyAmount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:background="@drawable/bg_copy_pill"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:fontFamily="@font/nunito_bold"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp"
-                            android:text="Sao chép"
-                            android:textColor="@color/primary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:layout_marginVertical="10dp"
-                        android:background="@color/divider_hairline" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="104dp"
-                            android:layout_height="wrap_content"
-                            android:text="Nội dung CK"
-                            android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/tvQrDescription"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:fontFamily="@font/nunito_extrabold"
-                            android:textColor="@color/text_primary"
-                            android:textSize="13.5sp" />
-
-                        <TextView
-                            android:id="@+id/btnCopyDescription"
-                            android:layout_width="wrap_content"
-                            android:layout_height="32dp"
-                            android:background="@drawable/bg_copy_pill"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:fontFamily="@font/nunito_bold"
-                            android:gravity="center"
-                            android:paddingHorizontal="10dp"
-                            android:text="Sao chép"
-                            android:textColor="@color/primary"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:text="Giữ nguyên số tiền và nội dung chuyển khoản để PayOS tự động đối soát."
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Inline 2-Step Cancel Payment Area (Zero AlertDialog Popup) -->
+            <!-- Inline 2-Step Cancel Payment Area -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="12dp"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 android:orientation="vertical">
 
@@ -522,8 +616,8 @@
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:cardBackgroundColor="@color/bg_card"
-                    app:cardCornerRadius="14dp"
-                    app:cardElevation="1dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0.5dp"
                     app:strokeColor="@color/danger_red"
                     app:strokeWidth="1dp">
 
@@ -536,7 +630,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_bold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:text="Xác nhận hủy giao dịch QR và đơn hàng này?"
                             android:textColor="@color/danger_red"
                             android:textSize="13.5sp" />
@@ -551,7 +645,7 @@
                                 android:id="@+id/btnKeepPayment"
                                 style="@style/Widget.BtDay4.SecondaryButton"
                                 android:layout_width="0dp"
-                                android:layout_height="44dp"
+                                android:layout_height="46dp"
                                 android:layout_marginEnd="8dp"
                                 android:layout_weight="1"
                                 android:text="Giữ lại" />
@@ -560,7 +654,7 @@
                                 android:id="@+id/btnConfirmCancelPayment"
                                 style="@style/Widget.BtDay4.PrimaryButton"
                                 android:layout_width="0dp"
-                                android:layout_height="44dp"
+                                android:layout_height="46dp"
                                 android:layout_weight="1"
                                 android:text="Xác nhận hủy"
                                 app:backgroundTint="@color/danger_red" />
@@ -586,7 +680,7 @@
         android:background="@color/bg_card"
         android:elevation="8dp"
         android:orientation="horizontal"
-        android:paddingHorizontal="12dp"
+        android:paddingHorizontal="16dp"
         android:paddingVertical="10dp"
         android:visibility="gone">
 

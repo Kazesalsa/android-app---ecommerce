@@ -6,19 +6,23 @@ import android.transition.TransitionManager;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import com.example.btday4.R;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityLoginBinding;
+import com.example.btday4.model.AppNotification;
 import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.util.Constants;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
-import com.google.android.material.snackbar.Snackbar;
 
 /**
- * Full-bleed launcher authentication screen with inline Đăng nhập / Đăng ký tabs, real password
- * verification, and inline field errors (zero popups).
+ * Full-bleed launcher authentication screen with segmented Đăng nhập / Đăng ký pill switcher,
+ * seamless status bar bleed, and custom top notification banner feedback.
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,19 +35,15 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         userSession = new UserSession(this);
-        if (userSession.isLoggedIn() && userSession.isRemembered()) {
+        if (userSession.isLoggedIn()) {
             navigateToMain();
             return;
         }
 
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.loginRoot);
-
-        if (userSession.isRemembered() && !userSession.getUsername().isEmpty()) {
-            binding.etUsername.setText(userSession.getUsername());
-            binding.cbRememberMe.setChecked(true);
-        }
+        UiUtils.setStatusBarLightIcons(this, false);
+        UiUtils.applyEdgeToEdgeBars(binding.loginRoot, binding.llLoginBrandHeader, null);
 
         UiUtils.clearErrorOnType(binding.etDisplayName, binding.tilDisplayName);
         UiUtils.clearErrorOnType(binding.etUsername, binding.tilUsername);
@@ -53,91 +53,119 @@ public class LoginActivity extends AppCompatActivity {
         binding.tabModeLogin.setOnClickListener(v -> setRegisterMode(false));
         binding.tabModeRegister.setOnClickListener(v -> setRegisterMode(true));
 
-        binding.tvFillDemo.setOnClickListener(v -> {
-            binding.etUsername.setText(Constants.DEMO_USERNAME);
-            binding.etPassword.setText(Constants.DEMO_PASSWORD);
-            binding.tilUsername.setError(null);
-            binding.tilPassword.setError(null);
-        });
-
         binding.etPassword.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE && !registerMode) {
-                submit();
-                return true;
-            }
-            return false;
-        });
-        binding.etConfirmPassword.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submit();
+            if (!registerMode && actionId == EditorInfo.IME_ACTION_DONE) {
+                attemptSubmit();
                 return true;
             }
             return false;
         });
 
-        binding.btnLogin.setOnClickListener(v -> submit());
-        applyModeUi();
+        binding.etConfirmPassword.setOnEditorActionListener((v, actionId, event) -> {
+            if (registerMode && actionId == EditorInfo.IME_ACTION_DONE) {
+                attemptSubmit();
+                return true;
+            }
+            return false;
+        });
+
+        binding.btnLogin.setOnClickListener(v -> attemptSubmit());
+        styleAuthTabs();
     }
 
-    private void setRegisterMode(boolean enabled) {
-        if (registerMode == enabled) {
+    private void setRegisterMode(boolean isRegister) {
+        if (registerMode == isRegister) {
             return;
         }
-        registerMode = enabled;
+        registerMode = isRegister;
         TransitionManager.beginDelayedTransition(binding.llAuthForm);
-        binding.tilDisplayName.setError(null);
+
         binding.tilUsername.setError(null);
         binding.tilPassword.setError(null);
+        binding.tilDisplayName.setError(null);
         binding.tilConfirmPassword.setError(null);
-        binding.etConfirmPassword.setText("");
-        applyModeUi();
+
+        styleAuthTabs();
+        if (registerMode) {
+            binding.tvAuthTitle.setText(R.string.auth_title_register);
+            binding.tvAuthSubtitle.setText(R.string.auth_subtitle_register);
+            binding.tilDisplayName.setVisibility(View.VISIBLE);
+            binding.tilConfirmPassword.setVisibility(View.VISIBLE);
+            binding.etPassword.setImeOptions(EditorInfo.IME_ACTION_NEXT);
+            binding.btnLogin.setText(R.string.btn_create_account);
+        } else {
+            binding.tvAuthTitle.setText(R.string.auth_title_login);
+            binding.tvAuthSubtitle.setText(R.string.auth_subtitle_login);
+            binding.tilDisplayName.setVisibility(View.GONE);
+            binding.tilConfirmPassword.setVisibility(View.GONE);
+            binding.etPassword.setImeOptions(EditorInfo.IME_ACTION_DONE);
+            binding.btnLogin.setText(R.string.btn_login);
+        }
     }
 
-    private void applyModeUi() {
-        UiUtils.styleUnderlineTab(binding.tvTabLogin, binding.indTabLogin, !registerMode);
-        UiUtils.styleUnderlineTab(binding.tvTabRegister, binding.indTabRegister, registerMode);
-
-        binding.tvAuthTitle.setText(registerMode ? R.string.auth_title_register : R.string.auth_title_login);
-        binding.tvAuthSubtitle.setText(registerMode ? R.string.auth_subtitle_register : R.string.auth_subtitle_login);
-        binding.tilDisplayName.setVisibility(registerMode ? View.VISIBLE : View.GONE);
-        binding.tilConfirmPassword.setVisibility(registerMode ? View.VISIBLE : View.GONE);
-        binding.tvFillDemo.setVisibility(registerMode ? View.GONE : View.VISIBLE);
-        binding.tilPassword.setHelperText(registerMode ? getString(R.string.error_password_short) : null);
-        binding.etPassword.setImeOptions(registerMode ? EditorInfo.IME_ACTION_NEXT : EditorInfo.IME_ACTION_DONE);
-        binding.btnLogin.setText(registerMode ? R.string.btn_create_account : R.string.btn_login);
+    private void styleAuthTabs() {
+        styleTab(binding.tabModeLogin, !registerMode);
+        styleTab(binding.tabModeRegister, registerMode);
     }
 
-    private void submit() {
+    private void styleTab(TextView tab, boolean active) {
+        tab.setBackgroundResource(active ? R.drawable.bg_segmented_active : 0);
+        tab.setTextColor(ContextCompat.getColor(
+                this,
+                active ? R.color.text_primary : R.color.text_secondary
+        ));
+        tab.setTypeface(ResourcesCompat.getFont(
+                this,
+                active ? R.font.be_vietnam_pro_bold : R.font.be_vietnam_pro_medium
+        ));
+    }
+
+    private void attemptSubmit() {
         String displayName = textOf(binding.etDisplayName).trim();
         String username = textOf(binding.etUsername).trim();
         String password = textOf(binding.etPassword);
-        String confirm = textOf(binding.etConfirmPassword);
+        String confirmPassword = textOf(binding.etConfirmPassword);
 
         boolean valid = true;
-        if (registerMode && !ValidationUtils.isNotBlank(displayName)) {
+        if (registerMode && displayName.isEmpty()) {
             binding.tilDisplayName.setError(getString(R.string.error_display_name_empty));
             valid = false;
+        } else {
+            binding.tilDisplayName.setError(null);
         }
-        if (!ValidationUtils.isNotBlank(username)) {
+
+        if (username.isEmpty()) {
             binding.tilUsername.setError(getString(R.string.error_username_empty));
             valid = false;
+        } else {
+            binding.tilUsername.setError(null);
         }
+
         if (password.isEmpty()) {
             binding.tilPassword.setError(getString(R.string.error_password_empty));
             valid = false;
-        } else if (registerMode && !ValidationUtils.isValidPassword(password)) {
+        } else if (!ValidationUtils.isValidPassword(password)) {
             binding.tilPassword.setError(getString(R.string.error_password_short));
             valid = false;
+        } else {
+            binding.tilPassword.setError(null);
         }
-        if (registerMode && !confirm.equals(password)) {
-            binding.tilConfirmPassword.setError(getString(R.string.error_password_mismatch));
-            valid = false;
+
+        if (registerMode) {
+            if (!password.equals(confirmPassword)) {
+                binding.tilConfirmPassword.setError(getString(R.string.error_password_mismatch));
+                valid = false;
+            } else {
+                binding.tilConfirmPassword.setError(null);
+            }
         }
+
         if (!valid) {
             return;
         }
 
         binding.btnLogin.setEnabled(false);
+        binding.btnLogin.setText(registerMode ? "Đang tạo tài khoản..." : "Đang đăng nhập...");
         boolean remember = binding.cbRememberMe.isChecked();
         if (registerMode) {
             userSession.register(username, displayName, password, remember, this::handleAuthResult);
@@ -151,31 +179,45 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         binding.btnLogin.setEnabled(true);
+        binding.btnLogin.setText(registerMode ? R.string.btn_create_account : R.string.btn_login);
         switch (result) {
             case SUCCESS:
                 navigateToMain();
                 break;
             case ACCOUNT_NOT_FOUND:
                 binding.tilUsername.setError(getString(R.string.error_account_not_found));
-                Snackbar.make(binding.getRoot(), R.string.error_account_not_found, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.btn_register, v -> setRegisterMode(true))
-                        .show();
+                InAppNotifier.showBannerOnly(
+                        this,
+                        AppNotification.TYPE_ALERT,
+                        "Tài khoản chưa đăng ký",
+                        getString(R.string.error_account_not_found),
+                        getString(R.string.btn_register),
+                        () -> setRegisterMode(true)
+                );
                 break;
             case WRONG_PASSWORD:
                 binding.tilPassword.setError(getString(R.string.error_wrong_password));
                 break;
             case ACCOUNT_EXISTS:
                 binding.tilUsername.setError(getString(R.string.error_account_exists));
-                Snackbar.make(binding.getRoot(), R.string.error_account_exists, Snackbar.LENGTH_LONG)
-                        .setAction(R.string.btn_login, v -> setRegisterMode(false))
-                        .show();
+                InAppNotifier.showBannerOnly(
+                        this,
+                        AppNotification.TYPE_ALERT,
+                        "Tài khoản đã tồn tại",
+                        getString(R.string.error_account_exists),
+                        getString(R.string.btn_login),
+                        () -> setRegisterMode(false)
+                );
                 break;
             case NETWORK_ERROR:
-                Snackbar.make(
-                        binding.getRoot(),
+                InAppNotifier.showBannerOnly(
+                        this,
+                        AppNotification.TYPE_ALERT,
+                        "Lỗi kết nối",
                         "Không thể kết nối Firebase (kiểm tra mạng hoặc Firestore Rules)",
-                        Snackbar.LENGTH_LONG
-                ).show();
+                        null,
+                        null
+                );
                 break;
         }
     }

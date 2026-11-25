@@ -1,14 +1,13 @@
 package com.example.btday4.model;
 
 /**
- * Standardized order lifecycle statuses with display labels.
+ * Standardized order lifecycle statuses (without manual admin confirmation step).
  */
 public enum OrderStatus {
-    PENDING_CONFIRMATION("PENDING_CONFIRMATION", "Chờ xác nhận"),
     PENDING_PAYMENT("PENDING_PAYMENT", "Chờ thanh toán QR"),
+    PROCESSING("PROCESSING", "Đang giao hàng"),
     PAID("PAID", "Đã thanh toán"),
-    PROCESSING("PROCESSING", "Đang chuẩn bị"),
-    DELIVERED("DELIVERED", "Đã giao hàng"),
+    DELIVERED("DELIVERED", "Hoàn tất"),
     CANCELLED("CANCELLED", "Đã hủy");
 
     private final String code;
@@ -28,11 +27,14 @@ public enum OrderStatus {
     }
 
     public static OrderStatus fromCode(String code) {
+        if ("PENDING_CONFIRMATION".equals(code)) {
+            return PROCESSING;
+        }
         for (OrderStatus status : values()) {
             if (status.code.equals(code)) {
                 return status;
             }
         }
-        return PENDING_CONFIRMATION;
+        return PROCESSING;
     }
 }

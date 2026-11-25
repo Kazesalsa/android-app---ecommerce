@@ -13,14 +13,14 @@
 
         <TextView
             android:id="@+id/tvReviewAvatar"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:background="@drawable/bg_circle_avatar"
-            android:backgroundTint="@color/bg_subtle"
-            android:fontFamily="@font/nunito_bold"
+            android:backgroundTint="@color/primary_soft"
+            android:fontFamily="@font/be_vietnam_pro_bold"
             android:gravity="center"
             android:text="NM"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/primary"
             android:textSize="12.5sp" />
 
         <LinearLayout
@@ -40,7 +40,7 @@
                     android:id="@+id/tvReviewAuthor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/nunito_bold"
+                    android:fontFamily="@font/be_vietnam_pro_bold"
                     android:text="Nguyễn Nhật Minh"
                     android:textColor="@color/text_primary"
                     android:textSize="14sp" />
@@ -50,13 +50,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_pill_subtle"
-                    android:fontFamily="@font/nunito_semibold"
+                    android:background="@drawable/bg_discount_tag"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
                     android:paddingHorizontal="7dp"
                     android:paddingVertical="2dp"
                     android:text="Bạn"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="11sp"
+                    android:textColor="@color/primary"
+                    android:textSize="10.5sp"
                     android:visibility="gone" />
             </LinearLayout>
 
@@ -78,6 +78,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
+                    android:fontFamily="@font/be_vietnam_pro_regular"
                     android:text="22/11/2026"
                     android:textColor="@color/text_muted"
                     android:textSize="12sp" />
@@ -94,9 +95,9 @@
             <TextView
                 android:id="@+id/btnEditOwnReview"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:background="?attr/selectableItemBackground"
-                android:fontFamily="@font/nunito_semibold"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:text="Sửa"
@@ -106,9 +107,9 @@
             <TextView
                 android:id="@+id/btnDeleteOwnReview"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="42dp"
                 android:background="?attr/selectableItemBackground"
-                android:fontFamily="@font/nunito_semibold"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
                 android:gravity="center"
                 android:paddingHorizontal="10dp"
                 android:text="Xóa"
@@ -121,11 +122,12 @@
         android:id="@+id/tvReviewComment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="50dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/be_vietnam_pro_regular"
         android:lineSpacingMultiplier="1.45"
         android:textColor="@color/text_secondary"
-        android:textSize="14sp" />
+        android:textSize="13.5sp" />
 
     <View
         android:layout_width="match_parent"

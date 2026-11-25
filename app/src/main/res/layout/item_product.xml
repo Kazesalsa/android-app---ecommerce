@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clickable="true"
     android:focusable="true"
     app:cardBackgroundColor="@color/bg_card"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="1.5dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="1dp"
     app:rippleColor="@color/primary_soft"
     app:strokeColor="@color/divider_hairline"
-    app:strokeWidth="0.75dp">
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Studio Product Image Stage with Floating Solid Coral Discount Pill -->
+        <!-- Studio Pedestal Image Stage (#F6F7FB) Separating Product Photo from Card Body -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="168dp"
+            android:layout_height="158dp"
             android:background="@color/bg_image_stage"
-            android:padding="14dp">
+            android:padding="12dp">
 
             <ImageView
                 android:id="@+id/imgProduct"
@@ -37,81 +38,97 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:background="@drawable/bg_discount_solid"
-                android:fontFamily="@font/nunito_extrabold"
+                android:fontFamily="@font/be_vietnam_pro_bold"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="2dp"
-                android:text="-13%"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="11sp"
+                android:visibility="gone"
+                tools:text="-13%"
+                tools:visibility="visible" />
+
+            <TextView
+                android:id="@+id/tvSoldOutOverlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/bg_pill_subtle"
+                android:backgroundTint="@color/scrim_sold_out"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="5dp"
+                android:text="@string/out_of_stock"
+                android:textColor="@color/white"
+                android:textSize="11.5sp"
                 android:visibility="gone" />
         </FrameLayout>
 
-        <!-- Structured Commerce Card Body -->
+        <!-- Clean Balanced Card Body -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingHorizontal="10dp"
             android:paddingTop="10dp"
-            android:paddingBottom="12dp">
+            android:paddingBottom="10dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvProductBrand"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
+                    android:maxLines="1"
+                    android:textColor="@color/text_muted"
+                    android:textSize="11sp"
+                    tools:text="APPLE" />
+
+                <TextView
+                    android:id="@+id/tvLowStockTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_pill_subtle"
+                    android:backgroundTint="@color/warning_bg"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="1dp"
+                    android:textColor="@color/warning_amber"
+                    android:textSize="10sp"
+                    android:visibility="gone"
+                    tools:text="Còn 3" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvProductName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
                 android:ellipsize="end"
-                android:fontFamily="@font/nunito_bold"
-                android:lineSpacingMultiplier="1.22"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:lineSpacingMultiplier="1.2"
                 android:lines="2"
-                android:text="iPhone 15 128GB"
                 android:textColor="@color/text_primary"
-                android:textSize="15.5sp" />
+                android:textSize="13.5sp"
+                tools:text="iPhone 16 Pro Max 256GB" />
 
-            <!-- Dynamic Trust Tags Row (Freeship / Brand) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tvFreeshipTag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="6dp"
-                    android:background="@drawable/bg_freeship_tag"
-                    android:fontFamily="@font/nunito_bold"
-                    android:paddingHorizontal="5dp"
-                    android:paddingVertical="1dp"
-                    android:text="Freeship"
-                    android:textColor="@color/teal_trust"
-                    android:textSize="11.5sp"
-                    android:visibility="gone" />
-
-                <TextView
-                    android:id="@+id/tvProductBrand"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="Apple"
-                    android:textColor="@color/text_muted"
-                    android:textSize="13sp" />
-            </LinearLayout>
-
-            <!-- Signature Coral Price + Strikethrough Original Price -->
             <TextView
                 android:id="@+id/tvProductPrice"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
+                android:layout_marginTop="6dp"
                 android:ellipsize="end"
-                android:fontFamily="@font/nunito_extrabold"
+                android:fontFamily="@font/be_vietnam_pro_bold"
                 android:maxLines="1"
-                android:text="199.900 ₫"
                 android:textColor="@color/primary"
-                android:textSize="18.5sp" />
+                android:textSize="16sp"
+                tools:text="344.900 ₫" />
 
             <TextView
                 android:id="@+id/tvProductOriginalPrice"
@@ -119,21 +136,22 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:text="229.900 ₫"
                 android:textColor="@color/text_muted"
-                android:textSize="13sp" />
+                android:textSize="11.5sp"
+                tools:text="349.900 ₫" />
 
-            <!-- Rating & Stock Footer -->
+            <!-- Rating + Quick Add-to-Cart Button Footer -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
+                android:layout_marginTop="4dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
+                    android:id="@+id/imgRatingStar"
+                    android:layout_width="13dp"
+                    android:layout_height="13dp"
                     android:importantForAccessibility="no"
                     android:src="@drawable/ic_star_filled"
                     app:tint="@color/star_amber" />
@@ -143,10 +161,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
-                    android:fontFamily="@font/nunito_bold"
-                    android:text="4.8"
+                    android:fontFamily="@font/be_vietnam_pro_semibold"
                     android:textColor="@color/text_primary"
-                    android:textSize="13.5sp" />
+                    android:textSize="12sp"
+                    tools:text="4.8" />
 
                 <TextView
                     android:id="@+id/tvProductReviewCount"
@@ -154,17 +172,38 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="3dp"
                     android:layout_weight="1"
-                    android:text="(3)"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:textColor="@color/text_muted"
-                    android:textSize="13sp" />
+                    android:textSize="11.5sp"
+                    tools:text="(12)" />
 
-                <TextView
-                    android:id="@+id/tvProductStockMini"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Còn 18"
-                    android:textColor="@color/text_muted"
-                    android:textSize="12.5sp" />
+                <FrameLayout
+                    android:id="@+id/btnQuickAddCart"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="-4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="Thêm nhanh vào giỏ"
+                    android:focusable="true">
+
+                    <FrameLayout
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/bg_circle_avatar"
+                        android:backgroundTint="@color/ink_dark">
+
+                        <ImageView
+                            android:layout_width="15dp"
+                            android:layout_height="15dp"
+                            android:layout_gravity="center"
+                            android:importantForAccessibility="no"
+                            android:src="@drawable/ic_add"
+                            app:tint="@color/white" />
+                    </FrameLayout>
+                </FrameLayout>
             </LinearLayout>
         </LinearLayout>
 

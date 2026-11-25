@@ -1,35 +1,59 @@
 package com.example.btday4.ui.profile;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ImageView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.btday4.R;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityEditProfileBinding;
+import com.example.btday4.model.AppNotification;
+import com.example.btday4.util.AvatarImageLoader;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
 import com.google.android.material.textfield.TextInputEditText;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.concurrent.Executors;
 
 /**
- * Full-screen profile editor using inline 3-field birthdate inputs (eliminating DatePickerDialog popup).
+ * Full-screen profile & avatar editor supporting device gallery photo upload, 6 vector presets,
+ * and complete personal info without focus-jump glitches.
  */
 public class EditProfileActivity extends AppCompatActivity {
 
     private ActivityEditProfileBinding binding;
     private UserSession userSession;
+    private String selectedAvatarUrl = "";
+    private boolean autoAdvanceEnabled = false;
+    private ImageView[] presetViews;
+
+    private final ActivityResultLauncher<String> galleryPickerLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            this::handlePickedGalleryImage
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.editProfileRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(
+                binding.editProfileRoot,
+                binding.toolbarEditProfile,
+                binding.llEditProfileBottomBar
+        );
 
         userSession = new UserSession(this);
+        selectedAvatarUrl = userSession.getAvatarUrl();
 
         binding.toolbarEditProfile.setNavigationOnClickListener(v -> finish());
         UiUtils.clearErrorOnType(binding.etEditName, binding.tilEditName);
@@ -37,10 +61,98 @@ public class EditProfileActivity extends AppCompatActivity {
         UiUtils.clearErrorOnType(binding.etEditPhone, binding.tilEditPhone);
         UiUtils.clearErrorOnType(binding.etEditAddress, binding.tilEditAddress);
 
+        presetViews = new ImageView[]{
+                binding.presetAvatar1,
+                binding.presetAvatar2,
+                binding.presetAvatar3,
+                binding.presetAvatar4,
+                binding.presetAvatar5,
+                binding.presetAvatar6
+        };
+        for (int i = 0; i < presetViews.length; i++) {
+            final String presetKey = AvatarImageLoader.PRESET_KEYS[i];
+            presetViews[i].setOnClickListener(v -> applyAvatarSelection(presetKey));
+        }
+
+        View.OnClickListener launchGallery = v -> galleryPickerLauncher.launch("image/*");
+        binding.flEditAvatarPreview.setOnClickListener(launchGallery);
+        binding.btnPickGalleryAvatar.setOnClickListener(launchGallery);
+        binding.btnClearAvatar.setOnClickListener(v -> applyAvatarSelection(""));
+
+        binding.etEditName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (selectedAvatarUrl.isEmpty()) {
+                    binding.tvEditAvatarInitials.setText(
+                            com.example.btday4.util.FormatUtils.extractInitials(s == null ? "" : s.toString())
+                    );
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
         setupInlineDateAutoAdvance();
         binding.btnSaveProfile.setOnClickListener(v -> saveProfile());
 
+        applyAvatarSelection(selectedAvatarUrl);
         loadCurrentProfile();
+    }
+
+    private void handlePickedGalleryImage(@Nullable Uri uri) {
+        if (uri == null) {
+            return;
+        }
+        Executors.newSingleThreadExecutor().execute(() -> {
+            String dataUri = AvatarImageLoader.encodeUriToDataUri(getApplicationContext(), uri);
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()) {
+                    return;
+                }
+                if (dataUri != null) {
+                    applyAvatarSelection(dataUri);
+                } else {
+                    InAppNotifier.show(
+                            binding.getRoot(),
+                            AppNotification.TYPE_ALERT,
+                            "Không thể đọc ảnh",
+                            "Không thể đọc ảnh đã chọn, vui lòng thử ảnh khác"
+                    );
+                }
+            });
+        });
+    }
+
+    private void applyAvatarSelection(String avatarValue) {
+        selectedAvatarUrl = avatarValue == null ? "" : avatarValue.trim();
+        String nameForInitials = textOf(binding.etEditName);
+        if (nameForInitials.isEmpty() && userSession != null) {
+            nameForInitials = userSession.getDisplayName();
+        }
+        AvatarImageLoader.load(
+                binding.imgEditAvatar,
+                binding.tvEditAvatarInitials,
+                selectedAvatarUrl,
+                nameForInitials
+        );
+        binding.btnClearAvatar.setVisibility(selectedAvatarUrl.isEmpty() ? View.GONE : View.VISIBLE);
+
+        if (presetViews != null) {
+            for (int i = 0; i < presetViews.length; i++) {
+                boolean active = AvatarImageLoader.PRESET_KEYS[i].equalsIgnoreCase(selectedAvatarUrl);
+                presetViews[i].setBackgroundResource(
+                        active ? R.drawable.bg_option_selected : R.drawable.bg_circle_button
+                );
+                presetViews[i].setScaleX(active ? 1.08f : 1.0f);
+                presetViews[i].setScaleY(active ? 1.08f : 1.0f);
+            }
+        }
     }
 
     private void setupInlineDateAutoAdvance() {
@@ -74,7 +186,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s != null && s.length() == 2) {
+                if (autoAdvanceEnabled && s != null && s.length() == 2) {
                     binding.etBirthMonth.requestFocus();
                 }
             }
@@ -91,7 +203,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (s != null && s.length() == 2) {
+                if (autoAdvanceEnabled && s != null && s.length() == 2) {
                     binding.etBirthYear.requestFocus();
                 }
             }
@@ -103,8 +215,11 @@ public class EditProfileActivity extends AppCompatActivity {
             if (isFinishing() || isDestroyed()) {
                 return;
             }
+            autoAdvanceEnabled = false;
             if (user == null) {
                 binding.etEditName.setText(userSession.getDisplayName());
+                applyAvatarSelection(userSession.getAvatarUrl());
+                autoAdvanceEnabled = true;
                 return;
             }
             binding.etEditName.setText(nonNull(user.getDisplayName()));
@@ -128,6 +243,10 @@ public class EditProfileActivity extends AppCompatActivity {
             } else if ("Khác".equalsIgnoreCase(gender)) {
                 binding.chipGenderOther.setChecked(true);
             }
+
+            String remoteAvatar = nonNull(user.getAvatarUrl()).trim();
+            applyAvatarSelection(remoteAvatar.isEmpty() ? userSession.getAvatarUrl() : remoteAvatar);
+            autoAdvanceEnabled = true;
         });
     }
 
@@ -186,13 +305,23 @@ public class EditProfileActivity extends AppCompatActivity {
         }
 
         binding.btnSaveProfile.setEnabled(false);
-        userSession.updateProfile(name, email, phone, gender, formattedBirthDate, address, () -> {
-            if (isFinishing() || isDestroyed()) {
-                return;
-            }
-            setResult(RESULT_OK);
-            finish();
-        });
+        binding.btnSaveProfile.setText("Đang lưu...");
+        userSession.updateProfile(
+                name,
+                email,
+                phone,
+                gender,
+                formattedBirthDate,
+                address,
+                selectedAvatarUrl,
+                () -> {
+                    if (isFinishing() || isDestroyed()) {
+                        return;
+                    }
+                    setResult(RESULT_OK);
+                    finish();
+                }
+        );
     }
 
     private void showBirthDateError(String message) {

@@ -11,11 +11,14 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.btday4.R;
 import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.data.repository.CartRepository;
+import com.example.btday4.data.repository.NotificationRepository;
 import com.example.btday4.data.repository.UserSession;
+import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.ActivityMainBinding;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.auth.LoginActivity;
 import com.example.btday4.ui.cart.CartFragment;
+import com.example.btday4.ui.notifications.NotificationsFragment;
 import com.example.btday4.ui.products.ProductsFragment;
 import com.example.btday4.ui.profile.ProfileFragment;
 import com.example.btday4.util.Constants;
@@ -23,26 +26,30 @@ import com.example.btday4.util.UiUtils;
 import com.google.android.material.badge.BadgeDrawable;
 
 /**
- * Main container hosting Store, Cart, and Profile tabs with Material 3 BottomNavigationView.
+ * Main container hosting Store, Cart, Notifications, and Profile tabs with Material 3 BottomNavigationView.
  */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG_PRODUCTS = "tag_products";
     private static final String TAG_CART = "tag_cart";
+    private static final String TAG_NOTIFICATIONS = "tag_notifications";
     private static final String TAG_PROFILE = "tag_profile";
     private static final String STATE_SELECTED_NAV_ID = "state_selected_nav_id";
 
     private ActivityMainBinding binding;
+    private UserSession userSession;
     private ProductsFragment productsFragment;
     private CartFragment cartFragment;
+    private NotificationsFragment notificationsFragment;
     private ProfileFragment profileFragment;
     private int selectedNavId = R.id.nav_products;
+    private final NotificationRepository.Listener notificationListener = this::refreshNotificationBadge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        UserSession userSession = new UserSession(this);
+        userSession = new UserSession(this);
         if (!userSession.isLoggedIn()) {
             Intent intent = new Intent(this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -54,15 +61,19 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         UiUtils.applyMainShellInsets(binding.main, binding.bottomNav);
+        NotificationRepository.addListener(notificationListener);
 
         FragmentManager fm = getSupportFragmentManager();
         if (savedInstanceState == null) {
             productsFragment = new ProductsFragment();
             cartFragment = new CartFragment();
+            notificationsFragment = new NotificationsFragment();
             profileFragment = new ProfileFragment();
             fm.beginTransaction()
                     .add(R.id.fragmentContainer, profileFragment, TAG_PROFILE)
                     .hide(profileFragment)
+                    .add(R.id.fragmentContainer, notificationsFragment, TAG_NOTIFICATIONS)
+                    .hide(notificationsFragment)
                     .add(R.id.fragmentContainer, cartFragment, TAG_CART)
                     .hide(cartFragment)
                     .add(R.id.fragmentContainer, productsFragment, TAG_PRODUCTS)
@@ -71,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
             selectedNavId = savedInstanceState.getInt(STATE_SELECTED_NAV_ID, R.id.nav_products);
             Fragment existingProducts = fm.findFragmentByTag(TAG_PRODUCTS);
             Fragment existingCart = fm.findFragmentByTag(TAG_CART);
+            Fragment existingNotifications = fm.findFragmentByTag(TAG_NOTIFICATIONS);
             Fragment existingProfile = fm.findFragmentByTag(TAG_PROFILE);
             productsFragment = existingProducts instanceof ProductsFragment
                     ? (ProductsFragment) existingProducts
@@ -78,6 +90,9 @@ public class MainActivity extends AppCompatActivity {
             cartFragment = existingCart instanceof CartFragment
                     ? (CartFragment) existingCart
                     : new CartFragment();
+            notificationsFragment = existingNotifications instanceof NotificationsFragment
+                    ? (NotificationsFragment) existingNotifications
+                    : new NotificationsFragment();
             profileFragment = existingProfile instanceof ProfileFragment
                     ? (ProfileFragment) existingProfile
                     : new ProfileFragment();
@@ -91,6 +106,8 @@ public class MainActivity extends AppCompatActivity {
         if (getIntent() != null) {
             if (getIntent().getBooleanExtra(Constants.EXTRA_OPEN_CART, false)) {
                 selectedNavId = R.id.nav_cart;
+            } else if (getIntent().getBooleanExtra(Constants.EXTRA_OPEN_NOTIFICATIONS, false)) {
+                selectedNavId = R.id.nav_notifications;
             } else if (getIntent().getBooleanExtra(Constants.EXTRA_OPEN_PRODUCTS, false)) {
                 selectedNavId = R.id.nav_products;
             }
@@ -98,10 +115,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (selectedNavId != R.id.nav_products) {
             binding.bottomNav.setSelectedItemId(selectedNavId);
+        } else {
+            syncTopStatusBarForTab(selectedNavId);
         }
 
         FirestoreHelper.seedProductsIfEmpty(null);
         FirestoreHelper.seedReviewsIfEmpty(null);
+        VoucherRepository.seedVouchersIfEmpty();
     }
 
     @Override
@@ -113,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
         }
         if (intent.getBooleanExtra(Constants.EXTRA_OPEN_CART, false)) {
             openCartTab();
+        } else if (intent.getBooleanExtra(Constants.EXTRA_OPEN_NOTIFICATIONS, false)) {
+            openNotificationsTab();
         } else if (intent.getBooleanExtra(Constants.EXTRA_OPEN_PRODUCTS, false)) {
             openProductsTab();
         }
@@ -121,7 +143,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        syncTopStatusBarForTab(selectedNavId);
         refreshCartBadge();
+        refreshNotificationBadge();
         BehaviorTracker tracker = BehaviorTracker.getInstance();
         if (tracker != null) {
             tracker.onMainResumed(tabNameFor(selectedNavId));
@@ -137,6 +161,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        NotificationRepository.removeListener(notificationListener);
+        super.onDestroy();
+    }
+
     public void openProductsTab() {
         if (binding != null) {
             binding.bottomNav.setSelectedItemId(R.id.nav_products);
@@ -146,6 +176,18 @@ public class MainActivity extends AppCompatActivity {
     public void openCartTab() {
         if (binding != null) {
             binding.bottomNav.setSelectedItemId(R.id.nav_cart);
+        }
+    }
+
+    public void openNotificationsTab() {
+        if (binding != null) {
+            binding.bottomNav.setSelectedItemId(R.id.nav_notifications);
+        }
+    }
+
+    public void openProfileTab() {
+        if (binding != null) {
+            binding.bottomNav.setSelectedItemId(R.id.nav_profile);
         }
     }
 
@@ -173,6 +215,26 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void refreshNotificationBadge() {
+        if (binding == null || isFinishing() || isDestroyed()) {
+            return;
+        }
+        if (userSession == null) {
+            userSession = new UserSession(this);
+        }
+        int unread = NotificationRepository.getUnreadCount(this, userSession.getUsername());
+        BadgeDrawable badge = binding.bottomNav.getOrCreateBadge(R.id.nav_notifications);
+        if (unread > 0) {
+            badge.setVisible(true);
+            badge.setNumber(unread);
+            badge.setBackgroundColor(ContextCompat.getColor(this, R.color.badge_bg));
+            badge.setBadgeTextColor(ContextCompat.getColor(this, R.color.white));
+        } else {
+            badge.setVisible(false);
+            badge.clearNumber();
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -181,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void selectTab(int navId) {
         selectedNavId = navId;
+        syncTopStatusBarForTab(navId);
         BehaviorTracker tracker = BehaviorTracker.getInstance();
         if (tracker != null) {
             tracker.onTabSelected(tabNameFor(navId));
@@ -189,6 +252,9 @@ public class MainActivity extends AppCompatActivity {
         if (navId == R.id.nav_cart) {
             target = cartFragment;
             cartFragment.refreshCart();
+        } else if (navId == R.id.nav_notifications) {
+            target = notificationsFragment;
+            notificationsFragment.refreshNotifications();
         } else if (navId == R.id.nav_profile) {
             target = profileFragment;
             profileFragment.refreshProfileData();
@@ -199,9 +265,19 @@ public class MainActivity extends AppCompatActivity {
         showOnlyFragment(target);
     }
 
+    private void syncTopStatusBarForTab(int navId) {
+        boolean isProfile = navId == R.id.nav_profile;
+        if (binding != null) {
+            binding.main.setBackgroundColor(
+                    ContextCompat.getColor(this, isProfile ? R.color.ink_dark : R.color.bg_card)
+            );
+        }
+        UiUtils.setStatusBarLightIcons(this, !isProfile);
+    }
+
     private void showOnlyFragment(Fragment target) {
         FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
-        Fragment[] all = {productsFragment, cartFragment, profileFragment};
+        Fragment[] all = {productsFragment, cartFragment, notificationsFragment, profileFragment};
         for (Fragment fragment : all) {
             if (fragment == target) {
                 if (!fragment.isAdded()) {
@@ -219,6 +295,9 @@ public class MainActivity extends AppCompatActivity {
         if (navId == R.id.nav_cart) {
             return "Cart";
         }
+        if (navId == R.id.nav_notifications) {
+            return "Notifications";
+        }
         if (navId == R.id.nav_profile) {
             return "Profile";
         }
@@ -228,6 +307,9 @@ public class MainActivity extends AppCompatActivity {
     private String tagFor(Fragment fragment) {
         if (fragment instanceof CartFragment) {
             return TAG_CART;
+        }
+        if (fragment instanceof NotificationsFragment) {
+            return TAG_NOTIFICATIONS;
         }
         if (fragment instanceof ProfileFragment) {
             return TAG_PROFILE;

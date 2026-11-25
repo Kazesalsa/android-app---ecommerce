@@ -10,8 +10,9 @@
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbarOrderDetail"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="wrap_content"
         android:background="@color/bg_card"
+        android:minHeight="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_arrow_back"
         app:navigationIconTint="@color/text_primary"
         app:title="@string/order_detail_title"
@@ -33,7 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="14dp"
+            android:paddingHorizontal="16dp"
             android:paddingTop="14dp"
             android:paddingBottom="28dp">
 
@@ -42,10 +43,10 @@
                 android:id="@+id/bannerOrderSuccess"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="14dp"
+                android:layout_marginBottom="12dp"
                 android:visibility="gone"
                 app:cardBackgroundColor="@color/teal_trust_bg"
-                app:cardCornerRadius="14dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:strokeColor="@color/teal_trust_border"
                 app:strokeWidth="1dp">
@@ -76,19 +77,20 @@
                             android:id="@+id/tvOrderSuccessTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:text="Đặt hàng thành công"
                             android:textColor="@color/teal_trust"
-                            android:textSize="16sp" />
+                            android:textSize="15.5sp" />
 
                         <TextView
                             android:id="@+id/tvOrderSuccessSubtitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:fontFamily="@font/be_vietnam_pro_regular"
                             android:text="Đơn hàng của bạn đã được lưu trong mục Đơn mua."
                             android:textColor="@color/text_secondary"
-                            android:textSize="13sp" />
+                            android:textSize="12.5sp" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -98,10 +100,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0.5dp"
                 app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -120,20 +122,23 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:ellipsize="end"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
+                            android:maxLines="1"
                             android:text="DH-20261124-1234"
                             android:textColor="@color/text_primary"
-                            android:textSize="16sp" />
+                            android:textSize="15.5sp" />
 
                         <TextView
                             android:id="@+id/tvDetailOrderStatus"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
                             android:background="@drawable/bg_discount_tag"
-                            android:fontFamily="@font/nunito_bold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:paddingHorizontal="10dp"
                             android:paddingVertical="3dp"
-                            android:text="Chờ xác nhận"
+                            android:text="Đang giao hàng"
                             android:textColor="@color/primary"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -142,7 +147,8 @@
                         android:id="@+id/tvDetailOrderDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
@@ -150,7 +156,8 @@
                         android:id="@+id/tvDetailPaymentMethod"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:textColor="@color/text_secondary"
                         android:textSize="13sp" />
 
@@ -158,7 +165,8 @@
                         android:id="@+id/tvDetailPayOsRef"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:textColor="@color/text_muted"
                         android:textSize="12.5sp"
                         android:visibility="gone" />
@@ -169,12 +177,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0.5dp"
                 app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -185,17 +193,17 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito_extrabold"
+                        android:fontFamily="@font/be_vietnam_pro_bold"
                         android:text="Địa chỉ nhận hàng"
                         android:textColor="@color/text_primary"
-                        android:textSize="15.5sp" />
+                        android:textSize="15sp" />
 
                     <TextView
                         android:id="@+id/tvDetailRecipientName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
-                        android:fontFamily="@font/nunito_bold"
+                        android:fontFamily="@font/be_vietnam_pro_semibold"
                         android:textColor="@color/text_primary"
                         android:textSize="14.5sp" />
 
@@ -204,6 +212,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
+                        android:fontFamily="@font/be_vietnam_pro_medium"
                         android:textColor="@color/text_secondary"
                         android:textSize="13.5sp" />
 
@@ -212,6 +221,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:lineSpacingMultiplier="1.35"
                         android:textColor="@color/text_secondary"
                         android:textSize="13.5sp" />
@@ -221,6 +231,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:fontFamily="@font/be_vietnam_pro_regular"
                         android:textColor="@color/text_muted"
                         android:textSize="13sp"
                         android:visibility="gone" />
@@ -231,12 +242,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0.5dp"
                 app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -247,10 +258,10 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/nunito_extrabold"
-                        android:text="Sản phẩm"
+                        android:fontFamily="@font/be_vietnam_pro_bold"
+                        android:text="Sản phẩm đã đặt"
                         android:textColor="@color/text_primary"
-                        android:textSize="15.5sp" />
+                        android:textSize="15sp" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvOrderDetailItems"
@@ -265,12 +276,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="14dp"
+                android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/bg_card"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0.5dp"
                 app:strokeColor="@color/border_light"
-                app:strokeWidth="0.75dp">
+                app:strokeWidth="1dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -287,15 +298,16 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:fontFamily="@font/be_vietnam_pro_regular"
                             android:text="Tổng tiền hàng"
                             android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
+                            android:textSize="13.5sp" />
 
                         <TextView
                             android:id="@+id/tvDetailSubtotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_semibold"
+                            android:fontFamily="@font/be_vietnam_pro_semibold"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
                     </LinearLayout>
@@ -310,16 +322,44 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
+                            android:fontFamily="@font/be_vietnam_pro_regular"
                             android:text="Phí vận chuyển"
                             android:textColor="@color/text_secondary"
-                            android:textSize="14sp" />
+                            android:textSize="13.5sp" />
 
                         <TextView
                             android:id="@+id/tvDetailShippingFee"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_semibold"
+                            android:fontFamily="@font/be_vietnam_pro_semibold"
                             android:textColor="@color/teal_trust"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/rowDetailVoucherDiscount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvDetailVoucherLabel"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:fontFamily="@font/be_vietnam_pro_regular"
+                            android:text="Voucher giảm giá"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="13.5sp" />
+
+                        <TextView
+                            android:id="@+id/tvDetailVoucherAmount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
+                            android:textColor="@color/primary"
                             android:textSize="14sp" />
                     </LinearLayout>
 
@@ -339,7 +379,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:text="Tổng thanh toán"
                             android:textColor="@color/text_primary"
                             android:textSize="15.5sp" />
@@ -348,7 +388,7 @@
                             android:id="@+id/tvDetailTotal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/nunito_extrabold"
+                            android:fontFamily="@font/be_vietnam_pro_bold"
                             android:textColor="@color/primary"
                             android:textSize="19sp" />
                     </LinearLayout>

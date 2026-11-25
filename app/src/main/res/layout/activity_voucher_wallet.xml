@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/voucherWalletRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_screen"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarVouchers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_card"
+        android:minHeight="?attr/actionBarSize"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:navigationIconTint="@color/text_primary"
+        app:title="@string/voucher_wallet_title"
+        app:titleCentered="true"
+        app:titleTextColor="@color/text_primary" />
+
+    <!-- Promo Code Input & Segmented Filter Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_card"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etPromoCode"
+                android:layout_width="0dp"
+                android:layout_height="46dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_stepper_pill"
+                android:hint="Nhập mã ưu đãi (VD: VIP20)"
+                android:imeOptions="actionDone"
+                android:inputType="textCapCharacters"
+                android:maxLines="1"
+                android:paddingHorizontal="14dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_muted"
+                android:textSize="13.5sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnApplyPromoCode"
+                style="@style/Widget.BtDay4.PrimaryButton"
+                android:layout_width="wrap_content"
+                android:layout_height="46dp"
+                android:layout_marginStart="8dp"
+                android:minHeight="46dp"
+                android:paddingHorizontal="18dp"
+                android:text="Áp dụng" />
+        </LinearLayout>
+
+        <!-- Segmented Filter Pills -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_segmented_track"
+            android:orientation="horizontal"
+            android:padding="3dp">
+
+            <TextView
+                android:id="@+id/tabVoucherAll"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_segmented_active"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/be_vietnam_pro_semibold"
+                android:gravity="center"
+                android:text="Tất cả"
+                android:textColor="@color/text_primary"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/tabVoucherSaved"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/be_vietnam_pro_medium"
+                android:gravity="center"
+                android:text="Đã lưu"
+                android:textColor="@color/text_secondary"
+                android:textSize="12.5sp" />
+
+            <TextView
+                android:id="@+id/tabVoucherFreeShip"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/be_vietnam_pro_medium"
+                android:gravity="center"
+                android:text="Freeship"
+                android:textColor="@color/text_secondary"
+                android:textSize="12.5sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_hairline" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvVouchers"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="4dp"
+            android:paddingBottom="24dp" />
+
+        <LinearLayout
+            android:id="@+id/llVouchersEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_voucher"
+                app:tint="@color/text_muted" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:fontFamily="@font/be_vietnam_pro_bold"
+                android:text="Chưa có voucher trong mục này"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:gravity="center"
+                android:text="Chuyển sang mục Tất cả hoặc nhập mã ưu đãi ở trên để lưu thêm voucher."
+                android:textColor="@color/text_secondary"
+                android:textSize="13.5sp" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Bottom Clear Selection Bar (Picker Mode Only) -->
+    <LinearLayout
+        android:id="@+id/llPickerBottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bg_card"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnClearSelectedVoucher"
+            style="@style/Widget.BtDay4.SecondaryButton"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="Không dùng mã giảm giá" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -10,6 +10,7 @@ import android.view.View;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.btday4.R;
 import com.example.btday4.data.local.Product;
@@ -20,25 +21,29 @@ import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.ActivityProductDetailBinding;
 import com.example.btday4.databinding.ItemRatingBarBinding;
+import com.example.btday4.databinding.ItemSpecPillBinding;
 import com.example.btday4.databinding.ItemSpecRowBinding;
+import com.example.btday4.model.AppNotification;
 import com.example.btday4.model.RatingSummary;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.checkout.CheckoutActivity;
 import com.example.btday4.ui.main.MainActivity;
+import com.example.btday4.ui.voucher.VoucherWalletActivity;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.ProductImageLoader;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
 import com.google.android.material.chip.Chip;
-import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
- * Edge-to-edge product detail screen with specifications, live rating distribution, full-screen
- * review composer navigation, instant undo review deletion (zero popups), Add to Cart, and Buy Now.
+ * Edge-to-edge flagship product detail screen with key-spec highlight pills, zebra specifications,
+ * voucher wallet cue, live rating distribution, and anchored bottom CTA bar.
  */
 public class ProductDetailActivity extends AppCompatActivity {
 
@@ -59,7 +64,12 @@ public class ProductDetailActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     loadReviews();
-                    Snackbar.make(binding.getRoot(), "Đã lưu đánh giá của bạn", Snackbar.LENGTH_SHORT).show();
+                    InAppNotifier.show(
+                            binding.getRoot(),
+                            AppNotification.TYPE_ACCOUNT,
+                            "Đánh giá sản phẩm",
+                            "Đã lưu đánh giá của bạn"
+                    );
                 }
             }
     );
@@ -69,13 +79,17 @@ public class ProductDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityProductDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.detailRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(binding.detailRoot, binding.flHeroTopBar, binding.llDetailBottomBar);
 
         userSession = new UserSession(this);
         openReviewComposerOnLoad = getIntent().getBooleanExtra(Constants.EXTRA_OPEN_REVIEW, false);
 
         binding.btnBack.setOnClickListener(v -> finish());
         binding.btnToolbarCart.setOnClickListener(v -> openCartAndFinish());
+        binding.rowDetailVoucherCue.setOnClickListener(v ->
+                startActivity(new Intent(this, VoucherWalletActivity.class))
+        );
         binding.btnAddToCart.setEnabled(false);
         binding.btnBuyNow.setEnabled(false);
 
@@ -171,7 +185,11 @@ public class ProductDetailActivity extends AppCompatActivity {
     private void bindProduct(Product item) {
         ProductImageLoader.load(binding.imgDetailProduct, item.getImageUrl());
 
-        binding.tvDetailBrand.setText(ValidationUtils.isNotBlank(item.getBrand()) ? item.getBrand() : "");
+        binding.tvDetailBrand.setText(
+                ValidationUtils.isNotBlank(item.getBrand())
+                        ? item.getBrand().toUpperCase(Locale.getDefault())
+                        : ""
+        );
         binding.tvDetailCategory.setText(ValidationUtils.isNotBlank(item.getCategory()) ? item.getCategory() : "");
         binding.tvDetailName.setText(item.getName());
         binding.tvDetailPrice.setText(item.getPrice());
@@ -204,16 +222,15 @@ public class ProductDetailActivity extends AppCompatActivity {
         bindStockState(item);
     }
 
-    /**
-     * Clamps the selected quantity to available stock and locks purchase actions when sold out.
-     */
     private void bindStockState(Product item) {
         int maxPurchasable = CartRepository.maxPurchasable(item);
         boolean inStock = maxPurchasable > 0;
-        binding.tvStockStatus.setText(inStock ? "Còn hàng (" + item.getStock() + ")" : getString(R.string.out_of_stock));
+        binding.tvStockStatus.setText(inStock ? "Còn " + item.getStock() : getString(R.string.out_of_stock));
+        binding.tvStockStatus.setTextColor(ContextCompat.getColor(
+                this,
+                inStock ? R.color.teal_trust : R.color.danger_red
+        ));
         quantity = inStock ? Math.max(1, Math.min(quantity, maxPurchasable)) : 1;
-        binding.btnQtyMinus.setEnabled(inStock);
-        binding.btnQtyPlus.setEnabled(inStock);
         binding.btnAddToCart.setEnabled(inStock);
         binding.btnBuyNow.setEnabled(inStock);
         binding.btnBuyNow.setText(inStock ? R.string.btn_buy_now : R.string.out_of_stock);
@@ -222,17 +239,29 @@ public class ProductDetailActivity extends AppCompatActivity {
 
     private void bindSpecifications(Map<String, String> specs) {
         binding.llSpecsContainer.removeAllViews();
+        binding.llSpecHighlights.removeAllViews();
         LayoutInflater inflater = LayoutInflater.from(this);
         int index = 0;
-        int total = specs.size();
+        int highlightCount = 0;
         for (Map.Entry<String, String> entry : specs.entrySet()) {
             ItemSpecRowBinding row = ItemSpecRowBinding.inflate(inflater, binding.llSpecsContainer, false);
             row.tvSpecKey.setText(entry.getKey());
             row.tvSpecValue.setText(entry.getValue());
-            row.dividerSpec.setVisibility(index == total - 1 ? View.GONE : View.VISIBLE);
+            if (index % 2 == 0) {
+                row.rowSpecContainer.setBackgroundResource(R.drawable.bg_zebra_row);
+            }
             binding.llSpecsContainer.addView(row.getRoot());
+
+            if (highlightCount < 4 && !"Bảo hành".equalsIgnoreCase(entry.getKey())) {
+                ItemSpecPillBinding pill = ItemSpecPillBinding.inflate(inflater, binding.llSpecHighlights, false);
+                pill.tvSpecPillLabel.setText(entry.getKey());
+                pill.tvSpecPillValue.setText(entry.getValue());
+                binding.llSpecHighlights.addView(pill.getRoot());
+                highlightCount++;
+            }
             index++;
         }
+        binding.hsvSpecHighlights.setVisibility(highlightCount > 0 ? View.VISIBLE : View.GONE);
     }
 
     private void setupReviewFilterChips() {
@@ -347,9 +376,6 @@ public class ProductDetailActivity extends AppCompatActivity {
         writeReviewLauncher.launch(intent);
     }
 
-    /**
-     * Removes review immediately with an inline Undo action — avoiding intrusive AlertDialog popups.
-     */
     private void deleteReviewWithUndo(ReviewEntity review) {
         final String savedProductId = review.getProductId();
         final String savedUsername = review.getUsername();
@@ -362,23 +388,38 @@ public class ProductDetailActivity extends AppCompatActivity {
                 return;
             }
             loadReviews();
-            Snackbar.make(binding.getRoot(), "Đã xóa đánh giá của bạn", Snackbar.LENGTH_LONG)
-                    .setAction("Hoàn tác", v ->
-                            ReviewRepository.saveReview(
-                                    this,
-                                    savedProductId,
-                                    savedUsername,
-                                    savedAuthor,
-                                    savedRating,
-                                    savedComment,
-                                    this::loadReviews
-                            )
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    AppNotification.TYPE_ACCOUNT,
+                    "Đã xóa đánh giá",
+                    "Đã xóa đánh giá của bạn",
+                    savedProductId,
+                    "Hoàn tác",
+                    () -> ReviewRepository.saveReview(
+                            this,
+                            savedProductId,
+                            savedUsername,
+                            savedAuthor,
+                            savedRating,
+                            savedComment,
+                            this::loadReviews
                     )
-                    .show();
+            );
         });
     }
 
     private void updateQuantityUi() {
+        if (product == null) {
+            return;
+        }
+        int max = CartRepository.maxPurchasable(product);
+        boolean canDecrease = max > 0 && quantity > 1;
+        boolean canIncrease = max > 0 && quantity < max;
+        binding.btnQtyMinus.setEnabled(canDecrease);
+        binding.btnQtyMinus.setAlpha(canDecrease ? 1.0f : 0.35f);
+        binding.btnQtyPlus.setEnabled(canIncrease);
+        binding.btnQtyPlus.setAlpha(canIncrease ? 1.0f : 0.35f);
+
         binding.tvQuantity.setText(String.valueOf(quantity));
         binding.tvSelectedSubtotal.setText(FormatUtils.computeLineTotal(product.getPrice(), quantity));
     }
@@ -405,12 +446,20 @@ public class ProductDetailActivity extends AppCompatActivity {
                     );
                 }
             }
+            String title = added > 0 ? "Đã thêm vào giỏ hàng" : "Giới hạn tồn kho";
+            String type = added > 0 ? AppNotification.TYPE_CART : AppNotification.TYPE_ALERT;
             String message = added > 0
                     ? "Đã thêm " + added + " × " + product.getName() + " vào giỏ"
                     : "Giỏ hàng đã có tối đa " + CartRepository.maxPurchasable(product) + " sản phẩm còn trong kho";
-            Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_LONG)
-                    .setAction("Xem giỏ", v -> openCartAndFinish())
-                    .show();
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    type,
+                    title,
+                    message,
+                    product.getId(),
+                    "Xem giỏ",
+                    this::openCartAndFinish
+            );
         });
     }
 

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.btday4.R;
@@ -20,14 +21,22 @@ import com.example.btday4.data.remote.FirestoreHelper;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.UserSession;
+import com.example.btday4.data.repository.VoucherRepository;
+import com.example.btday4.data.repository.VoucherRepository.VoucherItem;
 import com.example.btday4.databinding.FragmentProductsBinding;
+import com.example.btday4.databinding.ItemHomeVoucherBinding;
+import com.example.btday4.model.AppNotification;
 import com.example.btday4.model.ProductWithRating;
+import com.example.btday4.model.Voucher;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.tracking.RecommendationEngine;
 import com.example.btday4.ui.main.MainActivity;
+import com.example.btday4.ui.voucher.VoucherWalletActivity;
+import com.example.btday4.util.AvatarImageLoader;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
 import com.example.btday4.util.GridSpacingItemDecoration;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.ProductImageLoader;
 import com.example.btday4.util.UiUtils;
 import com.google.android.material.chip.Chip;
@@ -42,8 +51,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * TikTok Shop / Shopee Mall inspired Store feed with pinned search + cart header,
- * flagship spotlight banner, 4-tab inline sort bar (zero popups), and 2-column product grid.
+ * Flagship TechStore feed featuring user avatar header, quick voucher wallet access,
+ * AI-ranked spotlight hero, horizontal claimable voucher strip, 4-tab sort bar, and 2-column grid.
  */
 public class ProductsFragment extends Fragment {
 
@@ -90,11 +99,22 @@ public class ProductsFragment extends Fragment {
         refreshGreeting();
         refreshUserGender();
 
-        adapter = new ProductAdapter(this::openProductDetail);
+        adapter = new ProductAdapter(this::openProductDetail, this::quickAddToCart);
         int spacingPx = Math.round(10 * getResources().getDisplayMetrics().density);
         binding.rvProducts.setLayoutManager(new GridLayoutManager(requireContext(), 2));
         binding.rvProducts.addItemDecoration(new GridSpacingItemDecoration(2, spacingPx));
         binding.rvProducts.setAdapter(adapter);
+
+        binding.flHeaderAvatar.setOnClickListener(v -> {
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).openProfileTab();
+            }
+        });
+
+        View.OnClickListener openVouchers = v ->
+                startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
+        binding.btnHeaderVouchers.setOnClickListener(openVouchers);
+        binding.btnOpenVoucherWallet.setOnClickListener(openVouchers);
 
         binding.btnHomeCart.setOnClickListener(v -> {
             if (getActivity() instanceof MainActivity) {
@@ -144,13 +164,14 @@ public class ProductsFragment extends Fragment {
 
         binding.btnResetFilter.setOnClickListener(v -> resetFilters());
 
+        refreshHomeVouchers();
+
         productsListener = FirestoreHelper.listenProducts(new FirestoreHelper.FirestoreCallback<List<Product>>() {
             @Override
             public void onSuccess(List<Product> remoteProducts) {
                 if (!isAdded() || binding == null || remoteProducts == null || remoteProducts.isEmpty()) {
                     return;
                 }
-                // Render products immediately on first paint instead of blocking on a 2nd reviews round-trip.
                 if (allProducts.isEmpty()) {
                     updateProductData(ProductRepository.withoutRatings(remoteProducts));
                 }
@@ -164,7 +185,9 @@ public class ProductsFragment extends Fragment {
 
             @Override
             public void onError(Exception e) {
-                // Keep local Room SQLite catalog intact when offline.
+                if (isAdded() && binding != null) {
+                    binding.progressProducts.setVisibility(View.GONE);
+                }
             }
         });
     }
@@ -174,6 +197,7 @@ public class ProductsFragment extends Fragment {
         super.onResume();
         refreshGreeting();
         refreshHeaderCartBadge();
+        refreshHomeVouchers();
     }
 
     @Override
@@ -190,6 +214,7 @@ public class ProductsFragment extends Fragment {
         } else {
             refreshGreeting();
             refreshHeaderCartBadge();
+            refreshHomeVouchers();
         }
     }
 
@@ -236,10 +261,146 @@ public class ProductsFragment extends Fragment {
         });
     }
 
+    private void refreshHomeVouchers() {
+        if (!isAdded() || binding == null || userSession == null) {
+            return;
+        }
+        VoucherRepository.getVouchersForUser(requireContext(), userSession.getUsername(), list -> {
+            if (!isAdded() || binding == null) {
+                return;
+            }
+            binding.llHomeVouchers.removeAllViews();
+            LayoutInflater inflater = LayoutInflater.from(requireContext());
+            long now = System.currentTimeMillis();
+            int shown = 0;
+            for (VoucherItem row : list) {
+                if (row.used || row.voucher.isExpired(now)) {
+                    continue;
+                }
+                Voucher v = row.voucher;
+                ItemHomeVoucherBinding itemBinding = ItemHomeVoucherBinding.inflate(
+                        inflater,
+                        binding.llHomeVouchers,
+                        false
+                );
+                itemBinding.llMiniStub.setBackgroundResource(
+                        v.isFreeShipType()
+                                ? R.drawable.bg_voucher_stub_teal
+                                : R.drawable.bg_voucher_stub_primary
+                );
+                itemBinding.tvMiniBadge.setText(v.getBadgeLabel());
+                itemBinding.tvMiniTitle.setText(v.getTitle());
+                itemBinding.tvMiniCondition.setText("Đơn từ " + FormatUtils.formatVnd(v.getMinOrderAmount()));
+
+                if (row.claimed) {
+                    itemBinding.btnMiniClaim.setText("Đã lưu");
+                    itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_tag);
+                    itemBinding.btnMiniClaim.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.primary)
+                    );
+                } else {
+                    itemBinding.btnMiniClaim.setText("Lưu");
+                    itemBinding.btnMiniClaim.setBackgroundResource(R.drawable.bg_discount_solid);
+                    itemBinding.btnMiniClaim.setTextColor(
+                            ContextCompat.getColor(requireContext(), R.color.white)
+                    );
+                }
+
+                itemBinding.getRoot().setOnClickListener(click -> {
+                    if (!row.claimed) {
+                        VoucherRepository.claimByCode(
+                                requireContext(),
+                                userSession.getUsername(),
+                                v.getCode()
+                        );
+                        refreshHomeVouchers();
+                        showHomeNotification(
+                                AppNotification.TYPE_VOUCHER,
+                                "Đã lưu mã ưu đãi",
+                                "Đã lưu mã " + v.getCode() + " vào kho voucher",
+                                null,
+                                null
+                        );
+                    } else {
+                        startActivity(new Intent(requireContext(), VoucherWalletActivity.class));
+                    }
+                });
+
+                binding.llHomeVouchers.addView(itemBinding.getRoot());
+                shown++;
+                if (shown >= 5) {
+                    break;
+                }
+            }
+        });
+    }
+
+    private void quickAddToCart(Product product) {
+        if (!isAdded() || product == null) {
+            return;
+        }
+        CartRepository.addItem(requireContext(), product.getId(), 1, added -> {
+            if (!isAdded() || binding == null) {
+                return;
+            }
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).refreshCartBadge();
+            } else {
+                refreshHeaderCartBadge();
+            }
+            if (added > 0) {
+                BehaviorTracker tracker = BehaviorTracker.getInstance();
+                if (tracker != null) {
+                    tracker.trackAction(
+                            "MainActivity:Products",
+                            BehaviorTracker.EVENT_ADD_TO_CART,
+                            product.getId(),
+                            product.getName() + "|qty=" + added
+                    );
+                }
+                showHomeNotification(
+                        AppNotification.TYPE_CART,
+                        "Đã thêm vào giỏ hàng",
+                        "Đã thêm " + product.getName() + " vào giỏ",
+                        "Xem giỏ",
+                        () -> {
+                            if (getActivity() instanceof MainActivity) {
+                                ((MainActivity) getActivity()).openCartTab();
+                            }
+                        }
+                );
+            } else {
+                showHomeNotification(
+                        AppNotification.TYPE_ALERT,
+                        "Giới hạn tồn kho",
+                        "Đã đạt số lượng tồn kho tối đa trong giỏ",
+                        null,
+                        null
+                );
+            }
+        });
+    }
+
+    private void showHomeNotification(
+            String type,
+            String title,
+            String message,
+            @Nullable String actionLabel,
+            @Nullable Runnable action
+    ) {
+        if (!isAdded() || binding == null) {
+            return;
+        }
+        InAppNotifier.show(binding.getRoot(), type, title, message, "", actionLabel, action);
+    }
+
     private void updateProductData(List<ProductWithRating> products) {
         allProducts.clear();
         if (products != null) {
             allProducts.addAll(products);
+        }
+        if (binding != null) {
+            binding.progressProducts.setVisibility(View.GONE);
         }
         bindSpotlightProduct();
         rebuildCategoryChipsIfNeeded();
@@ -260,6 +421,7 @@ public class ProductsFragment extends Fragment {
                 currentUserGender = loadedGender;
                 refreshRecommendationScores();
             }
+            refreshGreeting();
         });
     }
 
@@ -406,7 +568,7 @@ public class ProductsFragment extends Fragment {
                 && currentSort == SortOption.DEFAULT;
         int bannerVisibility = isDefaultBrowse && spotlightProduct != null ? View.VISIBLE : View.GONE;
         binding.cardSpotlight.setVisibility(bannerVisibility);
-        binding.rowTrustStrip.setVisibility(bannerVisibility);
+        binding.sectionHomeVouchers.setVisibility(isDefaultBrowse ? View.VISIBLE : View.GONE);
 
         List<ProductWithRating> filtered = new ArrayList<>();
         for (ProductWithRating item : allProducts) {
@@ -448,8 +610,9 @@ public class ProductsFragment extends Fragment {
 
         lastFilteredCount = filtered.size();
         adapter.submitList(filtered);
-        binding.tvProductCount.setText(filtered.size() + " sản phẩm");
-        binding.llEmptyProducts.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
+        binding.llEmptyProducts.setVisibility(
+                filtered.isEmpty() && !allProducts.isEmpty() ? View.VISIBLE : View.GONE
+        );
     }
 
     private void scheduleSearchTracking(String query) {
@@ -481,7 +644,6 @@ public class ProductsFragment extends Fragment {
         if (selected == null || !isAdded()) {
             return;
         }
-        // Flush any pending search query immediately before navigating away.
         flushPendingSearchTrack();
         Intent intent = new Intent(requireContext(), ProductDetailActivity.class);
         intent.putExtra(Constants.EXTRA_PRODUCT_ID, selected.getId());
@@ -490,7 +652,14 @@ public class ProductsFragment extends Fragment {
 
     private void refreshGreeting() {
         if (binding != null && userSession != null) {
-            binding.tvWelcomeUser.setText("Xin chào, " + userSession.getDisplayName());
+            String name = userSession.getDisplayName();
+            binding.tvWelcomeUser.setText("Xin chào, " + name);
+            AvatarImageLoader.load(
+                    binding.imgHeaderAvatar,
+                    binding.tvHeaderAvatarInitials,
+                    userSession.getAvatarUrl(),
+                    name
+            );
         }
     }
 

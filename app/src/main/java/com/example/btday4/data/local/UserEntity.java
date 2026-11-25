@@ -43,6 +43,9 @@ public class UserEntity {
     @ColumnInfo(name = "birth_date")
     private String birthDate;
 
+    @ColumnInfo(name = "avatar_url")
+    private String avatarUrl;
+
     @Ignore
     public UserEntity() {
         this.username = "";
@@ -59,6 +62,22 @@ public class UserEntity {
             String gender,
             String birthDate
     ) {
+        this(username, displayName, password, phone, address, loginTime, email, gender, birthDate, "");
+    }
+
+    @Ignore
+    public UserEntity(
+            @NonNull String username,
+            String displayName,
+            String password,
+            String phone,
+            String address,
+            String loginTime,
+            String email,
+            String gender,
+            String birthDate,
+            String avatarUrl
+    ) {
         this.username = username;
         this.displayName = displayName;
         this.password = password;
@@ -68,6 +87,7 @@ public class UserEntity {
         this.email = email;
         this.gender = gender;
         this.birthDate = birthDate;
+        this.avatarUrl = avatarUrl;
     }
 
     @NonNull
@@ -145,5 +165,13 @@ public class UserEntity {
 
     public void setBirthDate(String birthDate) {
         this.birthDate = birthDate;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 }

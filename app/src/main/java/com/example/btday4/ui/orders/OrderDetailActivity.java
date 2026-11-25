@@ -12,7 +12,9 @@ import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.PayOsRepository;
+import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.ActivityOrderDetailBinding;
+import com.example.btday4.model.AppNotification;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.OrderWithItems;
 import com.example.btday4.model.PayOsPaymentInfo;
@@ -23,13 +25,13 @@ import com.example.btday4.ui.main.MainActivity;
 import com.example.btday4.ui.products.ProductDetailActivity;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.UiUtils;
 import com.example.btday4.util.ValidationUtils;
-import com.google.android.material.snackbar.Snackbar;
 
 /**
  * Full-bleed order detail screen serving post-checkout confirmation, PayOS QR resumption,
- * order history detail, popup-confirmed cancellation (with restock), and "Mua lại".
+ * voucher discount breakdown, cancellation with restock & voucher restore, and "Mua lại".
  */
 public class OrderDetailActivity extends AppCompatActivity {
 
@@ -45,7 +47,8 @@ public class OrderDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityOrderDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.orderDetailRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(binding.orderDetailRoot, binding.toolbarOrderDetail, null);
 
         isNewOrder = getIntent().getBooleanExtra(Constants.EXTRA_IS_NEW_ORDER, false);
         orderId = getIntent().getStringExtra(Constants.EXTRA_ORDER_ID);
@@ -74,7 +77,7 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.btnCancelOrder.setOnClickListener(v -> UiUtils.showConfirmDialog(
                 this,
                 "Hủy đơn hàng này?",
-                "Sản phẩm sẽ được hoàn lại kho. Thao tác này không thể hoàn tác.",
+                "Sản phẩm sẽ được hoàn lại kho và mã ưu đãi (nếu có) sẽ được khôi phục.",
                 getString(R.string.btn_cancel_order),
                 this::confirmCancel
         ));
@@ -149,14 +152,14 @@ public class OrderDetailActivity extends AppCompatActivity {
         PaymentMethod method = PaymentMethod.fromCode(order.getPaymentMethod());
 
         boolean showSuccessBanner = isNewOrder
-                && (status == OrderStatus.PAID || status == OrderStatus.PENDING_CONFIRMATION);
+                && (status == OrderStatus.PAID || status == OrderStatus.PROCESSING || status == OrderStatus.DELIVERED);
         binding.bannerOrderSuccess.setVisibility(showSuccessBanner ? View.VISIBLE : View.GONE);
         if (status == OrderStatus.PAID) {
             binding.tvOrderSuccessTitle.setText("Thanh toán QR thành công");
-            binding.tvOrderSuccessSubtitle.setText("Giao dịch VietQR đã được PayOS xác nhận tự động.");
+            binding.tvOrderSuccessSubtitle.setText("Giao dịch VietQR đã được PayOS ghi nhận tự động.");
         } else {
             binding.tvOrderSuccessTitle.setText("Đặt hàng thành công");
-            binding.tvOrderSuccessSubtitle.setText("Đơn hàng của bạn đã được lưu trong mục Đơn mua.");
+            binding.tvOrderSuccessSubtitle.setText("Đơn hàng của bạn đang được chuẩn bị và giao tới nơi.");
         }
 
         binding.tvDetailOrderCode.setText(order.getId());
@@ -182,6 +185,8 @@ public class OrderDetailActivity extends AppCompatActivity {
             binding.tvDetailNote.setVisibility(View.GONE);
         }
 
+        boolean allowReview = status != OrderStatus.CANCELLED && status != OrderStatus.PENDING_PAYMENT;
+        itemAdapter.setReviewAllowed(allowReview);
         itemAdapter.submitItems(data.safeItems());
 
         binding.tvDetailSubtotal.setText(FormatUtils.formatVnd(order.getSubtotalAmount()));
@@ -194,13 +199,21 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvDetailShippingFee.setTextColor(
                 ContextCompat.getColor(this, isFreeShipping ? R.color.teal_trust : R.color.text_primary)
         );
+
+        if (order.getVoucherDiscount() > 0L) {
+            binding.rowDetailVoucherDiscount.setVisibility(View.VISIBLE);
+            String label = order.getVoucherCode().isEmpty()
+                    ? "Voucher giảm giá"
+                    : "Voucher giảm giá (" + order.getVoucherCode() + ")";
+            binding.tvDetailVoucherLabel.setText(label);
+            binding.tvDetailVoucherAmount.setText("-" + FormatUtils.formatVnd(order.getVoucherDiscount()));
+        } else {
+            binding.rowDetailVoucherDiscount.setVisibility(View.GONE);
+        }
+
         binding.tvDetailTotal.setText(FormatUtils.formatVnd(order.getTotalAmount()));
     }
 
-    /**
-     * Unpaid QR orders cancel their PayOS link first; COD orders cancel locally. Both paths
-     * restock items exactly once.
-     */
     private void confirmCancel() {
         binding.btnCancelOrder.setEnabled(false);
         boolean hasActiveQr = currentOrder != null
@@ -210,8 +223,15 @@ public class OrderDetailActivity extends AppCompatActivity {
             PayOsRepository.cancelPayment(this, latestPayment, "Khách hàng hủy đơn", new PayOsRepository.PaymentCallback() {
                 @Override
                 public void onSuccess(PaymentEntity payment) {
-                    // PayOS may report the QR as already paid, in which case the order is kept.
-                    onCancelFinished(PayOsPaymentInfo.STATUS_CANCELLED.equalsIgnoreCase(payment.getStatus()));
+                    boolean cancelled = PayOsPaymentInfo.STATUS_CANCELLED.equalsIgnoreCase(payment.getStatus());
+                    if (cancelled && currentOrder != null) {
+                        VoucherRepository.restoreVoucherIfCancelled(
+                                OrderDetailActivity.this,
+                                currentOrder.order.getUsername(),
+                                currentOrder.order.getVoucherCode()
+                        );
+                    }
+                    onCancelFinished(cancelled);
                 }
 
                 @Override
@@ -229,11 +249,24 @@ public class OrderDetailActivity extends AppCompatActivity {
             return;
         }
         binding.btnCancelOrder.setEnabled(true);
-        Snackbar.make(
-                binding.getRoot(),
-                cancelled ? "Đã hủy đơn hàng và hoàn sản phẩm về kho" : "Không thể hủy đơn hàng ở trạng thái hiện tại",
-                Snackbar.LENGTH_LONG
-        ).show();
+        if (cancelled) {
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    AppNotification.TYPE_ORDER,
+                    "Đã hủy đơn hàng",
+                    "Đơn " + orderId + " đã hủy và hoàn sản phẩm về kho.",
+                    orderId,
+                    null,
+                    null
+            );
+        } else {
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    AppNotification.TYPE_ALERT,
+                    "Không thể hủy đơn",
+                    "Không thể hủy đơn hàng ở trạng thái hiện tại."
+            );
+        }
         loadOrderData();
     }
 
@@ -248,9 +281,21 @@ public class OrderDetailActivity extends AppCompatActivity {
             }
             binding.btnBuyAgain.setEnabled(true);
             if (added == 0) {
-                Snackbar.make(binding.getRoot(), "Các sản phẩm trong đơn đã hết hàng", Snackbar.LENGTH_LONG).show();
+                InAppNotifier.show(
+                        binding.getRoot(),
+                        AppNotification.TYPE_ALERT,
+                        "Hết hàng",
+                        "Các sản phẩm trong đơn hiện đã hết hàng."
+                );
                 return;
             }
+            InAppNotifier.recordOnly(
+                    this,
+                    AppNotification.TYPE_CART,
+                    "Đã thêm lại vào giỏ hàng",
+                    "Đã thêm " + added + " sản phẩm từ đơn " + orderId + " vào giỏ.",
+                    orderId
+            );
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.putExtra(Constants.EXTRA_OPEN_CART, true);
@@ -260,7 +305,7 @@ public class OrderDetailActivity extends AppCompatActivity {
     }
 
     private void applyStatusBadgeStyle(OrderStatus status) {
-        if (status == OrderStatus.PAID || status == OrderStatus.DELIVERED) {
+        if (status == OrderStatus.PAID || status == OrderStatus.DELIVERED || status == OrderStatus.PROCESSING) {
             binding.tvDetailOrderStatus.setBackgroundResource(R.drawable.bg_freeship_tag);
             binding.tvDetailOrderStatus.setTextColor(ContextCompat.getColor(this, R.color.teal_trust));
         } else if (status == OrderStatus.CANCELLED) {

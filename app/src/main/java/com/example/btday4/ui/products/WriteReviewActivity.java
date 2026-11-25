@@ -15,8 +15,8 @@ import com.example.btday4.util.UiUtils;
 import com.google.android.material.chip.Chip;
 
 /**
- * Full-screen native review composer replacing the previous BottomSheet popup.
- * Features large 48dp star targets, quick-tag suggestions, and keyboard-safe scroll form.
+ * Full-screen native review composer featuring 48dp star targets, quick-tag suggestions,
+ * and IME-aware edge-to-edge scroll form.
  */
 public class WriteReviewActivity extends AppCompatActivity {
 
@@ -39,7 +39,12 @@ public class WriteReviewActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityWriteReviewBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.writeReviewRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(
+                binding.writeReviewRoot,
+                binding.toolbarWriteReview,
+                binding.llWriteReviewBottomBar
+        );
 
         productId = getIntent().getStringExtra(Constants.EXTRA_PRODUCT_ID);
         String productName = getIntent().getStringExtra(Constants.EXTRA_PRODUCT_NAME);

@@ -9,9 +9,9 @@
 
     <TextView
         android:id="@+id/tvBarStar"
-        android:layout_width="24dp"
+        android:layout_width="26dp"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/nunito_semibold"
+        android:fontFamily="@font/be_vietnam_pro_semibold"
         android:text="5★"
         android:textColor="@color/text_secondary"
         android:textSize="12sp" />
@@ -30,8 +30,9 @@
 
     <TextView
         android:id="@+id/tvBarCount"
-        android:layout_width="22dp"
+        android:layout_width="24dp"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/be_vietnam_pro_regular"
         android:gravity="end"
         android:text="0"
         android:textColor="@color/text_muted"

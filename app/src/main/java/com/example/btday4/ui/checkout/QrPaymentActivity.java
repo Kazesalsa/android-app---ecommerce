@@ -17,20 +17,22 @@ import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.PayOsRepository;
+import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.ActivityQrPaymentBinding;
+import com.example.btday4.model.AppNotification;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.PayOsPaymentInfo;
 import com.example.btday4.ui.orders.OrderDetailActivity;
 import com.example.btday4.util.Constants;
 import com.example.btday4.util.FormatUtils;
+import com.example.btday4.util.InAppNotifier;
 import com.example.btday4.util.QrCodeGenerator;
 import com.example.btday4.util.UiUtils;
-import com.google.android.material.snackbar.Snackbar;
 import java.util.Locale;
 
 /**
  * Full-screen PayOS VietQR payment screen with offline ZXing QR bitmap rendering, live status
- * polling, countdown timer, copyable transfer details, and inline two-step cancel (zero popups).
+ * polling, countdown timer, collapsible manual transfer details, and custom top notifications.
  */
 public class QrPaymentActivity extends AppCompatActivity {
 
@@ -44,6 +46,7 @@ public class QrPaymentActivity extends AppCompatActivity {
     private boolean isPollingActive = false;
     private boolean isCheckingStatus = false;
     private boolean hasCompletedTransition = false;
+    private boolean isManualExpanded = false;
 
     private final Runnable pollStatusRunnable = new Runnable() {
         @Override
@@ -84,7 +87,12 @@ public class QrPaymentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityQrPaymentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        UiUtils.applySystemBarInsets(binding.qrPaymentRoot);
+        UiUtils.setStatusBarLightIcons(this, true);
+        UiUtils.applyEdgeToEdgeBars(
+                binding.qrPaymentRoot,
+                binding.toolbarQrPayment,
+                binding.llQrBottomBar
+        );
 
         orderId = getIntent().getStringExtra(Constants.EXTRA_ORDER_ID);
         isNewOrder = getIntent().getBooleanExtra(Constants.EXTRA_IS_NEW_ORDER, false);
@@ -102,6 +110,13 @@ public class QrPaymentActivity extends AppCompatActivity {
         });
         binding.btnRetryQr.setOnClickListener(v -> initPayOsPayment(true));
         binding.btnViewOrderFromError.setOnClickListener(v -> openOrderDetailAndFinish(false));
+
+        binding.rowToggleManualTransfer.setOnClickListener(v -> {
+            isManualExpanded = !isManualExpanded;
+            TransitionManager.beginDelayedTransition(binding.qrContentContainer);
+            binding.llManualTransferDetails.setVisibility(isManualExpanded ? View.VISIBLE : View.GONE);
+            binding.tvToggleManualLabel.setText(isManualExpanded ? "Thu gọn" : "Mở rộng");
+        });
 
         binding.btnCopyAccount.setOnClickListener(v -> {
             if (currentPayment != null) {
@@ -122,7 +137,6 @@ public class QrPaymentActivity extends AppCompatActivity {
         binding.btnCheckStatus.setOnClickListener(v -> checkStatusOnServer(true));
         binding.btnOpenPayOsWeb.setOnClickListener(v -> openCheckoutUrlInBrowser());
 
-        // Inline 2-step cancel confirmation (no AlertDialog popup)
         binding.btnCancelPayment.setOnClickListener(v -> showCancelConfirm(true));
         binding.btnKeepPayment.setOnClickListener(v -> showCancelConfirm(false));
         binding.btnConfirmCancelPayment.setOnClickListener(v -> confirmCancelPayment());
@@ -184,6 +198,13 @@ public class QrPaymentActivity extends AppCompatActivity {
                 }
                 currentPayment = payment;
                 if (PayOsPaymentInfo.STATUS_PAID.equalsIgnoreCase(payment.getStatus())) {
+                    InAppNotifier.recordOnly(
+                            QrPaymentActivity.this,
+                            AppNotification.TYPE_ORDER,
+                            "Thanh toán VietQR thành công",
+                            "Đơn " + orderId + " đã được thanh toán qua PayOS.",
+                            orderId
+                    );
                     openOrderDetailAndFinish(true);
                     return;
                 }
@@ -207,6 +228,17 @@ public class QrPaymentActivity extends AppCompatActivity {
         String formattedAmount = FormatUtils.formatVnd(payment.getAmount());
         binding.tvQrAmount.setText(formattedAmount);
         binding.tvQrTransferAmount.setText(formattedAmount);
+
+        if (currentOrder != null && currentOrder.getVoucherDiscount() > 0L) {
+            binding.tvQrVoucherNote.setVisibility(View.VISIBLE);
+            binding.tvQrVoucherNote.setText(
+                    "Đã giảm " + FormatUtils.formatVnd(currentOrder.getVoucherDiscount())
+                            + " (" + currentOrder.getVoucherCode() + ")"
+            );
+        } else {
+            binding.tvQrVoucherNote.setVisibility(View.GONE);
+        }
+
         binding.tvQrBankName.setText(QrCodeGenerator.resolveBankName(payment.getBankBin()));
         binding.tvQrAccountName.setText(
                 payment.getAccountName() == null || payment.getAccountName().isEmpty()
@@ -216,7 +248,7 @@ public class QrPaymentActivity extends AppCompatActivity {
         binding.tvQrAccountNumber.setText(payment.getAccountNumber());
         binding.tvQrDescription.setText(payment.getDescription());
 
-        int qrSizePx = Math.round(240 * getResources().getDisplayMetrics().density);
+        int qrSizePx = Math.round(236 * getResources().getDisplayMetrics().density);
         Bitmap qrBitmap = QrCodeGenerator.encode(payment.getQrCode(), qrSizePx);
         if (qrBitmap != null) {
             binding.imgQrCode.setImageBitmap(qrBitmap);
@@ -248,6 +280,13 @@ public class QrPaymentActivity extends AppCompatActivity {
 
                 if (PayOsPaymentInfo.STATUS_PAID.equalsIgnoreCase(updated.getStatus())) {
                     stopTimers();
+                    InAppNotifier.recordOnly(
+                            QrPaymentActivity.this,
+                            AppNotification.TYPE_ORDER,
+                            "Thanh toán VietQR thành công",
+                            "Đơn " + orderId + " đã được thanh toán qua PayOS.",
+                            orderId
+                    );
                     openOrderDetailAndFinish(true);
                 } else if (PayOsPaymentInfo.STATUS_CANCELLED.equalsIgnoreCase(updated.getStatus())
                         || PayOsPaymentInfo.STATUS_EXPIRED.equalsIgnoreCase(updated.getStatus())) {
@@ -259,11 +298,15 @@ public class QrPaymentActivity extends AppCompatActivity {
                 } else {
                     binding.tvQrStatusText.setText("Đang tự động kiểm tra thanh toán...");
                     if (userTriggered) {
-                        Snackbar.make(
+                        InAppNotifier.show(
                                 binding.getRoot(),
+                                AppNotification.TYPE_ORDER,
+                                "Đang chờ thanh toán",
                                 "Chưa ghi nhận chuyển khoản. Hệ thống vẫn đang tự động theo dõi.",
-                                Snackbar.LENGTH_SHORT
-                        ).show();
+                                orderId,
+                                null,
+                                null
+                        );
                     }
                 }
             }
@@ -277,7 +320,12 @@ public class QrPaymentActivity extends AppCompatActivity {
                 binding.btnCheckStatus.setEnabled(true);
                 binding.tvQrStatusText.setText("Đang tự động kiểm tra thanh toán...");
                 if (userTriggered) {
-                    Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+                    InAppNotifier.show(
+                            binding.getRoot(),
+                            AppNotification.TYPE_ALERT,
+                            "Lỗi kiểm tra giao dịch",
+                            message
+                    );
                 }
             }
         });
@@ -304,6 +352,20 @@ public class QrPaymentActivity extends AppCompatActivity {
                             return;
                         }
                         boolean paid = PayOsPaymentInfo.STATUS_PAID.equalsIgnoreCase(updated.getStatus());
+                        if (!paid && currentOrder != null) {
+                            VoucherRepository.restoreVoucherIfCancelled(
+                                    QrPaymentActivity.this,
+                                    currentOrder.getUsername(),
+                                    currentOrder.getVoucherCode()
+                            );
+                            InAppNotifier.recordOnly(
+                                    QrPaymentActivity.this,
+                                    AppNotification.TYPE_ORDER,
+                                    "Đã hủy giao dịch QR",
+                                    "Đơn " + orderId + " đã hủy và hoàn sản phẩm về kho.",
+                                    orderId
+                            );
+                        }
                         openOrderDetailAndFinish(paid);
                     }
 
@@ -315,7 +377,12 @@ public class QrPaymentActivity extends AppCompatActivity {
                         binding.btnConfirmCancelPayment.setEnabled(true);
                         binding.btnKeepPayment.setEnabled(true);
                         binding.btnCheckStatus.setEnabled(true);
-                        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
+                        InAppNotifier.show(
+                                binding.getRoot(),
+                                AppNotification.TYPE_ALERT,
+                                "Không thể hủy giao dịch",
+                                message
+                        );
                         startTimers();
                     }
                 }
@@ -331,8 +398,12 @@ public class QrPaymentActivity extends AppCompatActivity {
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currentPayment.getCheckoutUrl()));
             startActivity(browserIntent);
         } catch (Exception e) {
-            Snackbar.make(binding.getRoot(), "Không tìm thấy trình duyệt để mở trang PayOS", Snackbar.LENGTH_SHORT)
-                    .show();
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    AppNotification.TYPE_ALERT,
+                    "Không thể mở trình duyệt",
+                    "Không tìm thấy trình duyệt để mở trang PayOS"
+            );
         }
     }
 
@@ -420,8 +491,15 @@ public class QrPaymentActivity extends AppCompatActivity {
         ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
         if (clipboard != null) {
             clipboard.setPrimaryClip(ClipData.newPlainText(label, text.trim()));
-            Snackbar.make(binding.getRoot(), "Đã sao chép " + label.toLowerCase(Locale.getDefault()), Snackbar.LENGTH_SHORT)
-                    .show();
+            InAppNotifier.show(
+                    binding.getRoot(),
+                    AppNotification.TYPE_ORDER,
+                    "Đã sao chép",
+                    "Đã sao chép " + label.toLowerCase(Locale.getDefault()),
+                    orderId,
+                    null,
+                    null
+            );
         }
     }
 }
