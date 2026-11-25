@@ -118,19 +118,21 @@ public class UserSession {
                 callback.accept(AuthResult.ACCOUNT_EXISTS);
                 return;
             }
-            UserEntity user = new UserEntity(
-                    cleanUsername,
-                    cleanDisplayName,
-                    PasswordHasher.hash(password),
-                    "",
-                    "",
-                    "",
-                    ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "",
-                    "",
-                    ""
-            );
-            startSession(user, rememberMe);
-            callback.accept(AuthResult.SUCCESS);
+            AUTH_EXECUTOR.execute(() -> {
+                UserEntity user = new UserEntity(
+                        cleanUsername,
+                        cleanDisplayName,
+                        PasswordHasher.hash(password),
+                        "",
+                        "",
+                        "",
+                        ValidationUtils.isValidEmail(cleanUsername) ? cleanUsername : "",
+                        "",
+                        ""
+                );
+                startSession(user, rememberMe);
+                MAIN_HANDLER.post(() -> callback.accept(AuthResult.SUCCESS));
+            });
         }).addOnFailureListener(e -> {
             Log.e(TAG, "Firestore register failed for " + cleanUsername, e);
             callback.accept(AuthResult.NETWORK_ERROR);
@@ -234,17 +236,18 @@ public class UserSession {
             return;
         }
         DocumentReference docRef = usersRef().document(username);
-        docRef.get().addOnSuccessListener(snapshot -> {
+        docRef.get().addOnSuccessListener(snapshot -> AUTH_EXECUTOR.execute(() -> {
             UserEntity user = snapshot.exists() ? snapshot.toObject(UserEntity.class) : null;
             boolean verified = user != null && PasswordHasher.matches(currentPassword, user.getPassword());
             if (!verified) {
-                callback.accept(false);
+                MAIN_HANDLER.post(() -> callback.accept(false));
                 return;
             }
-            docRef.update("password", PasswordHasher.hash(newPassword))
+            String hashedNew = PasswordHasher.hash(newPassword);
+            docRef.update("password", hashedNew)
                     .addOnSuccessListener(unused -> callback.accept(true))
                     .addOnFailureListener(e -> callback.accept(false));
-        }).addOnFailureListener(e -> callback.accept(false));
+        })).addOnFailureListener(e -> callback.accept(false));
     }
 
     public void loadCurrentUser(Consumer<UserEntity> callback) {
@@ -276,6 +279,7 @@ public class UserSession {
             editor.remove(Constants.KEY_DISPLAY_NAME);
         }
         editor.apply();
+        VoucherRepository.clearPendingVoucherCode(appContext);
         RecommendationEngine.clearCache();
     }
 

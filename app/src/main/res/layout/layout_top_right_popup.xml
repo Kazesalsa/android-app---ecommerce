@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:padding="6dp">
+
+    <LinearLayout
+        android:id="@+id/popupCard"
+        android:layout_width="304dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_top_right_popup"
+        android:clipToOutline="true"
+        android:elevation="12dp"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
+
+            <FrameLayout
+                android:layout_width="44dp"
+                android:layout_height="44dp">
+
+                <FrameLayout
+                    android:id="@+id/popupThumbWrap"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_popup_thumb_frame"
+                    android:padding="4dp">
+
+                    <ImageView
+                        android:id="@+id/imgPopupProduct"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@null"
+                        android:scaleType="fitCenter" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/popupIconWrap"
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_circle_avatar"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/imgPopupIcon"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="@color/teal_trust" />
+                </FrameLayout>
+
+                <ImageView
+                    android:id="@+id/imgPopupMiniBadge"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="bottom|end"
+                    android:background="@drawable/bg_circle_avatar"
+                    android:backgroundTint="@color/teal_trust"
+                    android:contentDescription="@null"
+                    android:padding="2dp"
+                    android:src="@drawable/ic_check_circle"
+                    app:tint="@color/white" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPopupTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/nunito_extrabold"
+                    android:maxLines="1"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tvPopupMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:textColor="#C9CBD6"
+                    android:textSize="11.5sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end|center_vertical"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/btnPopupClose"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="Đóng"
+                    android:padding="3dp"
+                    android:src="@drawable/ic_close"
+                    app:tint="#8E92A4" />
+
+                <TextView
+                    android:id="@+id/btnPopupAction"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_popup_cta_pill"
+                    android:fontFamily="@font/nunito_bold"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="Xem giỏ"
+                    android:textColor="@color/white"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/viewPopupProgress"
+            android:layout_width="match_parent"
+            android:layout_height="2.5dp"
+            android:background="@color/teal_trust" />
+    </LinearLayout>
+</FrameLayout>
+

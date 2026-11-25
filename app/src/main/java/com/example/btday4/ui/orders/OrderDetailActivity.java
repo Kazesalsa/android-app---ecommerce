@@ -10,9 +10,11 @@ import com.example.btday4.R;
 import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.repository.CartRepository;
+import com.example.btday4.data.repository.NotificationRepository;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.PayOsRepository;
 import com.example.btday4.databinding.ActivityOrderDetailBinding;
+import com.example.btday4.model.NotificationItem;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.OrderWithItems;
 import com.example.btday4.model.PayOsPaymentInfo;
@@ -87,8 +89,6 @@ public class OrderDetailActivity extends AppCompatActivity {
         });
         binding.rvOrderDetailItems.setLayoutManager(new LinearLayoutManager(this));
         binding.rvOrderDetailItems.setAdapter(itemAdapter);
-
-        loadOrderData();
     }
 
     @Override
@@ -194,6 +194,16 @@ public class OrderDetailActivity extends AppCompatActivity {
         binding.tvDetailShippingFee.setTextColor(
                 ContextCompat.getColor(this, isFreeShipping ? R.color.teal_trust : R.color.text_primary)
         );
+        if (order.getDiscountAmount() > 0L) {
+            binding.llDetailDiscountRow.setVisibility(View.VISIBLE);
+            String code = ValidationUtils.isNotBlank(order.getVoucherCode())
+                    ? " (" + order.getVoucherCode() + ")"
+                    : "";
+            binding.tvDetailDiscountLabel.setText("Giảm giá" + code);
+            binding.tvDetailDiscountAmount.setText("-" + FormatUtils.formatVnd(order.getDiscountAmount()));
+        } else {
+            binding.llDetailDiscountRow.setVisibility(View.GONE);
+        }
         binding.tvDetailTotal.setText(FormatUtils.formatVnd(order.getTotalAmount()));
     }
 
@@ -229,6 +239,15 @@ public class OrderDetailActivity extends AppCompatActivity {
             return;
         }
         binding.btnCancelOrder.setEnabled(true);
+        if (cancelled) {
+            NotificationRepository.addNotification(
+                    this,
+                    NotificationItem.Type.ORDER,
+                    "Đã hủy đơn hàng #" + orderId,
+                    "Đơn hàng đã được hủy và hoàn sản phẩm về kho.",
+                    orderId
+            );
+        }
         Snackbar.make(
                 binding.getRoot(),
                 cancelled ? "Đã hủy đơn hàng và hoàn sản phẩm về kho" : "Không thể hủy đơn hàng ở trạng thái hiện tại",
@@ -251,6 +270,13 @@ public class OrderDetailActivity extends AppCompatActivity {
                 Snackbar.make(binding.getRoot(), "Các sản phẩm trong đơn đã hết hàng", Snackbar.LENGTH_LONG).show();
                 return;
             }
+            NotificationRepository.addNotification(
+                    this,
+                    NotificationItem.Type.CART,
+                    "Đã thêm sản phẩm mua lại",
+                    "Đã thêm " + added + " sản phẩm từ đơn #" + orderId + " vào giỏ hàng.",
+                    ""
+            );
             Intent intent = new Intent(this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             intent.putExtra(Constants.EXTRA_OPEN_CART, true);

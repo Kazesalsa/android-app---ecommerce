@@ -52,6 +52,7 @@ public class ProductAdapter extends ListAdapter<ProductWithRating, ProductAdapte
                             && Objects.equals(oldItem.product.getPrice(), newItem.product.getPrice())
                             && Objects.equals(oldItem.product.getOriginalPrice(), newItem.product.getOriginalPrice())
                             && Objects.equals(oldItem.product.getImageUrl(), newItem.product.getImageUrl())
+                            && oldItem.product.getStock() == newItem.product.getStock()
                             && Double.compare(oldItem.avgRating, newItem.avgRating) == 0
                             && oldItem.reviewCount == newItem.reviewCount;
                 }

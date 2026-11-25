@@ -2,8 +2,6 @@ package com.example.btday4.data.remote;
 
 import android.util.Log;
 import androidx.annotation.NonNull;
-import com.example.btday4.data.local.OrderEntity;
-import com.example.btday4.data.local.OrderItemEntity;
 import com.example.btday4.data.local.PaymentEntity;
 import com.example.btday4.data.local.Product;
 import com.example.btday4.data.local.ReviewEntity;
@@ -13,13 +11,11 @@ import com.example.btday4.data.repository.ReviewRepository;
 import com.example.btday4.util.Constants;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -172,42 +168,6 @@ public final class FirestoreHelper {
                 });
     }
 
-    public static void saveOrder(
-            @NonNull OrderEntity order,
-            @NonNull List<OrderItemEntity> items,
-            FirestoreCallback<Void> callback
-    ) {
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("id", order.getId());
-        payload.put("username", order.getUsername());
-        payload.put("recipientName", order.getRecipientName());
-        payload.put("recipientPhone", order.getRecipientPhone());
-        payload.put("shippingAddress", order.getShippingAddress());
-        payload.put("note", order.getNote());
-        payload.put("paymentMethod", order.getPaymentMethod());
-        payload.put("subtotalAmount", order.getSubtotalAmount());
-        payload.put("shippingFee", order.getShippingFee());
-        payload.put("totalAmount", order.getTotalAmount());
-        payload.put("status", order.getStatus());
-        payload.put("createdAt", order.getCreatedAt());
-        payload.put("items", items);
-
-        getDb().collection(Constants.COLLECTION_ORDERS)
-                .document(order.getId())
-                .set(payload)
-                .addOnSuccessListener(unused -> {
-                    if (callback != null) {
-                        callback.onSuccess(null);
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "Failed to sync order", e);
-                    if (callback != null) {
-                        callback.onError(e);
-                    }
-                });
-    }
-
     public static void updateOrderStatus(
             @NonNull String orderId,
             @NonNull String status,
@@ -227,16 +187,6 @@ public final class FirestoreHelper {
                         callback.onError(e);
                     }
                 });
-    }
-
-    /**
-     * Best-effort mirror of a local stock change using an atomic server-side increment.
-     */
-    public static void adjustProductStock(@NonNull String productId, int delta) {
-        getDb().collection(Constants.COLLECTION_PRODUCTS)
-                .document(productId)
-                .update("stock", FieldValue.increment(delta))
-                .addOnFailureListener(e -> Log.e(TAG, "Failed to sync product stock", e));
     }
 
     public static void savePayment(@NonNull PaymentEntity payment, FirestoreCallback<Void> callback) {
@@ -312,8 +262,7 @@ public final class FirestoreHelper {
     }
 
     /**
-     * Stores one compact tracking summary document under users/{username}/tracking/profile
-     * and removes any legacy trackingProfile field on users/{username} or top-level tracking_profiles docs.
+     * Stores one compact tracking summary document under users/{username}/tracking/profile.
      */
     public static void saveTrackingProfile(
             @NonNull String username,
@@ -323,35 +272,11 @@ public final class FirestoreHelper {
         if (cleanUser.isEmpty() || "guest".equals(cleanUser)) {
             return;
         }
-        FirebaseFirestore db = getDb();
-        db.collection(Constants.COLLECTION_USERS)
+        getDb().collection(Constants.COLLECTION_USERS)
                 .document(cleanUser)
                 .collection(Constants.COLLECTION_TRACKING)
                 .document(Constants.DOC_TRACKING_PROFILE)
                 .set(summary)
-                .addOnSuccessListener(unused -> cleanupLegacyTrackingData(db, cleanUser))
                 .addOnFailureListener(e -> Log.e(TAG, "Failed to sync tracking profile", e));
-    }
-
-    private static void cleanupLegacyTrackingData(FirebaseFirestore db, String username) {
-        // Remove old trackingProfile field from users/{username} if it was written earlier
-        db.collection(Constants.COLLECTION_USERS)
-                .document(username)
-                .set(Collections.singletonMap("trackingProfile", FieldValue.delete()), SetOptions.merge());
-
-        // Delete all docs in legacy top-level tracking_profiles so the collection disappears
-        db.collection("tracking_profiles")
-                .get()
-                .addOnSuccessListener(snapshot -> {
-                    if (snapshot == null || snapshot.isEmpty()) {
-                        return;
-                    }
-                    WriteBatch batch = db.batch();
-                    for (DocumentSnapshot doc : snapshot.getDocuments()) {
-                        batch.delete(doc.getReference());
-                    }
-                    batch.commit()
-                            .addOnFailureListener(e -> Log.e(TAG, "Failed to delete legacy tracking_profiles", e));
-                });
     }
 }

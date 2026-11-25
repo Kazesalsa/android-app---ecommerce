@@ -1,65 +1,47 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.Index;
-import androidx.room.PrimaryKey;
 
 /**
- * Room and Firestore entity representing a submitted customer order with shipping and payment snapshot.
+ * Firestore POJO representing a submitted customer order with shipping and payment snapshot.
  */
-@Entity(
-        tableName = "orders",
-        indices = {@Index(value = "username")}
-)
 public class OrderEntity {
 
-    @PrimaryKey
     @NonNull
     private String id;
 
     @NonNull
-    @ColumnInfo(name = "username")
     private String username;
 
     @NonNull
-    @ColumnInfo(name = "recipient_name")
     private String recipientName;
 
     @NonNull
-    @ColumnInfo(name = "recipient_phone")
     private String recipientPhone;
 
     @NonNull
-    @ColumnInfo(name = "shipping_address")
     private String shippingAddress;
 
-    @ColumnInfo(name = "note")
     private String note;
 
     @NonNull
-    @ColumnInfo(name = "payment_method")
     private String paymentMethod;
 
-    @ColumnInfo(name = "subtotal_amount")
     private long subtotalAmount;
 
-    @ColumnInfo(name = "shipping_fee")
     private long shippingFee;
 
-    @ColumnInfo(name = "total_amount")
+    private String voucherCode;
+
+    private long discountAmount;
+
     private long totalAmount;
 
     @NonNull
-    @ColumnInfo(name = "status")
     private String status;
 
-    @ColumnInfo(name = "created_at")
     private long createdAt;
 
-    @Ignore
     public OrderEntity() {
         this.id = "";
         this.username = "";
@@ -67,6 +49,8 @@ public class OrderEntity {
         this.recipientPhone = "";
         this.shippingAddress = "";
         this.paymentMethod = "";
+        this.voucherCode = "";
+        this.discountAmount = 0L;
         this.status = "";
     }
 
@@ -80,6 +64,8 @@ public class OrderEntity {
             @NonNull String paymentMethod,
             long subtotalAmount,
             long shippingFee,
+            String voucherCode,
+            long discountAmount,
             long totalAmount,
             @NonNull String status,
             long createdAt
@@ -93,6 +79,8 @@ public class OrderEntity {
         this.paymentMethod = paymentMethod;
         this.subtotalAmount = subtotalAmount;
         this.shippingFee = shippingFee;
+        this.voucherCode = voucherCode == null ? "" : voucherCode;
+        this.discountAmount = Math.max(0L, discountAmount);
         this.totalAmount = totalAmount;
         this.status = status;
         this.createdAt = createdAt;
@@ -174,6 +162,22 @@ public class OrderEntity {
 
     public void setShippingFee(long shippingFee) {
         this.shippingFee = shippingFee;
+    }
+
+    public String getVoucherCode() {
+        return voucherCode == null ? "" : voucherCode;
+    }
+
+    public void setVoucherCode(String voucherCode) {
+        this.voucherCode = voucherCode == null ? "" : voucherCode;
+    }
+
+    public long getDiscountAmount() {
+        return discountAmount;
+    }
+
+    public void setDiscountAmount(long discountAmount) {
+        this.discountAmount = Math.max(0L, discountAmount);
     }
 
     public long getTotalAmount() {

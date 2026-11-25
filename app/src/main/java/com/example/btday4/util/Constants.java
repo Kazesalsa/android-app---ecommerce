@@ -18,7 +18,6 @@ public final class Constants {
     // ==========================================
     // INTENT EXTRA KEYS (Biến đại diện cho putExtra)
     // ==========================================
-    public static final String EXTRA_PRODUCT = "product";
     public static final String EXTRA_PRODUCT_ID = "product_id";
     public static final String EXTRA_PRODUCT_NAME = "product_name";
     public static final String EXTRA_PRODUCT_IMAGE_URL = "product_image_url";
@@ -26,6 +25,7 @@ public final class Constants {
     public static final String EXTRA_SELECTED_PRODUCT_IDS = "selected_product_ids";
     public static final String EXTRA_OPEN_CART = "open_cart";
     public static final String EXTRA_OPEN_PRODUCTS = "open_products";
+    public static final String EXTRA_OPEN_VOUCHERS = "open_vouchers";
     public static final String EXTRA_OPEN_REVIEW = "open_review";
     public static final String EXTRA_ORDER_ID = "order_id";
     public static final String EXTRA_IS_NEW_ORDER = "is_new_order";
@@ -42,6 +42,8 @@ public final class Constants {
     public static final String COLLECTION_REVIEWS = "reviews";
     public static final String COLLECTION_ORDERS = "orders";
     public static final String COLLECTION_PAYMENTS = "payments";
+    public static final String COLLECTION_VOUCHERS = "vouchers";
+    public static final String COLLECTION_NOTIFICATIONS = "notifications";
     public static final String COLLECTION_TRACKING = "tracking";
     public static final String DOC_TRACKING_PROFILE = "profile";
 

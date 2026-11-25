@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import com.example.btday4.R;
 import com.example.btday4.data.local.Product;
 import com.example.btday4.data.remote.FirestoreHelper;
-import com.example.btday4.data.repository.CartRepository;
 import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.UserSession;
 import com.example.btday4.databinding.FragmentProductsBinding;
@@ -173,7 +172,6 @@ public class ProductsFragment extends Fragment {
     public void onResume() {
         super.onResume();
         refreshGreeting();
-        refreshHeaderCartBadge();
     }
 
     @Override
@@ -189,7 +187,6 @@ public class ProductsFragment extends Fragment {
             flushPendingSearchTrack();
         } else {
             refreshGreeting();
-            refreshHeaderCartBadge();
         }
     }
 
@@ -219,21 +216,16 @@ public class ProductsFragment extends Fragment {
         });
     }
 
-    public void refreshHeaderCartBadge() {
+    public void updateHeaderCartBadge(int count) {
         if (!isAdded() || binding == null) {
             return;
         }
-        CartRepository.getTotalQuantity(requireContext(), count -> {
-            if (!isAdded() || binding == null) {
-                return;
-            }
-            if (count > 0) {
-                binding.tvHomeCartBadge.setVisibility(View.VISIBLE);
-                binding.tvHomeCartBadge.setText(count > 99 ? "99+" : String.valueOf(count));
-            } else {
-                binding.tvHomeCartBadge.setVisibility(View.GONE);
-            }
-        });
+        if (count > 0) {
+            binding.tvHomeCartBadge.setVisibility(View.VISIBLE);
+            binding.tvHomeCartBadge.setText(count > 99 ? "99+" : String.valueOf(count));
+        } else {
+            binding.tvHomeCartBadge.setVisibility(View.GONE);
+        }
     }
 
     private void updateProductData(List<ProductWithRating> products) {
@@ -408,6 +400,7 @@ public class ProductsFragment extends Fragment {
         binding.cardSpotlight.setVisibility(bannerVisibility);
         binding.rowTrustStrip.setVisibility(bannerVisibility);
 
+        String foldedQuery = RecommendationEngine.foldText(searchQuery);
         List<ProductWithRating> filtered = new ArrayList<>();
         for (ProductWithRating item : allProducts) {
             Product p = item.product;
@@ -416,11 +409,12 @@ public class ProductsFragment extends Fragment {
                     continue;
                 }
             }
-            if (!searchQuery.isEmpty()) {
-                String haystack = (safe(p.getName()) + " " + safe(p.getBrand()) + " "
-                        + safe(p.getCategory()) + " " + safe(p.getShortInfo()))
-                        .toLowerCase(Locale.getDefault());
-                if (!haystack.contains(searchQuery)) {
+            if (!foldedQuery.isEmpty()) {
+                String haystack = RecommendationEngine.foldText(
+                        safe(p.getName()) + " " + safe(p.getBrand()) + " "
+                                + safe(p.getCategory()) + " " + safe(p.getShortInfo())
+                );
+                if (!haystack.contains(foldedQuery)) {
                     continue;
                 }
             }

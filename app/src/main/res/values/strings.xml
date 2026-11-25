@@ -25,7 +25,9 @@
 
     <!-- Navigation -->
     <string name="nav_products">Cửa hàng</string>
+    <string name="nav_vouchers">Voucher</string>
     <string name="nav_cart">Giỏ hàng</string>
+    <string name="nav_notifications">Thông báo</string>
     <string name="nav_profile">Tài khoản</string>
 
     <!-- Products -->
@@ -63,6 +65,14 @@
     <string name="empty_orders">Bạn chưa có đơn hàng nào</string>
     <string name="btn_buy_again">Mua lại</string>
     <string name="btn_cancel_order">Hủy đơn hàng</string>
+
+    <!-- Notifications -->
+    <string name="notifications_title">Thông báo</string>
+    <string name="btn_mark_all_read">Đọc tất cả</string>
+    <string name="empty_notifications">Chưa có thông báo nào</string>
+
+    <!-- Vouchers -->
+    <string name="vouchers_title">Kho Voucher</string>
 
     <!-- Profile -->
     <string name="profile_title">Tài khoản</string>

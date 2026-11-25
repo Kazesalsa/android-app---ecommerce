@@ -1,49 +1,26 @@
 package com.example.btday4.data.local;
 
 import androidx.annotation.NonNull;
-import androidx.room.ColumnInfo;
-import androidx.room.Entity;
-import androidx.room.Ignore;
-import androidx.room.PrimaryKey;
-import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.IgnoreExtraProperties;
 
 /**
- * Room and Firestore entity storing user credentials (hashed) and personal profile details.
+ * Firestore POJO storing user credentials (hashed) and personal profile details.
  */
 @IgnoreExtraProperties
-@Entity(tableName = "users")
 public class UserEntity {
 
-    @PrimaryKey
     @NonNull
     private String username;
 
-    @ColumnInfo(name = "display_name")
     private String displayName;
-
-    @ColumnInfo(name = "password")
     private String password;
-
-    @ColumnInfo(name = "phone")
     private String phone;
-
-    @ColumnInfo(name = "address")
     private String address;
-
-    @ColumnInfo(name = "login_time")
     private String loginTime;
-
-    @ColumnInfo(name = "email")
     private String email;
-
-    @ColumnInfo(name = "gender")
     private String gender;
-
-    @ColumnInfo(name = "birth_date")
     private String birthDate;
 
-    @Ignore
     public UserEntity() {
         this.username = "";
     }

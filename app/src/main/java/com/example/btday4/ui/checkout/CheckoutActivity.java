@@ -4,18 +4,25 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.transition.TransitionManager;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.btday4.R;
 import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.OrderItemEntity;
+import com.example.btday4.data.local.VoucherEntity;
 import com.example.btday4.data.repository.CartRepository;
+import com.example.btday4.data.repository.NotificationRepository;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.ProductRepository;
 import com.example.btday4.data.repository.UserSession;
+import com.example.btday4.data.repository.VoucherRepository;
 import com.example.btday4.databinding.ActivityCheckoutBinding;
 import com.example.btday4.model.CartItem;
+import com.example.btday4.model.NotificationItem;
 import com.example.btday4.model.PaymentMethod;
 import com.example.btday4.tracking.BehaviorTracker;
 import com.example.btday4.ui.orders.OrderDetailActivity;
@@ -45,6 +52,8 @@ public class CheckoutActivity extends AppCompatActivity {
     private String recipientPhone = "";
     private String shippingAddress = "";
     private PaymentMethod selectedPaymentMethod = PaymentMethod.COD;
+    private VoucherEntity appliedVoucher = null;
+    private long currentSubtotal = 0L;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,11 +97,14 @@ public class CheckoutActivity extends AppCompatActivity {
 
         binding.optionCod.setOnClickListener(v -> selectPaymentMethod(PaymentMethod.COD));
         binding.optionQr.setOnClickListener(v -> selectPaymentMethod(PaymentMethod.VIETQR));
+        binding.btnApplyVoucher.setOnClickListener(v -> applyManualVoucherCode());
+        binding.btnRemoveVoucher.setOnClickListener(v -> removeAppliedVoucher());
         binding.btnPlaceOrder.setOnClickListener(v -> submitOrder());
         selectPaymentMethod(PaymentMethod.COD);
 
         loadUserShippingDefaults();
         loadCheckoutItems();
+        loadAvailableVouchers();
     }
 
     private void loadUserShippingDefaults() {
@@ -236,8 +248,22 @@ public class CheckoutActivity extends AppCompatActivity {
             totalQuantity += item.getQuantity();
             subtotal += item.lineSubtotal();
         }
+        currentSubtotal = subtotal;
         long shippingFee = FormatUtils.computeShippingFee(subtotal);
-        long grandTotal = subtotal + shippingFee;
+
+        long discountAmount = 0L;
+        if (appliedVoucher != null && subtotal > 0L) {
+            String error = appliedVoucher.validateForOrder(subtotal, System.currentTimeMillis());
+            if (error == null) {
+                discountAmount = appliedVoucher.computeDiscount(subtotal);
+            } else {
+                showVoucherFeedback(error, true);
+                appliedVoucher = null;
+            }
+        }
+        updateAppliedVoucherUi(discountAmount);
+
+        long grandTotal = Math.max(0L, subtotal - discountAmount + shippingFee);
 
         binding.tvCheckoutItemsHeader.setText("Sản phẩm đặt mua (" + totalQuantity + ")");
         binding.tvSubtotalLabel.setText("Tạm tính (" + totalQuantity + " sản phẩm)");
@@ -253,10 +279,144 @@ public class CheckoutActivity extends AppCompatActivity {
             binding.tvFreeShippingHint.setVisibility(View.VISIBLE);
         }
 
+        if (discountAmount > 0L && appliedVoucher != null) {
+            binding.llCheckoutDiscountRow.setVisibility(View.VISIBLE);
+            binding.tvCheckoutDiscountLabel.setText("Giảm giá (" + appliedVoucher.getCode() + ")");
+            binding.tvCheckoutDiscount.setText("-" + FormatUtils.formatVnd(discountAmount));
+        } else {
+            binding.llCheckoutDiscountRow.setVisibility(View.GONE);
+        }
+
         String totalFormatted = FormatUtils.formatVnd(grandTotal);
         binding.tvCheckoutTotal.setText(totalFormatted);
         binding.tvBottomTotal.setText(totalFormatted);
         binding.btnPlaceOrder.setEnabled(!checkoutItems.isEmpty());
+    }
+
+    private void loadAvailableVouchers() {
+        VoucherRepository.getAllVouchers(vouchers -> {
+            if (isFinishing() || isDestroyed() || binding == null) {
+                return;
+            }
+            renderQuickVoucherChips(vouchers);
+            String pendingCode = VoucherRepository.getPendingVoucherCode(this);
+            if (appliedVoucher == null && ValidationUtils.isNotBlank(pendingCode)) {
+                for (VoucherEntity v : vouchers) {
+                    if (pendingCode.equalsIgnoreCase(v.getCode())) {
+                        tryApplyVoucher(v, false);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    private void renderQuickVoucherChips(List<VoucherEntity> vouchers) {
+        binding.llQuickVoucherChips.removeAllViews();
+        long now = System.currentTimeMillis();
+        float density = getResources().getDisplayMetrics().density;
+        int marginEnd = Math.round(8 * density);
+        int padH = Math.round(11 * density);
+        int padV = Math.round(6 * density);
+
+        int count = 0;
+        for (VoucherEntity voucher : vouchers) {
+            if (voucher == null || !voucher.isAvailable(now)) {
+                continue;
+            }
+            TextView pill = new TextView(this);
+            pill.setText(voucher.getCode() + " • " + voucher.formatShortBadge());
+            pill.setTextSize(12f);
+            pill.setTypeface(ResourcesCompat.getFont(this, R.font.nunito_bold));
+            pill.setTextColor(ContextCompat.getColor(this, R.color.primary));
+            pill.setBackgroundResource(R.drawable.bg_discount_tag);
+            pill.setPadding(padH, padV, padH, padV);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            lp.setMarginEnd(marginEnd);
+            pill.setLayoutParams(lp);
+            pill.setOnClickListener(v -> tryApplyVoucher(voucher, true));
+            binding.llQuickVoucherChips.addView(pill);
+            count++;
+        }
+        binding.hsvQuickVouchers.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    private void applyManualVoucherCode() {
+        String code = binding.etVoucherCode.getText() == null
+                ? ""
+                : binding.etVoucherCode.getText().toString().trim();
+        if (code.isEmpty()) {
+            showVoucherFeedback("Vui lòng nhập mã voucher", true);
+            return;
+        }
+        binding.btnApplyVoucher.setEnabled(false);
+        VoucherRepository.findByCode(code, voucher -> {
+            if (isFinishing() || isDestroyed() || binding == null) {
+                return;
+            }
+            binding.btnApplyVoucher.setEnabled(true);
+            if (voucher == null) {
+                showVoucherFeedback("Không tìm thấy mã giảm giá \"" + code.toUpperCase(java.util.Locale.US) + "\"", true);
+                return;
+            }
+            tryApplyVoucher(voucher, true);
+        });
+    }
+
+    private void tryApplyVoucher(VoucherEntity voucher, boolean showErrorFeedback) {
+        if (voucher == null) {
+            return;
+        }
+        if (currentSubtotal <= 0L) {
+            appliedVoucher = voucher;
+            binding.etVoucherCode.setText(voucher.getCode());
+            return;
+        }
+        String err = voucher.validateForOrder(currentSubtotal, System.currentTimeMillis());
+        if (err != null) {
+            if (showErrorFeedback) {
+                showVoucherFeedback(err, true);
+            }
+            return;
+        }
+        appliedVoucher = voucher;
+        binding.etVoucherCode.setText(voucher.getCode());
+        binding.tvVoucherFeedback.setVisibility(View.GONE);
+        bindItemsAndPricing();
+    }
+
+    private void removeAppliedVoucher() {
+        appliedVoucher = null;
+        VoucherRepository.clearPendingVoucherCode(this);
+        binding.etVoucherCode.setText("");
+        binding.tvVoucherFeedback.setVisibility(View.GONE);
+        bindItemsAndPricing();
+    }
+
+    private void updateAppliedVoucherUi(long discountAmount) {
+        if (appliedVoucher != null && discountAmount > 0L) {
+            binding.llAppliedVoucher.setVisibility(View.VISIBLE);
+            binding.tvAppliedVoucherInfo.setText(
+                    "Đang áp dụng " + appliedVoucher.getCode() + " (-" + FormatUtils.formatVnd(discountAmount) + ")"
+            );
+            binding.tvAppliedVoucherBadge.setVisibility(View.VISIBLE);
+            binding.tvAppliedVoucherBadge.setText(appliedVoucher.getCode());
+        } else {
+            binding.llAppliedVoucher.setVisibility(View.GONE);
+            binding.tvAppliedVoucherBadge.setVisibility(View.GONE);
+        }
+    }
+
+    private void showVoucherFeedback(String message, boolean isError) {
+        binding.tvVoucherFeedback.setVisibility(View.VISIBLE);
+        binding.tvVoucherFeedback.setText(message);
+        binding.tvVoucherFeedback.setTextColor(ContextCompat.getColor(
+                this,
+                isError ? R.color.danger_red : R.color.teal_trust
+        ));
     }
 
     private void selectPaymentMethod(PaymentMethod method) {
@@ -295,6 +455,7 @@ public class CheckoutActivity extends AppCompatActivity {
                 : binding.etDeliveryNote.getText().toString().trim();
 
         binding.btnPlaceOrder.setEnabled(false);
+        String voucherDocId = appliedVoucher != null ? appliedVoucher.getDocId() : null;
         OrderRepository.placeOrder(
                 this,
                 userSession.getUsername(),
@@ -305,12 +466,14 @@ public class CheckoutActivity extends AppCompatActivity {
                 selectedPaymentMethod,
                 checkoutItems,
                 isCartCheckout,
+                voucherDocId,
                 new OrderRepository.PlaceOrderCallback() {
                     @Override
                     public void onSuccess(OrderEntity createdOrder) {
                         if (isFinishing() || isDestroyed()) {
                             return;
                         }
+                        VoucherRepository.clearPendingVoucherCode(CheckoutActivity.this);
                         BehaviorTracker tracker = BehaviorTracker.getInstance();
                         if (tracker != null) {
                             StringBuilder purchasedIds = new StringBuilder();
@@ -328,6 +491,25 @@ public class CheckoutActivity extends AppCompatActivity {
                                             + "|total=" + createdOrder.getTotalAmount()
                                             + "|items=" + checkoutItems.size()
                                             + "|products=" + purchasedIds
+                            );
+                        }
+                        if (selectedPaymentMethod == PaymentMethod.VIETQR) {
+                            NotificationRepository.addNotification(
+                                    CheckoutActivity.this,
+                                    NotificationItem.Type.ORDER,
+                                    "Chờ thanh toán VietQR #" + createdOrder.getId(),
+                                    "Vui lòng hoàn tất thanh toán VietQR số tiền "
+                                            + FormatUtils.formatVnd(createdOrder.getTotalAmount()) + ".",
+                                    createdOrder.getId()
+                            );
+                        } else {
+                            NotificationRepository.addNotification(
+                                    CheckoutActivity.this,
+                                    NotificationItem.Type.ORDER,
+                                    "Đặt hàng thành công #" + createdOrder.getId(),
+                                    "Đơn hàng COD tổng " + FormatUtils.formatVnd(createdOrder.getTotalAmount())
+                                            + " đang chờ xác nhận.",
+                                    createdOrder.getId()
                             );
                         }
                         setResult(RESULT_OK);

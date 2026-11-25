@@ -15,9 +15,11 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.PaymentEntity;
+import com.example.btday4.data.repository.NotificationRepository;
 import com.example.btday4.data.repository.OrderRepository;
 import com.example.btday4.data.repository.PayOsRepository;
 import com.example.btday4.databinding.ActivityQrPaymentBinding;
+import com.example.btday4.model.NotificationItem;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.PayOsPaymentInfo;
 import com.example.btday4.ui.orders.OrderDetailActivity;
@@ -350,6 +352,19 @@ public class QrPaymentActivity extends AppCompatActivity {
         }
         hasCompletedTransition = true;
         stopTimers();
+
+        if (markSuccessBanner) {
+            String totalSuffix = currentOrder != null
+                    ? " (" + FormatUtils.formatVnd(currentOrder.getTotalAmount()) + ")"
+                    : "";
+            NotificationRepository.addNotification(
+                    this,
+                    NotificationItem.Type.PAYMENT,
+                    "Thanh toán thành công",
+                    "Đơn hàng #" + orderId + totalSuffix + " đã được thanh toán qua VietQR.",
+                    orderId
+            );
+        }
 
         if (!isNewOrder && !markSuccessBanner) {
             finish();

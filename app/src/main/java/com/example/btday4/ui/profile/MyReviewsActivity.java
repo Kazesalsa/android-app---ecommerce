@@ -49,8 +49,6 @@ public class MyReviewsActivity extends AppCompatActivity {
         });
         binding.rvMyReviews.setLayoutManager(new LinearLayoutManager(this));
         binding.rvMyReviews.setAdapter(adapter);
-
-        loadReviews();
     }
 
     @Override

@@ -11,6 +11,21 @@ import java.util.Locale;
  */
 public final class FormatUtils {
 
+    private static final ThreadLocal<DecimalFormat> VND_FORMATTER = ThreadLocal.withInitial(() -> {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.US);
+        symbols.setGroupingSeparator('.');
+        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
+        formatter.setGroupingUsed(true);
+        return formatter;
+    });
+
+    private static final ThreadLocal<SimpleDateFormat> DATE_FORMATTER =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()));
+    private static final ThreadLocal<SimpleDateFormat> DATE_TIME_FORMATTER =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()));
+    private static final ThreadLocal<SimpleDateFormat> SHORT_DATE_TIME_FORMATTER =
+            ThreadLocal.withInitial(() -> new SimpleDateFormat("HH:mm, dd/MM", Locale.getDefault()));
+
     private FormatUtils() {
     }
 
@@ -36,11 +51,7 @@ public final class FormatUtils {
     }
 
     public static String formatVnd(long amount) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.');
-        DecimalFormat formatter = new DecimalFormat("#,###", symbols);
-        formatter.setGroupingUsed(true);
-        return formatter.format(Math.max(0L, amount)) + " ₫";
+        return VND_FORMATTER.get().format(Math.max(0L, amount)) + " ₫";
     }
 
     public static String computeLineTotal(String unitPrice, int quantity) {
@@ -67,11 +78,15 @@ public final class FormatUtils {
     }
 
     public static String formatDate(long epochMillis) {
-        return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(epochMillis));
+        return DATE_FORMATTER.get().format(new Date(epochMillis));
     }
 
     public static String formatDateTime(long epochMillis) {
-        return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(epochMillis));
+        return DATE_TIME_FORMATTER.get().format(new Date(epochMillis));
+    }
+
+    public static String formatShortDateTime(long epochMillis) {
+        return SHORT_DATE_TIME_FORMATTER.get().format(new Date(epochMillis));
     }
 
     public static String formatRating(double rating) {

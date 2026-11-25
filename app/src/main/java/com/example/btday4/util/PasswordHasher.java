@@ -66,12 +66,16 @@ public final class PasswordHasher {
         }
     }
 
+    private static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
+
     private static String toHex(byte[] bytes) {
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-        for (byte b : bytes) {
-            builder.append(String.format("%02x", b));
+        char[] out = new char[bytes.length * 2];
+        for (int i = 0; i < bytes.length; i++) {
+            int v = bytes[i] & 0xFF;
+            out[i * 2] = HEX_CHARS[v >>> 4];
+            out[i * 2 + 1] = HEX_CHARS[v & 0x0F];
         }
-        return builder.toString();
+        return new String(out);
     }
 
     private static byte[] fromHex(String hex) {

@@ -1,5 +1,7 @@
 package com.example.btday4.model;
 
+import java.util.Locale;
+
 /**
  * Immutable DTO representing a parsed response from PayOS v2 payment-requests APIs.
  */
@@ -45,7 +47,7 @@ public final class PayOsPaymentInfo {
         this.bin = safe(bin);
         this.accountNumber = safe(accountNumber);
         this.accountName = safe(accountName);
-        this.status = status == null || status.trim().isEmpty() ? STATUS_PENDING : status.trim().toUpperCase();
+        this.status = status == null || status.trim().isEmpty() ? STATUS_PENDING : status.trim().toUpperCase(Locale.US);
         this.expiredAtSeconds = expiredAtSeconds;
     }
 

@@ -33,6 +33,7 @@ public final class RecommendationEngine {
     public static final long CACHE_TTL_MS = 12L * 60L * 60L * 1000L;
 
     private static final Object CACHE_LOCK = new Object();
+    private static volatile Handler mainHandler;
     private static String cachedUsername;
     private static String cachedGender;
     private static long cachedComputedAtMs;
@@ -120,7 +121,12 @@ public final class RecommendationEngine {
         String cleanGender = normalizeGender(gender);
         List<ProductWithRating> snapshot = new ArrayList<>(products);
         Context appContext = context.getApplicationContext();
-        Handler mainHandler = new Handler(Looper.getMainLooper());
+        Handler handler = mainHandler;
+        if (handler == null) {
+            handler = new Handler(Looper.getMainLooper());
+            mainHandler = handler;
+        }
+        final Handler uiHandler = handler;
         TrackingDatabase.runAsync(appContext, db -> {
             List<UserEventEntity> events = db.userEventDao().getRecentForUser(cleanUser, MAX_EVENTS_TO_ANALYZE);
             long computedAt = System.currentTimeMillis();
@@ -128,7 +134,7 @@ public final class RecommendationEngine {
             cacheScores(cleanUser, cleanGender, scores, computedAt);
             Log.d("RecommendationEngine", "Scored " + scores.size() + " products from "
                     + (events == null ? 0 : events.size()) + " events for user=" + cleanUser);
-            mainHandler.post(() -> callback.accept(scores));
+            uiHandler.post(() -> callback.accept(scores));
         });
     }
 
@@ -251,8 +257,9 @@ public final class RecommendationEngine {
                 String targetId = safeLower(event.getTargetId());
 
                 if (BehaviorTracker.EVENT_SEARCH.equals(type)) {
-                    if (!targetId.isEmpty()) {
-                        searchQueries.add(new WeightedQuery(targetId, decay));
+                    String qFolded = foldText(targetId);
+                    if (!qFolded.isEmpty()) {
+                        searchQueries.add(new WeightedQuery(qFolded, decay));
                     }
                 } else if (BehaviorTracker.EVENT_FILTER_CATEGORY.equals(type)) {
                     if (!targetId.isEmpty() && !targetId.equals("tất cả") && !targetId.equals("all")) {
@@ -316,13 +323,9 @@ public final class RecommendationEngine {
             String categoryFolded = foldText(categoryLower);
             String infoFolded = foldText(infoLower);
             for (WeightedQuery wq : searchQueries) {
-                String qFolded = foldText(wq.query);
-                if (qFolded.isEmpty()) {
-                    continue;
-                }
-                if (nameFolded.contains(qFolded) || brandFolded.contains(qFolded)) {
+                if (nameFolded.contains(wq.query) || brandFolded.contains(wq.query)) {
                     score += 25.0 * wq.weight;
-                } else if (categoryFolded.contains(qFolded) || infoFolded.contains(qFolded)) {
+                } else if (categoryFolded.contains(wq.query) || infoFolded.contains(wq.query)) {
                     score += 12.0 * wq.weight;
                 }
             }
@@ -415,11 +418,12 @@ public final class RecommendationEngine {
         return value == null ? "" : value.trim().toLowerCase(Locale.getDefault());
     }
 
-    private static String foldText(@NonNull String value) {
-        if (value.isEmpty()) {
+    @NonNull
+    public static String foldText(@Nullable String value) {
+        if (value == null || value.isEmpty()) {
             return "";
         }
-        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD);
+        String normalized = Normalizer.normalize(value.toLowerCase(Locale.getDefault()), Normalizer.Form.NFD);
         StringBuilder sb = new StringBuilder(normalized.length());
         for (int i = 0; i < normalized.length(); i++) {
             char c = normalized.charAt(i);

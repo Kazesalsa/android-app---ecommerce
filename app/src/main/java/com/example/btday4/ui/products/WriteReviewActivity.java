@@ -98,7 +98,7 @@ public class WriteReviewActivity extends AppCompatActivity {
         if (current.contains(tagText)) {
             return;
         }
-        String next = current.isEmpty() ? tagText : current + ", " + tagText.toLowerCase();
+        String next = current.isEmpty() ? tagText : current + ", " + tagText.toLowerCase(java.util.Locale.getDefault());
         binding.etReviewComment.setText(next);
         binding.etReviewComment.setSelection(next.length());
         binding.tilReviewComment.setError(null);

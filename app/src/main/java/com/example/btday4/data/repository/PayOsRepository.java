@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -30,6 +31,7 @@ public final class PayOsRepository {
     }
 
     private static final ExecutorService NETWORK_EXECUTOR = Executors.newCachedThreadPool();
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
     private PayOsRepository() {
     }
@@ -231,7 +233,7 @@ public final class PayOsRepository {
     private static PaymentEntity applyStatusUpdate(PaymentEntity original, String newStatus) {
         String normalized = newStatus == null || newStatus.trim().isEmpty()
                 ? original.getStatus()
-                : newStatus.trim().toUpperCase();
+                : newStatus.trim().toUpperCase(Locale.US);
         long paidAt = PayOsPaymentInfo.STATUS_PAID.equals(normalized)
                 ? (original.getPaidAtMillis() > 0L ? original.getPaidAtMillis() : System.currentTimeMillis())
                 : original.getPaidAtMillis();
@@ -264,7 +266,7 @@ public final class PayOsRepository {
 
     private static void notifySuccess(PaymentCallback callback, PaymentEntity payment) {
         if (callback != null) {
-            new Handler(Looper.getMainLooper()).post(() -> callback.onSuccess(payment));
+            MAIN_HANDLER.post(() -> callback.onSuccess(payment));
         }
     }
 
@@ -273,7 +275,7 @@ public final class PayOsRepository {
             String safeMessage = message == null || message.trim().isEmpty()
                     ? "Không thể kết nối cổng thanh toán PayOS"
                     : message;
-            new Handler(Looper.getMainLooper()).post(() -> callback.onError(safeMessage));
+            MAIN_HANDLER.post(() -> callback.onError(safeMessage));
         }
     }
 }

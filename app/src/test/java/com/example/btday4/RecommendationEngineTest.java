@@ -176,6 +176,7 @@ public class RecommendationEngineTest {
         );
 
         assertTrue(scores.get("mx_master") > scores.get("iphone_15"));
+        assertEquals("dien thoai chuot ban phim", RecommendationEngine.foldText("Điện Thoại Chuột Bàn Phím"));
     }
 
     private static ProductWithRating item(

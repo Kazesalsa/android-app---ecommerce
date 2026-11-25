@@ -4,6 +4,7 @@ import android.content.Context;
 import com.example.btday4.data.local.OrderEntity;
 import com.example.btday4.data.local.OrderItemEntity;
 import com.example.btday4.data.local.Product;
+import com.example.btday4.data.local.VoucherEntity;
 import com.example.btday4.model.OrderStatus;
 import com.example.btday4.model.OrderWithItems;
 import com.example.btday4.model.PaymentMethod;
@@ -58,6 +59,15 @@ public final class OrderRepository {
         }
     }
 
+    private static final class VoucherInvalidException extends RuntimeException {
+        final String userMessage;
+
+        VoucherInvalidException(String userMessage) {
+            super(userMessage);
+            this.userMessage = userMessage;
+        }
+    }
+
     public static void placeOrder(
             Context context,
             String username,
@@ -68,15 +78,21 @@ public final class OrderRepository {
             PaymentMethod paymentMethod,
             List<OrderItemEntity> previewItems,
             boolean removeFromCartAfterOrder,
+            String voucherDocId,
             PlaceOrderCallback callback
     ) {
-        if (!ValidationUtils.isNotBlank(username) || previewItems == null || previewItems.isEmpty()) {
+        if (!ValidationUtils.isNotBlank(username)
+                || !ValidationUtils.isNotBlank(recipientName)
+                || !ValidationUtils.isNotBlank(shippingAddress)
+                || previewItems == null
+                || previewItems.isEmpty()) {
             callback.onError("Không thể tạo đơn hàng, vui lòng thử lại");
             return;
         }
 
         long now = System.currentTimeMillis();
         String orderId = generateOrderId(now);
+        String cleanVoucherDocId = voucherDocId == null ? "" : voucherDocId.trim();
 
         long subtotal = 0L;
         List<OrderItemEntity> persistedItems = new ArrayList<>();
@@ -93,7 +109,7 @@ public final class OrderRepository {
         }
 
         long shippingFee = FormatUtils.computeShippingFee(subtotal);
-        long total = subtotal + shippingFee;
+        long baseTotal = subtotal + shippingFee;
         PaymentMethod method = paymentMethod == null ? PaymentMethod.COD : paymentMethod;
         OrderStatus initialStatus = method == PaymentMethod.VIETQR
                 ? OrderStatus.PENDING_PAYMENT
@@ -109,14 +125,17 @@ public final class OrderRepository {
                 method.getCode(),
                 subtotal,
                 shippingFee,
-                total,
+                "",
+                0L,
+                baseTotal,
                 initialStatus.getCode(),
                 now
         );
 
+        final long finalSubtotal = subtotal;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.runTransaction(transaction -> {
-            // 1. Read all referenced products first (required by Firestore transactions).
+            // 1. Read all referenced products and optional voucher first (required by Firestore transactions).
             Map<String, Product> loadedProducts = new HashMap<>();
             Map<String, DocumentReference> productRefs = new HashMap<>();
             for (OrderItemEntity item : persistedItems) {
@@ -127,6 +146,21 @@ public final class OrderRepository {
                 productRefs.put(item.getProductId(), ref);
                 DocumentSnapshot snap = transaction.get(ref);
                 loadedProducts.put(item.getProductId(), snap.exists() ? snap.toObject(Product.class) : null);
+            }
+
+            DocumentReference voucherRef = null;
+            VoucherEntity voucher = null;
+            if (!cleanVoucherDocId.isEmpty()) {
+                voucherRef = db.collection(Constants.COLLECTION_VOUCHERS).document(cleanVoucherDocId);
+                DocumentSnapshot voucherSnap = transaction.get(voucherRef);
+                voucher = VoucherRepository.parseVoucher(voucherSnap);
+                if (voucher == null) {
+                    throw new VoucherInvalidException("Mã giảm giá không tồn tại hoặc đã bị gỡ");
+                }
+                String error = voucher.validateForOrder(finalSubtotal, now);
+                if (error != null) {
+                    throw new VoucherInvalidException(error);
+                }
             }
 
             // 2. Verify stock availability for every item.
@@ -142,9 +176,17 @@ public final class OrderRepository {
                 remainingStock.put(item.getProductId(), currentStock - item.getQuantity());
             }
 
-            // 3. Decrement stock, persist order with embedded items, and clear ordered cart lines atomically.
+            // 3. Decrement stock, apply voucher usage atomically, persist order, and clear ordered cart lines.
             for (Map.Entry<String, Integer> entry : remainingStock.entrySet()) {
                 transaction.update(productRefs.get(entry.getKey()), "stock", entry.getValue());
+            }
+
+            if (voucherRef != null && voucher != null) {
+                long discount = voucher.computeDiscount(finalSubtotal);
+                order.setVoucherCode(voucher.getCode());
+                order.setDiscountAmount(discount);
+                order.setTotalAmount(Math.max(0L, finalSubtotal - discount + shippingFee));
+                transaction.update(voucherRef, "usedCount", voucher.getUsedCount() + 1);
             }
 
             DocumentReference orderRef = db.collection(Constants.COLLECTION_ORDERS).document(order.getId());
@@ -167,6 +209,10 @@ public final class OrderRepository {
                         callback.onError(((InsufficientStockException) cause).userMessage);
                     } else if (e instanceof InsufficientStockException) {
                         callback.onError(((InsufficientStockException) e).userMessage);
+                    } else if (cause instanceof VoucherInvalidException) {
+                        callback.onError(((VoucherInvalidException) cause).userMessage);
+                    } else if (e instanceof VoucherInvalidException) {
+                        callback.onError(((VoucherInvalidException) e).userMessage);
                     } else {
                         callback.onError("Không thể đặt hàng: " + e.getMessage());
                     }
@@ -231,9 +277,26 @@ public final class OrderRepository {
                 }
             }
 
+            String appliedCode = orderWithItems.order.getVoucherCode();
+            DocumentReference voucherRef = null;
+            int restoredUsedCount = -1;
+            if (ValidationUtils.isNotBlank(appliedCode)) {
+                voucherRef = db.collection(Constants.COLLECTION_VOUCHERS).document(appliedCode.trim());
+                DocumentSnapshot voucherDoc = transaction.get(voucherRef);
+                if (voucherDoc.exists()) {
+                    Long usedVal = voucherDoc.getLong("usedCount");
+                    if (usedVal != null && usedVal > 0L) {
+                        restoredUsedCount = (int) (usedVal - 1L);
+                    }
+                }
+            }
+
             transaction.update(orderRef, "status", OrderStatus.CANCELLED.getCode());
             for (Map.Entry<DocumentReference, Integer> entry : newStocks.entrySet()) {
                 transaction.update(entry.getKey(), "stock", entry.getValue());
+            }
+            if (voucherRef != null && restoredUsedCount >= 0) {
+                transaction.update(voucherRef, "usedCount", restoredUsedCount);
             }
             return true;
         });
@@ -307,6 +370,8 @@ public final class OrderRepository {
         payload.put("paymentMethod", order.getPaymentMethod());
         payload.put("subtotalAmount", order.getSubtotalAmount());
         payload.put("shippingFee", order.getShippingFee());
+        payload.put("voucherCode", order.getVoucherCode());
+        payload.put("discountAmount", order.getDiscountAmount());
         payload.put("totalAmount", order.getTotalAmount());
         payload.put("status", order.getStatus());
         payload.put("createdAt", order.getCreatedAt());
@@ -342,6 +407,8 @@ public final class OrderRepository {
                 nonEmpty(doc.getString("paymentMethod"), PaymentMethod.COD.getCode()),
                 longVal(doc.get("subtotalAmount")),
                 longVal(doc.get("shippingFee")),
+                nonEmpty(doc.getString("voucherCode"), ""),
+                longVal(doc.get("discountAmount")),
                 longVal(doc.get("totalAmount")),
                 nonEmpty(doc.getString("status"), OrderStatus.PENDING_CONFIRMATION.getCode()),
                 longVal(doc.get("createdAt"))
